@@ -36,7 +36,25 @@
   padding: 8px 12px;
   border-radius: 12px;
   background: rgba(0,0,0,.18);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);#scoreBox{
+  position: fixed;
+  left: 12px;
+  top: calc(env(safe-area-inset-top) + 48px);
+  z-index: 99999;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.28);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  text-shadow: 0 2px 6px rgba(0,0,0,.35);
+  user-select: none;
+  touch-action: none; /* ←スマホでドラッグが効く */
+  cursor: grab;
+}
+#scoreBox:active{ cursor: grabbing; }
+
 }
 
 #resetBtn{
@@ -292,6 +310,59 @@ resetBtn.addEventListener("click", resetGame);
     // 開始
     setInterval(spawnFish, SPAWN_INTERVAL);
     requestAnimationFrame(tick);
+    // --- スコア位置をドラッグで移動（PC/スマホ対応） ---
+const scoreBox = document.getElementById("scoreBox");
+
+// 保存してた位置があれば復元
+const saved = JSON.parse(localStorage.getItem("scorePos") || "null");
+if (saved && typeof saved.x === "number" && typeof saved.y === "number") {
+  scoreBox.style.left = saved.x + "px";
+  scoreBox.style.top  = saved.y + "px";
+}
+
+let dragging = false;
+let offsetX = 0, offsetY = 0;
+
+function clamp(n, min, max){ return Math.min(max, Math.max(min, n)); }
+
+function onDown(e){
+  dragging = true;
+  const p = e.touches ? e.touches[0] : e;
+  const rect = scoreBox.getBoundingClientRect();
+  offsetX = p.clientX - rect.left;
+  offsetY = p.clientY - rect.top;
+  e.preventDefault();
+}
+
+function onMove(e){
+  if (!dragging) return;
+  const p = e.touches ? e.touches[0] : e;
+
+  const w = scoreBox.offsetWidth;
+  const h = scoreBox.offsetHeight;
+
+  const x = clamp(p.clientX - offsetX, 0, window.innerWidth - w);
+  const y = clamp(p.clientY - offsetY, 0, window.innerHeight - h);
+
+  scoreBox.style.left = x + "px";
+  scoreBox.style.top  = y + "px";
+
+  localStorage.setItem("scorePos", JSON.stringify({x, y}));
+  e.preventDefault();
+}
+
+function onUp(){
+  dragging = false;
+}
+
+scoreBox.addEventListener("mousedown", onDown);
+window.addEventListener("mousemove", onMove);
+window.addEventListener("mouseup", onUp);
+
+scoreBox.addEventListener("touchstart", onDown, {passive:false});
+window.addEventListener("touchmove", onMove, {passive:false});
+window.addEventListener("touchend", onUp);
+
   </script>
 </body>
 </html>
