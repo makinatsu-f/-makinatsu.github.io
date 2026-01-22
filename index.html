@@ -149,25 +149,30 @@
     }
     /* スマホ用レイアウト調整（ボタン大きめ） */
 @media (max-width: 768px) {
-  .options {
+  /* バッグ・アップリケの並び全体 */
+  #bagChoices,
+  #appliqueChoices {
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
     justify-content: flex-start;
   }
 
-  .option-item {
+  /* 1つ1つのボタン（バッグ / アップリケ） */
+  .choice {
     flex: 0 0 calc(25% - 16px);
     max-width: 96px;
     height: 96px;
   }
 
-  .option-item img {
+  /* ボタンの中の画像 */
+  .choice img {
     width: 80%;
     height: 80%;
     object-fit: contain;
   }
 }
+
 
 }
 
