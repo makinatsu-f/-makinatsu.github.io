@@ -70,17 +70,17 @@
       display: block;
     }
 
-    /* ここが「何枚も置ける」用のアップリケ共通スタイル */
+    /* 置かれたアップリケ1枚1枚の見た目 */
     .applique-instance {
       position: absolute;
-      max-height: 60%;
-      object-fit: contain;
       left: 50%;
       top: 38%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(1);
+      max-height: 60%;
+      object-fit: contain;
       pointer-events: auto;
       cursor: grab;
-      touch-action: none; /* スクロールとケンカしにくくする */
+      touch-action: none;
     }
 
     .section-title {
@@ -182,15 +182,14 @@
     <div class="card">
       <div class="preview">
         <div class="preview-inner" id="previewInner">
-          <!-- バッグ本体 -->
           <img id="bagImage" src="images/bag_blue.png" alt="えらんだバッグ">
-          <!-- アップリケは JS で何枚も追加する -->
+          <!-- アップリケはJSで追加 -->
         </div>
       </div>
       <button id="clearAppliqueBtn" class="clear-btn">アップリケを消す</button>
     </div>
 
-    <!-- バッグをえらぶ -->
+    <!-- バッグ -->
     <div class="card">
       <p class="section-title">
         バッグのいろをえらぶ
@@ -199,7 +198,7 @@
       <div id="bagChoices" class="choices"></div>
     </div>
 
-    <!-- アップリケをえらぶ -->
+    <!-- アップリケ -->
     <div class="card">
       <p class="section-title">
         アップリケをえらぶ
@@ -210,7 +209,7 @@
   </div>
 
   <script>
-    // バッグ 5色
+    // バッグ5色
     const bags = [
       { id: "blue",  label: "青",       image: "images/bag_blue.png"  },
       { id: "red",   label: "あか",     image: "images/bag_red.png"   },
@@ -219,8 +218,7 @@
       { id: "brown", label: "ちゃいろ", image: "images/bag_brown.png"}
     ];
 
-    // アップリケ 恐竜6種類
-    // size: 表示する横幅（%） スピノ／トリケラ／ステゴは少し大きめ
+    // 恐竜6種（sizeは初期の横幅％）
     const appliques = [
       { id: "trex",    label: "ティラノ",      image: "images/applique_trex.png",    size: 45 },
       { id: "brachio", label: "ブラキオ",      image: "images/applique_brachio.png", size: 45 },
@@ -230,16 +228,18 @@
       { id: "trike",   label: "トリケラ",      image: "images/applique_trike.png",   size: 55 }
     ];
 
-    const bagImage = document.getElementById("bagImage");
-    const bagChoicesEl = document.getElementById("bagChoices");
-    const appliqueChoicesEl = document.getElementById("appliqueChoices");
-    const previewInner = document.getElementById("previewInner");
+    const bagImage         = document.getElementById("bagImage");
+    const bagChoicesEl     = document.getElementById("bagChoices");
+    const appliqueChoicesEl= document.getElementById("appliqueChoices");
+    const previewInner     = document.getElementById("previewInner");
     const clearAppliqueBtn = document.getElementById("clearAppliqueBtn");
 
-    // ===== アップリケをドラッグするための共通処理 =====
+    // ===== ドラッグ用 =====
     let currentDrag = null;
-    let dragOffsetX = 0;
-    let dragOffsetY = 0;
+    let dragStartPointerX = 0;
+    let dragStartPointerY = 0;
+    let dragStartLeft = 0;
+    let dragStartTop = 0;
 
     function getPoint(e) {
       if (e.touches && e.touches.length > 0) {
@@ -250,86 +250,39 @@
     }
 
     function onDragStart(e) {
-      const target = e.currentTarget;
-      currentDrag = target;
-      currentDrag.style.cursor = "grabbing";
+      // 2本指のときはドラッグしない（ピンチにまかせる）
+      if (e.touches && e.touches.length > 1) return;
 
-      const parentRect = previewInner.getBoundingClientRect();
-      const imgRect = currentDrag.getBoundingClientRect();
-
-      // 中央基準のtransformを最初だけ解除して、px基準にする
-      if (currentDrag.style.transform) {
-        currentDrag.style.transform = "none";
-        currentDrag.style.left = (imgRect.left - parentRect.left) + "px";
-        currentDrag.style.top  = (imgRect.top  - parentRect.top) + "px";
-      }
-// ===== ピンチでサイズ変更 =====
-let pinchStartDistance = 0;
-let pinchStartScale = 1;
-
-function getDistance(touches) {
-  const x = touches[0].clientX - touches[1].clientX;
-  const y = touches[0].clientY - touches[1].clientY;
-  return Math.sqrt(x*x + y*y);
-}
-
-function onPinchStart(e) {
-  if (e.touches.length !== 2) return;
-
-  const img = e.currentTarget;
-  pinchStartDistance = getDistance(e.touches);
-
-  // 現在のscaleを保存
-  const currentScale = parseFloat(img.dataset.scale || 1);
-  pinchStartScale = currentScale;
-
-  e.preventDefault();
-}
-
-function onPinchMove(e) {
-  if (e.touches.length !== 2) return;
-
-  const img = e.currentTarget;
-  const newDistance = getDistance(e.touches);
-
-  let scale = pinchStartScale * (newDistance / pinchStartDistance);
-
-  // 拡大縮小の上限・下限
-  if (scale < 0.3) scale = 0.3;
-  if (scale > 2.5) scale = 2.5;
-
-  img.dataset.scale = scale;
-  img.style.transform = `translate(-50%, -50%) scale(${scale})`;
-
-  e.preventDefault();
-}
+      const img = e.currentTarget;
+      currentDrag = img;
+      img.style.cursor = "grabbing";
 
       const point = getPoint(e);
-      dragOffsetX = point.x - imgRect.left;
-      dragOffsetY = point.y - imgRect.top;
+      dragStartPointerX = point.x;
+      dragStartPointerY = point.y;
+
+      const rect = img.getBoundingClientRect();
+      const parentRect = previewInner.getBoundingClientRect();
+      dragStartLeft = rect.left - parentRect.left;
+      dragStartTop  = rect.top  - parentRect.top;
 
       e.preventDefault();
     }
 
     function onDragMove(e) {
       if (!currentDrag) return;
+      // 2本指になったらドラッグは止める
+      if (e.touches && e.touches.length > 1) return;
 
       const point = getPoint(e);
-      const parentRect = previewInner.getBoundingClientRect();
+      const dx = point.x - dragStartPointerX;
+      const dy = point.y - dragStartPointerY;
 
-      let x = point.x - parentRect.left - dragOffsetX;
-      let y = point.y - parentRect.top - dragOffsetY;
+      const newLeft = dragStartLeft + dx;
+      const newTop  = dragStartTop  + dy;
 
-      const maxX = parentRect.width - currentDrag.offsetWidth;
-      const maxY = parentRect.height - currentDrag.offsetHeight;
-
-      if (x < 0) x = 0;
-      if (y < 0) y = 0;
-      if (x > maxX) x = maxX;
-      if (y > maxY) y = maxY;
-
-      currentDrag.style.left = x + "px";
-      currentDrag.style.top  = y + "px";
+      currentDrag.style.left = newLeft + "px";
+      currentDrag.style.top  = newTop  + "px";
 
       e.preventDefault();
     }
@@ -341,40 +294,76 @@ function onPinchMove(e) {
       currentDrag = null;
     }
 
-    // 1枚のアップリケ画像にドラッグ機能をつける
-    function makeDraggable(img) {
-      img.addEventListener("mousedown", onDragStart);
-      img.addEventListener("touchstart", onDragStart, { passive: false });
-    }
-
-    // 画面全体にmove/endのイベントを1回だけ貼る
+    // マウス・タッチmove/end
     window.addEventListener("mousemove", onDragMove);
     window.addEventListener("mouseup", onDragEnd);
     window.addEventListener("touchmove", onDragMove, { passive: false });
     window.addEventListener("touchend", onDragEnd);
     window.addEventListener("touchcancel", onDragEnd);
 
-    // ===== アップリケを追加する処理 =====
+    // ===== ピンチ拡大縮小用 =====
+    let pinchTarget = null;
+    let pinchStartDistance = 0;
+    let pinchStartScale = 1;
+
+    function getDistance(touches) {
+      const x = touches[0].clientX - touches[1].clientX;
+      const y = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(x * x + y * y);
+    }
+
+    function onPinchStart(e) {
+      if (!e.touches || e.touches.length !== 2) return;
+
+      pinchTarget = e.currentTarget;
+      pinchStartDistance = getDistance(e.touches);
+      pinchStartScale = parseFloat(pinchTarget.dataset.scale || "1");
+
+      e.preventDefault();
+    }
+
+    function onPinchMove(e) {
+      if (!pinchTarget) return;
+      if (!e.touches || e.touches.length !== 2) return;
+
+      const newDistance = getDistance(e.touches);
+      let scale = pinchStartScale * (newDistance / pinchStartDistance);
+
+      if (scale < 0.3) scale = 0.3;
+      if (scale > 2.5) scale = 2.5;
+
+      pinchTarget.dataset.scale = String(scale);
+      pinchTarget.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+      e.preventDefault();
+    }
+
+    // ===== 1枚のアップリケをつくる =====
     function addAppliqueInstance(item) {
-  const img = document.createElement("img");
-  img.src = item.image;
-  img.alt = item.label;
-  img.className = "applique-instance";
-  img.style.width = (item.size || 45) + "%"; // サイズ調整（スピノたちは大きめ）
-  img.style.left = "50%";
-  img.style.top = "38%";
-  img.style.transform = "translate(-50%, -50%)";
+      const img = document.createElement("img");
+      img.src = item.image;
+      img.alt = item.label;
+      img.className = "applique-instance";
+      img.style.width = (item.size || 45) + "%";
+      img.dataset.scale = "1"; // 初期スケール
 
-  // ★ここでピンチ用イベントをつける★
-  img.addEventListener("touchstart", onPinchStart, { passive: false });
-  img.addEventListener("touchmove",  onPinchMove,  { passive: false });
+      // 中央に置く
+      img.style.left = "50%";
+      img.style.top  = "38%";
+      img.style.transform = "translate(-50%, -50%) scale(1)";
 
-  previewInner.appendChild(img);
-  makeDraggable(img);
-}
+      // ドラッグ（1本指）
+      img.addEventListener("mousedown", onDragStart);
+      img.addEventListener("touchstart", onDragStart, { passive: false });
 
+      // ピンチ（2本指）
+      img.addEventListener("touchstart", onPinchStart, { passive: false });
+      img.addEventListener("touchmove",  onPinchMove,  { passive: false });
 
-    // ===== 選択ボタンを作る =====
+      previewInner.appendChild(img);
+    }
+
+    // ===== 選択ボタンをつくる =====
     function createChoice(parent, item, group) {
       const btn = document.createElement("button");
       btn.type = "button";
@@ -396,15 +385,14 @@ function onPinchMove(e) {
 
       btn.addEventListener("click", () => {
         if (group === "bag") {
-          // バッグは1枚だけ切り替え
           document
             .querySelectorAll('.choice[data-group="bag"]')
             .forEach(el => el.classList.remove("selected"));
           btn.classList.add("selected");
           bagImage.src = item.image;
         } else if (group === "applique") {
-          // アップリケは「押すたびに1枚追加」
-          btn.classList.add("selected"); // どれを使ったか分かりやすいように
+          // 押すたびに新しいアップリケを1枚追加
+          btn.classList.add("selected"); // どれを使ったか分かるように
           addAppliqueInstance(item);
         }
       });
@@ -412,7 +400,7 @@ function onPinchMove(e) {
       parent.appendChild(btn);
     }
 
-    // 初期表示をつくる
+    // ===== 初期表示 =====
     bags.forEach((bag, index) => {
       createChoice(bagChoicesEl, bag, "bag");
       if (index === 0) bagImage.src = bag.image;
@@ -420,17 +408,13 @@ function onPinchMove(e) {
 
     appliques.forEach((appli, index) => {
       createChoice(appliqueChoicesEl, appli, "applique");
-      if (index === 0) {
-        // 最初にティラノを1枚だけ置いておく
-        addAppliqueInstance(appli);
-      }
+      if (index === 0) addAppliqueInstance(appli); // ティラノ1体スタート
     });
 
-    // 最初のバッグだけ selected
     const firstBagBtn = bagChoicesEl.querySelector(".choice");
     if (firstBagBtn) firstBagBtn.classList.add("selected");
 
-    // アップリケを全部消すボタン
+    // アップリケを全部消す
     clearAppliqueBtn.addEventListener("click", () => {
       document
         .querySelectorAll(".applique-instance")
