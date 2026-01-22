@@ -2,160 +2,229 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>サバタップゲーム</title>
+
   <style>
     * { box-sizing: border-box; }
-
-    body {
+    html, body {
+      height: 100%;
       margin: 0;
-      background: #003f7f;
+      padding: 0;
+      overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+      background: #003f7f;
     }
 
-    #scoreBox {
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      color: #fff;
-      font-size: 24px;
-      font-weight: 800;
-      z-index: 9999;
-      user-select: none;
-    }
-
+    /* 海（画面全体） */
     .sea {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
       background: linear-gradient(#3fa9f5, #003f7f);
     }
 
-    .saba {
+    /* スコア表示 */
+    #scoreBox {
       position: absolute;
-      height: 80px; /* 鯖の大きさ */
+      top: 12px;
+      left: 12px;
+      z-index: 9999;
+      color: white;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      pointer-events: none;
+    }
+
+    /* 魚 */
+    .fish {
+      position: absolute;
+      height: 80px; /* 大きさはここで調整 */
+      width: auto;
       cursor: pointer;
-      user-select: none;
-      -webkit-user-drag: none;
-      touch-action: manipulation;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: auto;
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.22));
+      transition: transform 80ms ease;
+    }
+    .fish:active {
+      transform: scale(0.92);
+    }
+
+    /* ちょい説明（任意） */
+    #hint {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 9999;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      pointer-events: none;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.25);
     }
   </style>
 </head>
+
 <body>
-  <div id="scoreBox">SCORE: <span id="score">0</span></div>
-  <div class="sea" id="sea"></div>
+  <div class="sea" id="sea">
+    <div id="scoreBox">SCORE: <span id="score">0</span></div>
+    <div id="hint">魚をタップ！</div>
+  </div>
 
   <script>
+    // =========================
+    // 設定
+    // =========================
     const sea = document.getElementById("sea");
-    const scoreSpan = document.getElementById("score");
+    const scoreEl = document.getElementById("score");
 
     let score = 0;
+    let fishList = [];   // 画面にいる魚たち
+    let running = true;
 
-    // ▼調整ポイント
-    const SABA_COUNT = 8;      // 同時に出る鯖の数
-    const MIN_SPEED = 1.6;     // 遅い鯖
-    const MAX_SPEED = 3.8;     // 速い鯖
+    const MAX_FISH = 14;         // 画面に出せる最大数
+    const SPAWN_INTERVAL = 650;  // 出現頻度（ms）
+    const MIN_SPEED = 1.6;       // 最低速度
+    const MAX_SPEED = 4.6;       // 最高速度
 
-    const sabas = [];
+    // 魚の種類（画像は images/ に置く）
+    // まず saba.png だけでも動く（他が無ければ自動で saba にフォールバックする）
+    const FISH_TYPES = [
+      { name: "saba",   src: "images/saba.png",   points: 1, weight: 70 },
+      { name: "maguro", src: "images/maguro.png", points: 3, weight: 20 },
+      { name: "tai",    src: "images/tai.png",    points: 5, weight: 10 },
+    ];
 
-    function rand(min, max) {
-      return Math.random() * (max - min) + min;
+    // 乱数ヘルパ
+    const rand = (min, max) => Math.random() * (max - min) + min;
+
+    // 重み付き抽選
+    function pickFish() {
+      const total = FISH_TYPES.reduce((a, f) => a + f.weight, 0);
+      let r = Math.random() * total;
+      for (const f of FISH_TYPES) {
+        r -= f.weight;
+        if (r <= 0) return f;
+      }
+      return FISH_TYPES[0];
     }
 
-    function spawnSaba() {
+    function setScore(n) {
+      score = n;
+      scoreEl.textContent = String(score);
+    }
+
+    // =========================
+    // 魚を出す
+    // =========================
+    function spawnFish() {
+      if (!running) return;
+      if (fishList.length >= MAX_FISH) return;
+
+      const fishType = pickFish();
+
       const img = document.createElement("img");
-      img.src = "images/saba.png";
-      img.alt = "サバ";
-      img.className = "saba";
+      img.className = "fish";
+      img.alt = fishType.name;
+      img.src = fishType.src;
+
+      // 画像が無かったらサバに差し替え（壊れ画像を防ぐ）
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = "images/saba.png";
+        img.alt = "saba";
+      };
 
       const seaW = sea.clientWidth;
       const seaH = sea.clientHeight;
 
-      // 右から左へ（頭が左ならこれが自然）
-      const y = rand(40, seaH - 120);
+      // 右から左へ（頭が左の画像に合わせる）
+      const y = rand(40, Math.max(80, seaH - 140));
       const speed = rand(MIN_SPEED, MAX_SPEED);
 
-      img.style.left = (seaW + rand(0, 300)) + "px"; // 右外からスタート
+      // 右の外側からスタート
+      const startX = seaW + rand(20, 240);
+
+      img.style.left = startX + "px";
       img.style.top = y + "px";
 
-      // 鯖データ
-      const sabaObj = {
+      sea.appendChild(img);
+
+      const fishObj = {
         el: img,
-        x: parseFloat(img.style.left),
-        y,
-        speed,
-        alive: true
+        x: startX,
+        y: y,
+        speed: speed,
+        alive: true,
+        points: fishType.points
       };
 
-      // タップ（クリック）で捕獲
-      function catchIt(e) {
-        if (!sabaObj.alive) return;
-        sabaObj.alive = false;
+      // タップで捕獲（消えて +点）
+      img.addEventListener("click", () => catchFish(fishObj), { passive: true });
 
-        score += 1;
-        scoreSpan.textContent = String(score);
-
-        // 消す
-        sabaObj.el.style.opacity = "0";
-        sabaObj.el.style.pointerEvents = "none";
-
-        // 復活（ちょい待って右から再登場）
-        setTimeout(() => {
-          const seaW2 = sea.clientWidth;
-          const seaH2 = sea.clientHeight;
-          sabaObj.y = rand(40, seaH2 - 120);
-          sabaObj.speed = rand(MIN_SPEED, MAX_SPEED);
-          sabaObj.x = seaW2 + rand(0, 300);
-
-          sabaObj.el.style.top = sabaObj.y + "px";
-          sabaObj.el.style.left = sabaObj.x + "px";
-          sabaObj.el.style.opacity = "1";
-          sabaObj.el.style.pointerEvents = "auto";
-          sabaObj.alive = true;
-        }, 450);
-      }
-
-      // スマホ対策：clickだけじゃなくtouchも拾う
-      img.addEventListener("click", catchIt);
-      img.addEventListener("touchstart", (e) => { e.preventDefault(); catchIt(e); }, { passive: false });
-
-      sea.appendChild(img);
-      sabas.push(sabaObj);
+      fishList.push(fishObj);
     }
 
-    // 初期生成
-    for (let i = 0; i < SABA_COUNT; i++) spawnSaba();
+    // =========================
+    // 捕獲
+    // =========================
+    function catchFish(fishObj) {
+      if (!fishObj.alive) return;
+      fishObj.alive = false;
 
+      setScore(score + fishObj.points);
+
+      // 消す
+      fishObj.el.remove();
+
+      // 配列からも消す
+      fishList = fishList.filter(f => f.alive);
+    }
+
+    // =========================
+    // 動かす（右→左）
+    // =========================
     function tick() {
+      if (!running) return;
+
       const seaW = sea.clientWidth;
 
-      for (const s of sabas) {
-        if (!s.alive) continue;
+      for (const f of fishList) {
+        if (!f.alive) continue;
 
-        // 右→左へ移動
-        s.x -= s.speed;
+        // 右から左へ進む
+        f.x -= f.speed;
 
-        // 左端から消えたら右へワープして再登場
-        if (s.x < -160) {
-          s.x = seaW + rand(0, 300);
-          s.y = rand(40, sea.clientHeight - 120);
-          s.speed = rand(MIN_SPEED, MAX_SPEED);
-          s.el.style.top = s.y + "px";
+        // 画面の左に出たら、右側にワープして再登場
+        if (f.x < -180) {
+          f.x = seaW + rand(40, 260);
         }
 
-        s.el.style.left = s.x + "px";
+        f.el.style.left = f.x + "px";
       }
 
       requestAnimationFrame(tick);
     }
-    requestAnimationFrame(tick);
 
-    // 画面サイズ変わっても破綻しにくく
-    window.addEventListener("resize", () => {
-      // 特に何もしなくてOK（次のtickで幅取り直す）
-    });
+    // =========================
+    // 起動
+    // =========================
+    setScore(0);
+
+    // まず数匹出す
+    for (let i = 0; i < 6; i++) spawnFish();
+
+    // 定期的に増やす
+    setInterval(spawnFish, SPAWN_INTERVAL);
+
+    // アニメ開始
+    requestAnimationFrame(tick);
   </script>
 </body>
 </html>
