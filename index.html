@@ -176,6 +176,34 @@
 
 }
 
+@media (max-width: 768px) {
+  /* バッグの並びとアップリケの並びを、スマホでは
+     グリッドっぽく並べる */
+  #bagChoices,
+  #appliqueChoices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;              /* マスの間隔 */
+    justify-content: flex-start;
+  }
+
+  /* 1個1個のマス（バッグボタン・アップリケボタン） */
+  #bagChoices .choice,
+  #appliqueChoices .choice {
+    flex: 0 0 calc(25% - 12px); /* 幅 4コ/1段くらい */
+    max-width: calc(25% - 12px);
+    height: 80px;               /* マスの高さ */
+    box-sizing: border-box;
+  }
+
+  /* 中の画像をマスにフィットさせる */
+  #bagChoices .choice img,
+  #appliqueChoices .choice img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
 
   </style>
 </head>
