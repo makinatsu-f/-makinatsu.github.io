@@ -70,16 +70,19 @@
       display: block;
     }
 
-    #appliqueImage {
-      position: absolute;
-      width: 45%;
-      left: 50%;
-      top: 38%;
-      transform: translate(-50%, -50%);
-      pointer-events: auto;
-      cursor: grab;
-      touch-action: none; /* スクロールと競合しにくくする */
-    }
+  #appliqueImage {
+  position: absolute;
+  width: 45%;
+  max-height: 60%;          /* これを追加：縦サイズの上限を決める */
+  object-fit: contain;      /* はみ出さずにおさめる */
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
 
     .section-title {
       font-size: 0.95rem;
