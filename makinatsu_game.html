@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>マキナツ★バッグ×アップリケゲーム</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+      background: #f5eee8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 16px 8px 4px;
+      text-align: center;
+    }
+
+    p {
+      margin: 0 0 12px;
+      font-size: 13px;
+      text-align: center;
+      color: #555;
+    }
+
+   
+.workspace {
+  position: relative;
+  width: 70vw;        /* ← 画面に対して7割の幅 */
+  max-width: 780px;   /* ← PCでも大きすぎない */
+  aspect-ratio: 3 / 2; 
+  background: #E2C9A3;
+  box-shadow: 0px 8px 8px rgba(0,0,0,0.18);
+  border-radius: 16px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.bag {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  width: 70%;      /* ここを 25〜40% で微調整 */
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+
+
+    /* アップリケ（ドラッグ可能） */
+    .applique {
+      position: absolute;
+      width: 30%;
+      max-width: 260px;
+      cursor: grab;
+      touch-action: none;   /* スマホでのスクロールを抑える */
+      user-select: none;
+    }
+  
+
+    .applique.dragging {
+      opacity: 0.85;
+      cursor: grabbing;
+      transform: scale(1.03);
+    }
+
+    /* 下の選択パネル */
+    .panel {
+      width: 90vw;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .panel-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .panel-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 6px;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+
+    .choice {
+      flex: 0 0 auto;
+      border-radius: 10px;
+      padding: 4px;
+      border: 2px solid transparent;
+      background: #f7f5f2;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      min-height: 48px;
+    }
+
+    .choice img {
+      max-width: 80px;
+      max-height: 50px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .choice.active {
+      border-color: #ff8a3c;
+      box-shadow: 0 0 0 2px rgba(255,138,60,0.35);
+    }
+
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 14px;
+      font-size: 12px;
+      background: #ff8a3c;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.16);
+    }
+
+    button.secondary {
+      background: #999;
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    }
+  </style>
+</head>
+<body>
+  <h1>マキナツ★バッグ × アップリケあそび</h1>
+  <p>下のバッグとアップリケを選んで、作業机のうえでドラッグして遊んでね🧵</p>
+
+  <!-- 作業机エリア -->
+  <div class="workspace" id="workspace">
+    <!-- 選択されたバッグ -->
+    <img id="bagImage" class="bag"
+      src="images/bag_red.png" alt="bag" />
+
+    <!-- ここに選んだアップリケが追加されていく -->
+  </div>
+
+  <!-- バッグ・アップリケ選択パネル -->
+  <div class="panel">
+    <div>
+      <div class="panel-section-title">🎒 バッグをえらぶ</div>
+      <div class="panel-row" id="bagChoices">
+        <!-- ここにJSからバッグ候補を並べる -->
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-section-title">🦖 アップリケを置く</div>
+      <div class="panel-row" id="appliqueChoices">
+        <!-- ここにJSからアップリケ候補を並べる -->
+      </div>
+      <div class="btn-row">
+        <button class="secondary" id="clearBtn">アップリケを全部消す</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 画像リスト（★ここをマキナツの本物パスに差し替えればOK）
+    const bags = [
+      { id: "red",    label: "あか",       src: "images/bag_red.png" },
+      { id: "green",  label: "みどり",     src: "images/bag_green.png" },
+      { id: "gray",   label: "グレー",     src: "images/bag_gray.png" },
+      { id: "blue",   label: "ブルー",     src: "images/bag_blue.png" },
+      { id: "brown",  label: "ちゃいろ",   src: "images/bag_brown.png" },
+    ];
+
+    const appliques = [
+      { id: "mosasaurus", label: "モササウルス？", src: "images/applique_mosa.png" },
+      { id: "stegosaurus", label: "ステゴ",         src: "images/applique_stego.png" },
+      { id: "brachio",     label: "ブラキオ",       src: "images/applique_brachio.png" },
+      { id: "trex",        label: "ティーレックス", src: "images/applique_trex.png" },
+      { id: "spino",       label: "スピノ",         src: "images/applique_spino.png" },
+   { id: "trike", label: "トリケラトプス", src: "images/applique_trike.png" },
+ ];
+
+    const bagImage = document.getElementById("bagImage");
+    const bagChoices = document.getElementById("bagChoices");
+    const appliqueChoices = document.getElementById("appliqueChoices");
+    const workspace = document.getElementById("workspace");
+    const clearBtn = document.getElementById("clearBtn");
+
+    // バッグ候補の表示
+    bags.forEach((bag, index) => {
+      const div = document.createElement("div");
+      div.className = "choice" + (index === 0 ? " active" : "");
+      div.dataset.id = bag.id;
+
+      const img = document.createElement("img");
+      img.src = bag.src;
+      img.alt = bag.label;
+
+      div.appendChild(img);
+      div.addEventListener("click", () => {
+        bagImage.src = bag.src;
+
+        // active切り替え
+        document.querySelectorAll("#bagChoices .choice")
+          .forEach(c => c.classList.remove("active"));
+        div.classList.add("active");
+      });
+
+      bagChoices.appendChild(div);
+    });
+
+    // アップリケ候補の表示
+    appliques.forEach(ap => {
+      const div = document.createElement("div");
+      div.className = "choice";
+      const img = document.createElement("img");
+      img.src = ap.src;
+      img.alt = ap.label;
+      div.appendChild(img);
+
+      div.addEventListener("click", () => {
+        addAppliqueToWorkspace(ap.src, ap.label);
+      });
+
+      appliqueChoices.appendChild(div);
+    });
+
+    // アップリケを作業机上に追加
+    function addAppliqueToWorkspace(src, label) {
+      const img = document.createElement("img");
+      img.className = "applique";
+      img.src = src;
+      img.alt = label;
+
+      // 初期位置：中央あたり
+      img.style.left = "40%";
+      img.style.top = "35%";
+
+      enableDrag(img);
+      workspace.appendChild(img);
+    }
+
+    // ドラッグ機能
+    function enableDrag(el) {
+      let offsetX = 0;
+      let offsetY = 0;
+      let isDragging = false;
+
+      const start = (clientX, clientY) => {
+        const rect = el.getBoundingClientRect();
+        offsetX = clientX - rect.left;
+        offsetY = clientY - rect.top;
+        isDragging = true;
+        el.classList.add("dragging");
+      };
+
+      const move = (clientX, clientY) => {
+        if (!isDragging) return;
+        const rect = workspace.getBoundingClientRect();
+        const x = clientX - rect.left - offsetX;
+        const y = clientY - rect.top - offsetY;
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+      };
+
+      const end = () => {
+        isDragging = false;
+        el.classList.remove("dragging");
+      };
+
+      // マウス
+      el.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        start(e.clientX, e.clientY);
+      });
+      window.addEventListener("mousemove", (e) => move(e.clientX, e.clientY));
+      window.addEventListener("mouseup", end);
+
+      // タッチ
+      el.addEventListener("touchstart", (e) => {
+        const t = e.touches[0];
+        start(t.clientX, t.clientY);
+      }, { passive: false });
+
+      window.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+        const t = e.touches[0];
+        move(t.clientX, t.clientY);
+      }, { passive: false });
+
+      window.addEventListener("touchend", end);
+      window.addEventListener("touchcancel", end);
+    }
+
+    // アップリケ全消し
+    clearBtn.addEventListener("click", () => {
+      document.querySelectorAll(".applique").forEach(el => el.remove());
+    });
+  </script>
+</body>
+</html>
