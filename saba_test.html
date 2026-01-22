@@ -55,8 +55,16 @@
   </style>
 </head>
 <body>
-  <div id="scoreBox">SCORE: <span id="score">0</span></div>
-  <div class="sea" id="sea"></div>
+ <div id="hud">
+  <div id="title">サバタップゲーム</div>
+
+  <div id="scoreRow">
+    SCORE: <span id="score">0</span>
+    <button id="resetBtn" type="button">リセット</button>
+  </div>
+</div>
+
+<div class="sea" id="sea"></div>
 
   <script>
     // ===== 設定 =====
@@ -65,6 +73,18 @@
 
     let score = 0;
     const fishes = []; // { el, type, x, y, speed, alive }
+const resetBtn = document.getElementById("resetBtn");
+
+function resetGame() {
+  score = 0;
+  scoreSpan.textContent = score;
+
+  // 画面上の魚を全部消す
+  fishes.forEach(f => f.el.remove());
+  fishes.length = 0; // 配列も空にする
+}
+
+resetBtn.addEventListener("click", resetGame);
 
     // 出現間隔（小さいほど多い）
     const SPAWN_INTERVAL = 650;
