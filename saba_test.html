@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>サバ1匹テスト</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+      background: #003f7f;          /* 海っぽい青 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .sea {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(#3fa9f5, #003f7f);
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    #saba {
+      position: absolute;
+      top: 50%;          /* 画面の縦中央あたり */
+      transform: translateY(-50%);
+      height: 80px;      /* サバの大きさ。大きすぎたらここを小さくしてOK */
+      pointer-events: none; /* まずは動きだけなのでタップ無効 */
+    }
+  </style>
+</head>
+<body>
+  <div class="sea">
+    <!-- ★★ ここがサバの画像 ★★ -->
+    <img id="saba" src="images/saba.png" alt="サバ">
+  </div>
+
+  <script>
+    // 画面の横幅に応じて、サバを左から右へ泳がせるテスト
+
+    const saba = document.getElementById("saba");
+    const sea = document.querySelector(".sea");
+
+    // サバの現在位置（左端のpx）
+    let sabaX = -150;       // 最初は画面の左外からスタート
+    const speed = 2.5;      // 速さ。大きいほど速い
+
+    function swim() {
+      const seaWidth = sea.clientWidth;
+
+      // 位置を右方向に移動
+      sabaX += speed;
+
+      // 画面の右端を出たら左にワープしてくる
+      if (sabaX > seaWidth + 150) {
+        sabaX = -150;
+      }
+
+      // 実際に反映
+      saba.style.left = sabaX + "px";
+
+      // アニメーションを続ける
+      requestAnimationFrame(swim);
+    }
+
+    // 画面読み込み後にアニメーション開始
+    window.addEventListener("load", () => {
+      // スタート地点（左の外）
+      sabaX = -150;
+      swim();
+    });
+  </script>
+</body>
+</html>
