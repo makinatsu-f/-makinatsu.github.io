@@ -147,27 +147,29 @@
       transform: translateY(1px);
       box-shadow: 0 1px 3px rgba(0,0,0,0.18);
     }
-    /* スマホ用レイアウト調整 */
+    /* スマホ用レイアウト調整（ボタン大きめ） */
 @media (max-width: 768px) {
-  .options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    justify-content: space-between;
-  }
+    .options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: flex-start;
+    }
 
-  .option-item {
-    flex: 1 1 calc(20% - 8px);  /* 5列レイアウト調整 */
-    max-width: 70px;            /* 最大幅 */
-    height: 70px;               /* 高さ */
-  }
+    .option-item {
+        /* 1列に4個くらい・前より大きめ */
+        flex: 0 0 calc(25% - 16px);
+        max-width: 96px;
+        height: 96px;
+    }
 
-  .option-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
+    .option-item img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+    }
 }
+
 
   </style>
 </head>
