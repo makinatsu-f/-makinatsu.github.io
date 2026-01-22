@@ -133,10 +133,6 @@
       margin: 0 auto 2px;
     }
 
-    .choice.bag-color-chip {
-      border: 1px solid #ccc;
-    }
-
     .choice.selected {
       border-color: #f49c3b;
       background: #fff7ea;
@@ -172,7 +168,7 @@
           <!-- バッグ本体 -->
           <img id="bagImage" src="images/bag_blue.png" alt="えらんだバッグ">
           <!-- アップリケ -->
-          <img id="appliqueImage" src="images/appli_trex.png" alt="えらんだアップリケ">
+          <img id="appliqueImage" src="images/applique_trex.png" alt="えらんだアップリケ">
         </div>
       </div>
     </div>
@@ -192,7 +188,7 @@
     <div class="card">
       <p class="section-title">
         アップリケをえらぶ
-        <span class="tag">恐竜・海の生き物など</span>
+        <span class="tag">恐竜 6しゅるい</span>
       </p>
       <div id="appliqueChoices" class="choices">
         <!-- JSでボタンを作る -->
@@ -201,7 +197,9 @@
   </div>
 
   <script>
-    // ★ ここだけマキナツの画像ファイル名にあわせて変えてね ★
+    // ★ マキナツの画像ファイル名に合わせた版
+
+    // バッグ 5色
     const bags = [
       {
         id: "blue",
@@ -209,14 +207,19 @@
         image: "images/bag_blue.png"
       },
       {
-        id: "navy",
-        label: "濃紺",
-        image: "images/bag_navy.png"
+        id: "red",
+        label: "あか",
+        image: "images/bag_red.png"
       },
       {
         id: "green",
         label: "みどり",
         image: "images/bag_green.png"
+      },
+      {
+        id: "gray",
+        label: "グレー",
+        image: "images/bag_gray.png"
       },
       {
         id: "brown",
@@ -225,36 +228,37 @@
       }
     ];
 
+    // アップリケ 恐竜6種類
     const appliques = [
       {
         id: "trex",
         label: "ティラノ",
-        image: "images/appli_trex.png"
+        image: "images/applique_trex.png"
+      },
+      {
+        id: "brachio",
+        label: "ブラキオ",
+        image: "images/applique_brachio.png"
       },
       {
         id: "spino",
         label: "スピノ",
-        image: "images/appli_spino.png"
+        image: "images/applique_spino.png"
       },
       {
-        id: "trico",
+        id: "mosa",
+        label: "モササウルス",
+        image: "images/applique_mosa.png"
+      },
+      {
+        id: "stego",
+        label: "ステゴ",
+        image: "images/applique_stego.png"
+      },
+      {
+        id: "trike",
         label: "トリケラ",
-        image: "images/appli_tricera.png"
-      },
-      {
-        id: "manta",
-        label: "マンタ",
-        image: "images/appli_manta.png"
-      },
-      {
-        id: "manatee",
-        label: "マナティー",
-        image: "images/appli_manatee.png"
-      },
-      {
-        id: "angler",
-        label: "チョウチンアンコウ",
-        image: "images/appli_angler.png"
+        image: "images/applique_trike.png"
       }
     ];
 
@@ -270,7 +274,6 @@
       btn.dataset.group = group;
       btn.dataset.id = item.id;
 
-      // 画像が用意できたら img を使う
       if (item.image) {
         const img = document.createElement("img");
         img.src = item.image;
@@ -284,7 +287,6 @@
       btn.appendChild(span);
 
       btn.addEventListener("click", () => {
-        // 同じグループの selected を外す
         document
           .querySelectorAll('.choice[data-group="' + group + '"]')
           .forEach(el => el.classList.remove("selected"));
