@@ -53,19 +53,22 @@
     const sea = document.querySelector(".sea");
 
     // サバの現在位置（左端のpx）
-    let sabaX = -150;       // 最初は画面の左外からスタート
+    let sabaX = sea.clientWidth + 150;
+      // 最初は画面の左外からスタート
     const speed = 2.5;      // 速さ。大きいほど速い
 
     function swim() {
       const seaWidth = sea.clientWidth;
 
       // 位置を右方向に移動
-      sabaX += speed;
+      sabaX -= speed;
+
 
       // 画面の右端を出たら左にワープしてくる
-      if (sabaX > seaWidth + 150) {
-        sabaX = -150;
-      }
+     if (sabaX < -150) {
+  sabaX = seaWidth + 150;
+}
+
 
       // 実際に反映
       saba.style.left = sabaX + "px";
