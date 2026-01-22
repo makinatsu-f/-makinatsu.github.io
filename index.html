@@ -76,7 +76,9 @@
       left: 50%;
       top: 38%;
       transform: translate(-50%, -50%);
-      pointer-events: none;
+      pointer-events: auto;
+      cursor: grab;
+      touch-action: none; /* スクロールと競合しにくくする */
     }
 
     .section-title {
@@ -145,6 +147,21 @@
       box-shadow: none;
     }
 
+    .clear-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: none;
+      background: #ddd;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .clear-btn:hover {
+      background: #ccc;
+    }
+
     @media (max-width: 400px) {
       .choice {
         flex: 0 0 calc(33.333% - 6px); /* 1段3こにする */
@@ -161,16 +178,17 @@
     <h1>マキナツ★バッグ×アップリケあそび</h1>
     <p class="sub">色をえらんで、アップリケをのせてみよう👆</p>
 
-    <!-- プレビュー -->
+    <!-- プレビュー & 消すボタン -->
     <div class="card">
       <div class="preview">
-        <div class="preview-inner">
+        <div class="preview-inner" id="previewInner">
           <!-- バッグ本体 -->
           <img id="bagImage" src="images/bag_blue.png" alt="えらんだバッグ">
-          <!-- アップリケ -->
+          <!-- アップリケ（動かせる） -->
           <img id="appliqueImage" src="images/applique_trex.png" alt="えらんだアップリケ">
         </div>
       </div>
+      <button id="clearAppliqueBtn" class="clear-btn">アップリケを消す</button>
     </div>
 
     <!-- バッグをえらぶ -->
@@ -179,9 +197,7 @@
         バッグのいろをえらぶ
         <span class="tag">レッスンバッグ</span>
       </p>
-      <div id="bagChoices" class="choices">
-        <!-- JSでボタンを作る -->
-      </div>
+      <div id="bagChoices" class="choices"></div>
     </div>
 
     <!-- アップリケをえらぶ -->
@@ -190,82 +206,44 @@
         アップリケをえらぶ
         <span class="tag">恐竜 6しゅるい</span>
       </p>
-      <div id="appliqueChoices" class="choices">
-        <!-- JSでボタンを作る -->
-      </div>
+      <div id="appliqueChoices" class="choices"></div>
     </div>
   </div>
 
   <script>
-    // ★ マキナツの画像ファイル名に合わせた版
-
     // バッグ 5色
     const bags = [
-      {
-        id: "blue",
-        label: "青",
-        image: "images/bag_blue.png"
-      },
-      {
-        id: "red",
-        label: "あか",
-        image: "images/bag_red.png"
-      },
-      {
-        id: "green",
-        label: "みどり",
-        image: "images/bag_green.png"
-      },
-      {
-        id: "gray",
-        label: "グレー",
-        image: "images/bag_gray.png"
-      },
-      {
-        id: "brown",
-        label: "ちゃいろ",
-        image: "images/bag_brown.png"
-      }
+      { id: "blue",  label: "青",       image: "images/bag_blue.png"  },
+      { id: "red",   label: "あか",     image: "images/bag_red.png"   },
+      { id: "green", label: "みどり",   image: "images/bag_green.png" },
+      { id: "gray",  label: "グレー",   image: "images/bag_gray.png"  },
+      { id: "brown", label: "ちゃいろ", image: "images/bag_brown.png"}
     ];
 
     // アップリケ 恐竜6種類
     const appliques = [
-      {
-        id: "trex",
-        label: "ティラノ",
-        image: "images/applique_trex.png"
-      },
-      {
-        id: "brachio",
-        label: "ブラキオ",
-        image: "images/applique_brachio.png"
-      },
-      {
-        id: "spino",
-        label: "スピノ",
-        image: "images/applique_spino.png"
-      },
-      {
-        id: "mosa",
-        label: "モササウルス",
-        image: "images/applique_mosa.png"
-      },
-      {
-        id: "stego",
-        label: "ステゴ",
-        image: "images/applique_stego.png"
-      },
-      {
-        id: "trike",
-        label: "トリケラ",
-        image: "images/applique_trike.png"
-      }
+      { id: "trex",    label: "ティラノ",  image: "images/applique_trex.png"   },
+      { id: "brachio", label: "ブラキオ",  image: "images/applique_brachio.png"},
+      { id: "spino",   label: "スピノ",    image: "images/applique_spino.png"  },
+      { id: "mosa",    label: "モササウルス", image: "images/applique_mosa.png"   },
+      { id: "stego",   label: "ステゴ",    image: "images/applique_stego.png"  },
+      { id: "trike",   label: "トリケラ",  image: "images/applique_trike.png"  }
     ];
 
     const bagImage = document.getElementById("bagImage");
     const appliqueImage = document.getElementById("appliqueImage");
     const bagChoicesEl = document.getElementById("bagChoices");
     const appliqueChoicesEl = document.getElementById("appliqueChoices");
+    const previewInner = document.getElementById("previewInner");
+    const clearAppliqueBtn = document.getElementById("clearAppliqueBtn");
+
+    // 位置をリセットして中心に戻す
+    function resetAppliquePosition() {
+      appliqueImage.style.display = "block";
+      appliqueImage.style.left = "50%";
+      appliqueImage.style.top = "38%";
+      appliqueImage.style.transform = "translate(-50%, -50%)";
+    }
 
     function createChoice(parent, item, group) {
       const btn = document.createElement("button");
@@ -287,6 +265,7 @@
       btn.appendChild(span);
 
       btn.addEventListener("click", () => {
+        // 同じグループの selected を外す
         document
           .querySelectorAll('.choice[data-group="' + group + '"]')
           .forEach(el => el.classList.remove("selected"));
@@ -297,6 +276,7 @@
           bagImage.src = item.image;
         } else if (group === "applique") {
           appliqueImage.src = item.image;
+          resetAppliquePosition(); // 新しいアップリケを真ん中に
         }
       });
 
@@ -306,16 +286,12 @@
     // 初期表示をつくる
     bags.forEach((bag, index) => {
       createChoice(bagChoicesEl, bag, "bag");
-      if (index === 0) {
-        bagImage.src = bag.image;
-      }
+      if (index === 0) bagImage.src = bag.image;
     });
 
     appliques.forEach((appli, index) => {
       createChoice(appliqueChoicesEl, appli, "applique");
-      if (index === 0) {
-        appliqueImage.src = appli.image;
-      }
+      if (index === 0) appliqueImage.src = appli.image;
     });
 
     // 最初の選択状態
@@ -323,6 +299,86 @@
     if (firstBagBtn) firstBagBtn.classList.add("selected");
     const firstAppliBtn = appliqueChoicesEl.querySelector(".choice");
     if (firstAppliBtn) firstAppliBtn.classList.add("selected");
+
+    // アップリケを消すボタン
+    clearAppliqueBtn.addEventListener("click", () => {
+      appliqueImage.style.display = "none";
+    });
+
+    // -------- ここからドラッグで動かす処理 --------
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    function getPoint(e) {
+      if (e.touches && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      } else {
+        return { x: e.clientX, y: e.clientY };
+      }
+    }
+
+    function onDragStart(e) {
+      if (appliqueImage.style.display === "none") return;
+
+      isDragging = true;
+      appliqueImage.style.cursor = "grabbing";
+
+      // いったん中央基準のtransformを解除して、左上基準にする
+      if (appliqueImage.style.transform) {
+        const rect = appliqueImage.getBoundingClientRect();
+        const parentRect = previewInner.getBoundingClientRect();
+        appliqueImage.style.transform = "none";
+        appliqueImage.style.left = (rect.left - parentRect.left) + "px";
+        appliqueImage.style.top  = (rect.top  - parentRect.top) + "px";
+      }
+
+      const point = getPoint(e);
+      const imgRect = appliqueImage.getBoundingClientRect();
+      dragOffsetX = point.x - imgRect.left;
+      dragOffsetY = point.y - imgRect.top;
+
+      e.preventDefault();
+    }
+
+    function onDragMove(e) {
+      if (!isDragging) return;
+      const point = getPoint(e);
+      const parentRect = previewInner.getBoundingClientRect();
+
+      let x = point.x - parentRect.left - dragOffsetX;
+      let y = point.y - parentRect.top - dragOffsetY;
+
+      // はみ出さないように制限
+      const maxX = parentRect.width - appliqueImage.offsetWidth;
+      const maxY = parentRect.height - appliqueImage.offsetHeight;
+      if (x < 0) x = 0;
+      if (y < 0) y = 0;
+      if (x > maxX) x = maxX;
+      if (y > maxY) y = maxY;
+
+      appliqueImage.style.left = x + "px";
+      appliqueImage.style.top  = y + "px";
+
+      e.preventDefault();
+    }
+
+    function onDragEnd() {
+      isDragging = false;
+      appliqueImage.style.cursor = "grab";
+    }
+
+    // マウス
+    appliqueImage.addEventListener("mousedown", onDragStart);
+    window.addEventListener("mousemove", onDragMove);
+    window.addEventListener("mouseup", onDragEnd);
+
+    // タッチ
+    appliqueImage.addEventListener("touchstart", onDragStart, { passive: false });
+    window.addEventListener("touchmove", onDragMove, { passive: false });
+    window.addEventListener("touchend", onDragEnd);
+    window.addEventListener("touchcancel", onDragEnd);
+    // -------- ドラッグ処理ここまで --------
   </script>
 </body>
 </html>
