@@ -41,9 +41,25 @@
   </style>
 </head>
 <body>
+<div id="scoreBox" 
+     style="
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+        z-index: 9999;
+     ">
+  SCORE: <span id="score">0</span>
+</div>
   <div class="sea">
     <!-- ★★ ここがサバの画像 ★★ -->
-    <img id="saba" src="images/saba.png" alt="サバ">
+   <img id="saba" 
+     src="images/saba.png" 
+     alt="サバ" 
+     onclick="catchSaba()" />
+
   </div>
 
   <script>
@@ -83,6 +99,24 @@
       sabaX = -150;
       swim();
     });
-  </script>
+ // ==== スコア関連 ====
+let score = 0;
+const scoreDisplay = document.getElementById("score");
+
+// 捕獲処理（タップ／クリックで呼ばれる）
+function catchSaba() {
+  score++;
+  scoreDisplay.textContent = score;
+
+  // 消す（display:none）
+  saba.style.display = "none";
+
+  // 少し待ってから復活（テスト用）
+  setTimeout(() => {
+    saba.style.left = "-150px";
+    saba.style.display = "block";
+  }, 800);
+}
+ </script>
 </body>
 </html>
