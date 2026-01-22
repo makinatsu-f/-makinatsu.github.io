@@ -4,266 +4,221 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>サバタップゲーム</title>
-
   <style>
     * { box-sizing: border-box; }
-    html, body {
-      height: 100%;
+    body {
       margin: 0;
-      padding: 0;
+      height: 100vh;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
       background: #003f7f;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
     }
 
-    /* 海（画面全体） */
+    #scoreBox{
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: white;
+      z-index: 9999;
+      text-shadow: 0 2px 8px rgba(0,0,0,.25);
+      user-select: none;
+    }
+
     .sea {
       position: relative;
       width: 100vw;
       height: 100vh;
-      overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
       background: linear-gradient(#3fa9f5, #003f7f);
+      overflow: hidden;
+      touch-action: manipulation;
     }
 
-    /* スコア表示 */
-    #scoreBox {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      z-index: 9999;
-      color: white;
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.35);
-      pointer-events: none;
-    }
-
-    /* 魚 */
     .fish {
       position: absolute;
-      height: 80px; /* 大きさはここで調整 */
-      width: auto;
+      user-select: none;
+      -webkit-user-drag: none;
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      pointer-events: auto;
-      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.22));
-      transition: transform 80ms ease;
-    }
-    .fish:active {
-      transform: scale(0.92);
+
+      /* 「見た目よりタップ判定を大きく」する魔法🪄 */
+      padding: 18px;
+      margin: -18px;
     }
 
-    /* ちょい説明（任意） */
-    #hint {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      z-index: 9999;
-      color: rgba(255,255,255,0.7);
-      font-size: 14px;
-      pointer-events: none;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    /* ちょい楽しい演出 */
+    .pop {
+      transform: scale(1.08);
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+      transition: transform .08s;
     }
   </style>
 </head>
-
 <body>
-  <div class="sea" id="sea">
-    <div id="scoreBox">SCORE: <span id="score">0</span></div>
-    <div id="hint">魚をタップ！</div>
-  </div>
+  <div id="scoreBox">SCORE: <span id="score">0</span></div>
+  <div class="sea" id="sea"></div>
 
   <script>
-/* =========================
-   サバタップゲーム（複数魚＋レア演出）
-   右→左に流れて、タップで消えてスコア加算
-   ========================= */
+    // ===== 設定 =====
+    const sea = document.getElementById("sea");
+    const scoreSpan = document.getElementById("score");
 
-(() => {
-  // ===== 設定 =====
-  const SPAWN_INTERVAL = 650;     // 出現間隔(ms) 小さいほど多い
-  const OFFSCREEN = 200;          // 画面外判定の余白(px)
-  const MAX_FISH_ON_SCREEN = 14;  // 同時に出す最大数（重くなりすぎ防止）
+    let score = 0;
+    const fishes = []; // { el, type, x, y, speed, alive }
 
-  // 魚の種類（weight=出やすさ, points=得点, size=高さpx, speed=基本スピード範囲）
-  const FISH_TYPES = [
-  { name: "saba",     src: "images/saba.png",     points: 1,  size: 90,  weight: 55 },
-  { name: "tai",      src: "images/tai.png",      points: 2,  size: 105, weight: 20 },
-  { name: "maguro",   src: "images/maguro.png",   points: 3,  size: 120, weight: 15 },
-  { name: "jinbe",    src: "images/jinbe.png",    points: 10, size: 190, weight: 6  }, // デカい高得点
-  { name: "hohojiro", src: "images/hohojiro.png", points: 8,  size: 170, weight: 4  }  // 速いレア枠にしやすい
-];
+    // 出現間隔（小さいほど多い）
+    const SPAWN_INTERVAL = 650;
 
+    // 画面外の余白（大きい魚に合わせて少し多め）
+    const OFFSCREEN = 260;
 
-  // ===== 要素取得 =====
-  const sea = document.querySelector(".sea") || document.body;
-  const scoreSpan = document.getElementById("score");       // 推奨: <span id="score">0</span>
-  const scoreBox = document.getElementById("scoreBox");     // あるなら更新補助に使う
+    // 同時に増えすぎない保険
+    const MAX_FISH_ON_SCREEN = 16;
 
-  // ===== 状態 =====
-  let score = 0;
-  const fishes = []; // { el, type, x, y, speed, alive }
+    // 「たまに爆速」確率
+    const RARE_FAST_CHANCE = 0.08; // 8%
+    const RARE_FAST_MULT = 2.8;
 
-  // ===== スタイル注入（ホホジロの揺れ演出） =====
-  const style = document.createElement("style");
-  style.textContent = `
-    .sea { position: relative; overflow: hidden; touch-action: manipulation; }
-    .fish { position: absolute; user-select: none; -webkit-user-drag: none; cursor: pointer; }
-    .shake {
-      animation: shake 180ms linear 1;
-    }
-    @keyframes shake {
-      0% { transform: translate(0,0); }
-      20% { transform: translate(-6px, 2px); }
-      40% { transform: translate(5px, -2px); }
-      60% { transform: translate(-4px, -1px); }
-      80% { transform: translate(3px, 2px); }
-      100% { transform: translate(0,0); }
-    }
-  `;
-  document.head.appendChild(style);
+    // 「たまにサバの群れ」確率
+    const SABA_SCHOOL_CHANCE = 0.10; // 10%
+    const SABA_SCHOOL_COUNT_MIN = 5;
+    const SABA_SCHOOL_COUNT_MAX = 9;
 
-  // ===== 便利関数 =====
-  const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    // 魚の種類（size=高さpx, points=得点, weight=出やすさ, speed=[min,max]）
+    // ※小さすぎてタップしづらい→ size を上げる
+    const FISH_TYPES = [
+      { name:"saba",     src:"images/saba.png",     points:1,  size:110, weight:60, speed:[1.7, 3.0] },
+      { name:"tai",      src:"images/tai.png",      points:2,  size:125, weight:22, speed:[1.6, 2.8] },
+      { name:"maguro",   src:"images/maguro.png",   points:3,  size:140, weight:16, speed:[2.2, 3.8] },
 
-  function updateScore() {
-    if (scoreSpan) scoreSpan.textContent = String(score);
-    // scoreSpan が無い構造でも見えるように保険
-    if (!scoreSpan && scoreBox) scoreBox.textContent = "SCORE: " + score;
-  }
+      // レア枠（大きめ・高得点）
+      { name:"jinbe",    src:"images/jinbe.png",    points:12, size:210, weight:3,  speed:[1.2, 2.0] },
+      { name:"hohojiro", src:"images/hohojiro.png", points:9,  size:185, weight:4,  speed:[2.8, 4.8] },
+    ];
 
-  function pickFishType() {
-    const total = FISH_TYPES.reduce((a, f) => a + f.weight, 0);
-    let r = Math.random() * total;
-    for (const f of FISH_TYPES) {
-      r -= f.weight;
-      if (r <= 0) return f;
-    }
-    return FISH_TYPES[0];
-  }
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+    function randi(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-  function shakeSea() {
-    sea.classList.remove("shake");
-    // 付け直しのために1フレーム待つ
-    requestAnimationFrame(() => sea.classList.add("shake"));
-    setTimeout(() => sea.classList.remove("shake"), 220);
-  }
-
-  function fishCountAlive() {
-    return fishes.filter(f => f.alive).length;
-  }
-
-  // ===== 魚生成 =====
-  function spawnFish() {
-    if (fishCountAlive() >= MAX_FISH_ON_SCREEN) return;
-
-    const type = pickFishType();
-
-    const seaW = sea.clientWidth || window.innerWidth;
-    const seaH = sea.clientHeight || window.innerHeight;
-
-    const img = document.createElement("img");
-    img.src = type.src;
-    img.alt = type.name;
-    img.className = "fish";
-
-    // サイズ（少しだけブレを作る）
-    const sizeJitter = rand(-6, 10);
-    const h = Math.max(28, type.size + sizeJitter);
-    img.style.height = h + "px";
-
-    // 位置（右からスタート、Yはランダム）
-    const x = seaW + rand(20, 220);
-    const y = rand(30, Math.max(30, seaH - h - 30));
-
-    // スピード（基本）
-    let speed = rand(type.speed[0] * 10, type.speed[1] * 10) / 10;
-
-    // ジンベエだけ「基本ゆっくり、たまにターボ」
-    // 15%でターボ個体にする
-    let turbo = false;
-    if (type.name === "jinbe" && Math.random() < 0.15) {
-      turbo = true;
-      speed = rand(14, 22) / 1; // ドーン！速い
-      img.style.height = Math.round(h * 1.1) + "px"; // ちょいデカく
-      img.style.filter = "drop-shadow(0 0 10px rgba(255,255,255,0.35))";
-    }
-
-    // ホホジロは出現時に揺れ
-    if (type.name === "hohojiro") {
-      shakeSea();
-    }
-
-    img.style.left = x + "px";
-    img.style.top = y + "px";
-
-    // オブジェクト化
-    const fishObj = { el: img, type, x, y, speed, alive: true, turbo };
-
-    // タップで捕獲（スマホもOKな pointerdown）
-    const catchFish = (ev) => {
-      ev.preventDefault();
-
-      if (!fishObj.alive) return;
-      fishObj.alive = false;
-
-      // スコア加算（ターボジンベエはボーナス）
-      const add = fishObj.turbo ? (fishObj.type.points + 8) : fishObj.type.points;
-      score += add;
-      updateScore();
-
-      // 消す（ふわっと）
-      fishObj.el.style.transition = "transform 120ms ease, opacity 120ms ease";
-      fishObj.el.style.transform = "scale(1.15)";
-      fishObj.el.style.opacity = "0";
-
-      setTimeout(() => {
-        fishObj.el.remove();
-      }, 140);
-    };
-
-    img.addEventListener("pointerdown", catchFish, { passive: false });
-    img.addEventListener("click", catchFish, { passive: false }); // 念のため
-
-    sea.appendChild(img);
-    fishes.push(fishObj);
-  }
-
-  // ===== アニメ更新 =====
-  function tick() {
-    const seaW = sea.clientWidth || window.innerWidth;
-
-    for (const f of fishes) {
-      if (!f.alive) continue;
-
-      // 右→左へ
-      f.x -= f.speed;
-      f.el.style.left = f.x + "px";
-
-      // 画面外に出たら消す
-      if (f.x < -OFFSCREEN) {
-        f.alive = false;
-        f.el.remove();
+    function pickFishType(){
+      const total = FISH_TYPES.reduce((a,t)=>a+t.weight,0);
+      let r = Math.random() * total;
+      for(const t of FISH_TYPES){
+        r -= t.weight;
+        if(r <= 0) return t;
       }
+      return FISH_TYPES[0];
     }
 
+    function updateScore(add){
+      score += add;
+      scoreSpan.textContent = String(score);
+    }
+
+    function spawnOne(typeOverride=null, yOverride=null, speedOverride=null){
+      if(fishes.length >= MAX_FISH_ON_SCREEN) return;
+
+      const type = typeOverride ?? pickFishType();
+
+      const img = document.createElement("img");
+      img.src = type.src;
+      img.alt = type.name;
+      img.className = "fish";
+      img.style.height = type.size + "px";
+
+      const seaW = sea.clientWidth;
+      const seaH = sea.clientHeight;
+
+      // 右から左に泳ぐ（頭が左の画像に合う）
+      const x = seaW + rand(20, OFFSCREEN);
+
+      // 上下ランダム（端っこ行きすぎ防止）
+      const y = (yOverride != null)
+        ? yOverride
+        : rand(30, Math.max(40, seaH - type.size - 30));
+
+      let speed = speedOverride != null
+        ? speedOverride
+        : rand(type.speed[0], type.speed[1]);
+
+      // たまに爆速になる（どの魚でも）
+      if(Math.random() < RARE_FAST_CHANCE){
+        speed *= RARE_FAST_MULT;
+      }
+
+      img.style.left = x + "px";
+      img.style.top  = y + "px";
+
+      const fishObj = { el: img, type, x, y, speed, alive: true };
+
+      // タップで消す + スコア加算
+      function catchIt(ev){
+        ev.preventDefault?.();
+
+        if(!fishObj.alive) return;
+        fishObj.alive = false;
+
+        img.classList.add("pop");
+        updateScore(type.points);
+
+        // 消す（少しだけ余韻）
+        setTimeout(()=>{
+          img.remove();
+        }, 60);
+      }
+
+      img.addEventListener("click", catchIt);
+      img.addEventListener("touchstart", catchIt, { passive:false });
+
+      sea.appendChild(img);
+      fishes.push(fishObj);
+    }
+
+    function spawnFish(){
+      // たまに「サバの群れ」ドドドッ
+      if(Math.random() < SABA_SCHOOL_CHANCE){
+        const n = randi(SABA_SCHOOL_COUNT_MIN, SABA_SCHOOL_COUNT_MAX);
+        const seaH = sea.clientHeight;
+
+        const baseY = rand(60, Math.max(80, seaH - 220));
+        for(let i=0;i<n;i++){
+          const y = baseY + rand(-60, 60);
+          const speed = rand(2.2, 4.2) + i*0.08; // ちょい隊列感
+          spawnOne(FISH_TYPES[0], y, speed); // saba固定
+        }
+        return;
+      }
+
+      spawnOne();
+    }
+
+    function tick(){
+      const seaW = sea.clientWidth;
+
+      for(let i=fishes.length-1; i>=0; i--){
+        const f = fishes[i];
+
+        if(!f.alive){
+          fishes.splice(i,1);
+          continue;
+        }
+
+        // 右 -> 左へ
+        f.x -= f.speed;
+        f.el.style.left = f.x + "px";
+
+        // 左に出たら消す
+        if(f.x < -OFFSCREEN){
+          f.el.remove();
+          fishes.splice(i,1);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    // 開始
+    setInterval(spawnFish, SPAWN_INTERVAL);
     requestAnimationFrame(tick);
-  }
-
-  // ===== 開始 =====
-  updateScore();
-  setInterval(spawnFish, SPAWN_INTERVAL);
-
-  // 最初に少しだけ出して賑やかに
-  for (let i = 0; i < 6; i++) setTimeout(spawnFish, i * 120);
-
-  requestAnimationFrame(tick);
-})();
-</script>
-
+  </script>
 </body>
 </html>
