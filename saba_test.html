@@ -67,67 +67,42 @@
   <script>
     // 画面の横幅に応じて、サバを左から右へ泳がせるテスト
 
-    const saba = document.getElementById("saba");
-    const sea = document.querySelector(".sea");
-// ===== 追加：スコアと捕獲処理 =====
-// ===== 追加：スコアと捕獲処理 =====
-let score = 0;
-let caught = false;
+   
+   const saba = document.getElementById("saba");
+const sea = document.querySelector(".sea");
 
-const scoreEl = document.getElementById("score");
+// 右から左へ
+let sabaX = 0;
+const speed = 2.5;
 
-function catchSaba() {
-  if (caught) return;      // 連打防止
-  caught = true;
+function swim() {
+  const seaWidth = sea.clientWidth;
 
-  score += 1;
-  if (scoreEl) scoreEl.textContent = score;  // ← span#score には数字だけ入れる
+  // 左へ進む
+  sabaX -= speed;
 
-  // サバを一瞬消す（当たり判定も消す）
-  saba.style.opacity = "0";
-  saba.style.pointerEvents = "none";
+  // 左に消えたら、右外から復帰
+  if (sabaX < -150) {
+    sabaX = seaWidth + 150;
+  }
 
-  // 0.8秒後に復活
-  setTimeout(() => {
-    saba.style.opacity = "1";
-    saba.style.pointerEvents = "auto";
-    caught = false;
-  }, 800);
+  // 反映
+  saba.style.left = sabaX + "px";
+
+  requestAnimationFrame(swim);
 }
 
-}
+window.addEventListener("load", () => {
+  // もし透明のままになってても復活させる
+  saba.style.opacity = "1";
+  saba.style.pointerEvents = "auto";
 
-    // サバの現在位置（左端のpx）
-    let sabaX = sea.clientWidth + 150;
-      // 最初は画面の左外からスタート
-    const speed = 2.5;      // 速さ。大きいほど速い
+  // 最初は右外からスタート
+  sabaX = sea.clientWidth + 150;
 
-    function swim() {
-      const seaWidth = sea.clientWidth;
+  swim();
+});
 
-      // 位置を右方向に移動
-      sabaX -= speed;
-
-
-      // 画面の右端を出たら左にワープしてくる
-     if (sabaX < -150) {
-  sabaX = seaWidth + 150;
-}
-
-
-      // 実際に反映
-      saba.style.left = sabaX + "px";
-
-      // アニメーションを続ける
-      requestAnimationFrame(swim);
-    }
-
-    // 画面読み込み後にアニメーション開始
-    window.addEventListener("load", () => {
-      // スタート地点（左の外）
-      sabaX = -150;
-      swim();
-    });
  // ==== スコア関連 ====
 let score = 0;
 const scoreDisplay = document.getElementById("score");
