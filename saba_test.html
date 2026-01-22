@@ -1,126 +1,161 @@
-<!-- test deploy -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>サバ1匹テスト</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>サバタップゲーム</title>
   <style>
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 0;
+      background: #003f7f;
       font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-      background: #003f7f;          /* 海っぽい青 */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    }
+
+    #scoreBox {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      color: #fff;
+      font-size: 24px;
+      font-weight: 800;
+      z-index: 9999;
+      user-select: none;
     }
 
     .sea {
       position: relative;
-      width: 100%;
-      max-width: 480px;
-      aspect-ratio: 16 / 9;
-      background: linear-gradient(#3fa9f5, #003f7f);
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      background: linear-gradient(#3fa9f5, #003f7f);
     }
 
-   #saba { cursor: pointer; }
-
+    .saba {
       position: absolute;
-      top: 50%;          /* 画面の縦中央あたり */
-      transform: translateY(-50%);
-      height: 80px;      /* サバの大きさ。大きすぎたらここを小さくしてOK */
-      pointer-events: auto;
-
+      height: 80px; /* 鯖の大きさ */
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-drag: none;
+      touch-action: manipulation;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
     }
   </style>
 </head>
 <body>
-<div id="scoreBox" 
-     style="
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        font-size: 24px;
-        font-weight: bold;
-        color: white;
-        z-index: 9999;
-     ">
-  SCORE: <span id="score">0</span>
-</div>
-  <div class="sea">
-    <!-- ★★ ここがサバの画像 ★★ -->
-   <img id="saba" 
-     src="images/saba.png" 
-     alt="サバ" 
-     onclick="catchSaba()" />
-
-  </div>
+  <div id="scoreBox">SCORE: <span id="score">0</span></div>
+  <div class="sea" id="sea"></div>
 
   <script>
-    // 画面の横幅に応じて、サバを左から右へ泳がせるテスト
+    const sea = document.getElementById("sea");
+    const scoreSpan = document.getElementById("score");
 
-   
-   const saba = document.getElementById("saba");
-const sea = document.querySelector(".sea");
+    let score = 0;
 
-// 右から左へ
-let sabaX = 0;
-const speed = 2.5;
+    // ▼調整ポイント
+    const SABA_COUNT = 8;      // 同時に出る鯖の数
+    const MIN_SPEED = 1.6;     // 遅い鯖
+    const MAX_SPEED = 3.8;     // 速い鯖
 
-function swim() {
-  const seaWidth = sea.clientWidth;
+    const sabas = [];
 
-  // 左へ進む
-  sabaX -= speed;
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
 
-  // 左に消えたら、右外から復帰
-  if (sabaX < -150) {
-    sabaX = seaWidth + 150;
-  }
+    function spawnSaba() {
+      const img = document.createElement("img");
+      img.src = "images/saba.png";
+      img.alt = "サバ";
+      img.className = "saba";
 
-  // 反映
-  saba.style.left = sabaX + "px";
+      const seaW = sea.clientWidth;
+      const seaH = sea.clientHeight;
 
-  requestAnimationFrame(swim);
-}
+      // 右から左へ（頭が左ならこれが自然）
+      const y = rand(40, seaH - 120);
+      const speed = rand(MIN_SPEED, MAX_SPEED);
 
-window.addEventListener("load", () => {
-  // もし透明のままになってても復活させる
-  saba.style.opacity = "1";
-  saba.style.pointerEvents = "auto";
+      img.style.left = (seaW + rand(0, 300)) + "px"; // 右外からスタート
+      img.style.top = y + "px";
 
-  // 最初は右外からスタート
-  sabaX = sea.clientWidth + 150;
+      // 鯖データ
+      const sabaObj = {
+        el: img,
+        x: parseFloat(img.style.left),
+        y,
+        speed,
+        alive: true
+      };
 
-  swim();
-});
+      // タップ（クリック）で捕獲
+      function catchIt(e) {
+        if (!sabaObj.alive) return;
+        sabaObj.alive = false;
 
- // ==== スコア関連 ====
-let score = 0;
-const scoreDisplay = document.getElementById("score");
+        score += 1;
+        scoreSpan.textContent = String(score);
 
-// 捕獲処理（タップ／クリックで呼ばれる）
-function catchSaba() {
-  score++;
-  scoreDisplay.textContent = score;
+        // 消す
+        sabaObj.el.style.opacity = "0";
+        sabaObj.el.style.pointerEvents = "none";
 
-  // 消す（display:none）
-  saba.style.display = "none";
+        // 復活（ちょい待って右から再登場）
+        setTimeout(() => {
+          const seaW2 = sea.clientWidth;
+          const seaH2 = sea.clientHeight;
+          sabaObj.y = rand(40, seaH2 - 120);
+          sabaObj.speed = rand(MIN_SPEED, MAX_SPEED);
+          sabaObj.x = seaW2 + rand(0, 300);
 
-  // 少し待ってから復活（テスト用）
-  setTimeout(() => {
-    saba.style.left = "-150px";
-    saba.style.display = "block";
-  }, 800);
-}
- </script>
+          sabaObj.el.style.top = sabaObj.y + "px";
+          sabaObj.el.style.left = sabaObj.x + "px";
+          sabaObj.el.style.opacity = "1";
+          sabaObj.el.style.pointerEvents = "auto";
+          sabaObj.alive = true;
+        }, 450);
+      }
+
+      // スマホ対策：clickだけじゃなくtouchも拾う
+      img.addEventListener("click", catchIt);
+      img.addEventListener("touchstart", (e) => { e.preventDefault(); catchIt(e); }, { passive: false });
+
+      sea.appendChild(img);
+      sabas.push(sabaObj);
+    }
+
+    // 初期生成
+    for (let i = 0; i < SABA_COUNT; i++) spawnSaba();
+
+    function tick() {
+      const seaW = sea.clientWidth;
+
+      for (const s of sabas) {
+        if (!s.alive) continue;
+
+        // 右→左へ移動
+        s.x -= s.speed;
+
+        // 左端から消えたら右へワープして再登場
+        if (s.x < -160) {
+          s.x = seaW + rand(0, 300);
+          s.y = rand(40, sea.clientHeight - 120);
+          s.speed = rand(MIN_SPEED, MAX_SPEED);
+          s.el.style.top = s.y + "px";
+        }
+
+        s.el.style.left = s.x + "px";
+      }
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    // 画面サイズ変わっても破綻しにくく
+    window.addEventListener("resize", () => {
+      // 特に何もしなくてOK（次のtickで幅取り直す）
+    });
+  </script>
 </body>
 </html>
