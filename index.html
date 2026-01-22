@@ -3,378 +3,324 @@
 <head>
   <meta charset="UTF-8" />
   <title>マキナツ★バッグ×アップリケゲーム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
-      background: #f5eee8;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+      background: #f6f5f0;
+      color: #333;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      padding: 12px 12px 32px;
     }
 
     h1 {
-      font-size: 20px;
-      margin: 16px 8px 4px;
+      font-size: 1.3rem;
+      margin: 0 0 8px;
       text-align: center;
     }
 
-    p {
-      margin: 0 0 12px;
-      font-size: 13px;
+    .sub {
+      font-size: 0.9rem;
       text-align: center;
-      color: #555;
+      margin-bottom: 12px;
+      color: #666;
     }
 
-   
-.workspace {
-  position: relative;
-  width: 70vw;        /* ← 画面に対して7割の幅 */
-  max-width: 780px;   /* ← PCでも大きすぎない */
-  aspect-ratio: 3 / 2; 
-  background: #E2C9A3;
-  box-shadow: 0px 8px 8px rgba(0,0,0,0.18);
-  border-radius: 16px;
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-
-.bag {
-  position: absolute;
-  left: 50%;
-  bottom: 8%;
-  transform: translateX(-50%);
-  width: 70%;      /* ここを 25〜40% で微調整 */
-  height: auto;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-
-
-    /* アップリケ（ドラッグ可能） */
-    .applique {
-      position: absolute;
-      width: 30%;
-      max-width: 260px;
-      cursor: grab;
-      touch-action: none;   /* スマホでのスクロールを抑える */
-      user-select: none;
-    }
-  
-
-    .applique.dragging {
-      opacity: 0.85;
-      cursor: grabbing;
-      transform: scale(1.03);
-    }
-
-    /* 下の選択パネル */
-    .panel {
-      width: 90vw;
-      max-width: 900px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-
-    .panel-section-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .panel-row {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 6px;
-      border-radius: 10px;
+    .card {
       background: #fff;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      margin-bottom: 14px;
     }
 
-    .choice {
-      flex: 0 0 auto;
-      border-radius: 10px;
-      padding: 4px;
-      border: 2px solid transparent;
-      background: #f7f5f2;
-      cursor: pointer;
+    .preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 16px;
+      background: #e5e3dc;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 72px;
-      min-height: 48px;
     }
 
-    .choice img {
-      max-width: 80px;
-      max-height: 50px;
-      object-fit: contain;
+    .preview-inner {
+      position: relative;
+      width: 88%;
+      max-width: 360px;
+    }
+
+    #bagImage {
+      width: 100%;
       display: block;
     }
 
-    .choice.active {
-      border-color: #ff8a3c;
-      box-shadow: 0 0 0 2px rgba(255,138,60,0.35);
+    #appliqueImage {
+      position: absolute;
+      width: 45%;
+      left: 50%;
+      top: 38%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
     }
 
-    .btn-row {
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 0 0 8px;
       display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 4px;
+      align-items: center;
+      gap: 6px;
     }
 
-    button {
+    .section-title span.tag {
+      font-size: 0.75rem;
+      background: #e0ddd3;
+      padding: 2px 6px;
       border-radius: 999px;
-      border: none;
-      padding: 6px 14px;
-      font-size: 12px;
-      background: #ff8a3c;
-      color: #fff;
+    }
+
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .choice {
+      flex: 0 0 calc(25% - 6px);  /* 1段4こ */
+      max-width: calc(25% - 6px);
+      height: 80px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      position: relative;
+      overflow: hidden;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.16);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease, background 0.1s ease;
     }
 
-    button.secondary {
-      background: #999;
+    .choice span.label {
+      font-size: 0.7rem;
+      text-align: center;
+      line-height: 1.2;
+      padding: 0 3px;
+      word-break: keep-all;
     }
 
-    button:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    .choice img {
+      max-width: 80%;
+      max-height: 70%;
+      display: block;
+      margin: 0 auto 2px;
     }
-    /* スマホ用レイアウト調整（ボタン大きめ） */
-@media (max-width: 768px) {
-  /* バッグ・アップリケの並び全体 */
-  #bagChoices,
-  #appliqueChoices {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    justify-content: flex-start;
-  }
 
-  /* 1つ1つのボタン（バッグ / アップリケ） */
-  .choice {
-    flex: 0 0 calc(25% - 16px);
-    max-width: 96px;
-    height: 96px;
-  }
+    .choice.bag-color-chip {
+      border: 1px solid #ccc;
+    }
 
-  /* ボタンの中の画像 */
-  .choice img {
-    width: 80%;
-    height: 80%;
-    object-fit: contain;
-  }
-}
+    .choice.selected {
+      border-color: #f49c3b;
+      background: #fff7ea;
+      box-shadow: 0 0 0 2px rgba(244,156,59,0.35);
+      transform: translateY(-2px);
+    }
 
+    .choice:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
 
-}
-
-@media (max-width: 768px) {
-  /* バッグの並びとアップリケの並びを、スマホでは
-     グリッドっぽく並べる */
-  #bagChoices,
-  #appliqueChoices {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;              /* マスの間隔 */
-    justify-content: flex-start;
-  }
-
-  /* 1個1個のマス（バッグボタン・アップリケボタン） */
-  #bagChoices .choice,
-  #appliqueChoices .choice {
-    flex: 0 0 calc(25% - 12px); /* 幅 4コ/1段くらい */
-    max-width: calc(25% - 12px);
-    height: 80px;               /* マスの高さ */
-    box-sizing: border-box;
-  }
-
-  /* 中の画像をマスにフィットさせる */
-  #bagChoices .choice img,
-  #appliqueChoices .choice img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-}
-
+    @media (max-width: 400px) {
+      .choice {
+        flex: 0 0 calc(33.333% - 6px); /* 1段3こにする */
+        max-width: calc(33.333% - 6px);
+      }
+      #appliqueImage {
+        width: 52%;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>マキナツ★バッグ × アップリケあそび</h1>
-  <p>下のバッグとアップリケを選んで、作業机のうえでドラッグして遊んでね🧵</p>
+  <div class="app">
+    <h1>マキナツ★バッグ×アップリケあそび</h1>
+    <p class="sub">色をえらんで、アップリケをのせてみよう👆</p>
 
-  <!-- 作業机エリア -->
-  <div class="workspace" id="workspace">
-    <!-- 選択されたバッグ -->
-    <img id="bagImage" class="bag"
-      src="images/bag_red.png" alt="bag" />
-
-    <!-- ここに選んだアップリケが追加されていく -->
-  </div>
-
-  <!-- バッグ・アップリケ選択パネル -->
-  <div class="panel">
-    <div>
-      <div class="panel-section-title">🎒 バッグをえらぶ</div>
-      <div class="panel-row" id="bagChoices">
-        <!-- ここにJSからバッグ候補を並べる -->
+    <!-- プレビュー -->
+    <div class="card">
+      <div class="preview">
+        <div class="preview-inner">
+          <!-- バッグ本体 -->
+          <img id="bagImage" src="images/bag_blue.png" alt="えらんだバッグ">
+          <!-- アップリケ -->
+          <img id="appliqueImage" src="images/appli_trex.png" alt="えらんだアップリケ">
+        </div>
       </div>
     </div>
 
-    <div>
-      <div class="panel-section-title">🦖 アップリケを置く</div>
-      <div class="panel-row" id="appliqueChoices">
-        <!-- ここにJSからアップリケ候補を並べる -->
+    <!-- バッグをえらぶ -->
+    <div class="card">
+      <p class="section-title">
+        バッグのいろをえらぶ
+        <span class="tag">レッスンバッグ</span>
+      </p>
+      <div id="bagChoices" class="choices">
+        <!-- JSでボタンを作る -->
       </div>
-      <div class="btn-row">
-        <button class="secondary" id="clearBtn">アップリケを全部消す</button>
+    </div>
+
+    <!-- アップリケをえらぶ -->
+    <div class="card">
+      <p class="section-title">
+        アップリケをえらぶ
+        <span class="tag">恐竜・海の生き物など</span>
+      </p>
+      <div id="appliqueChoices" class="choices">
+        <!-- JSでボタンを作る -->
       </div>
     </div>
   </div>
 
   <script>
-    // 画像リスト（★ここをマキナツの本物パスに差し替えればOK）
+    // ★ ここだけマキナツの画像ファイル名にあわせて変えてね ★
     const bags = [
-      { id: "red",    label: "あか",       src: "images/bag_red.png" },
-      { id: "green",  label: "みどり",     src: "images/bag_green.png" },
-      { id: "gray",   label: "グレー",     src: "images/bag_gray.png" },
-      { id: "blue",   label: "ブルー",     src: "images/bag_blue.png" },
-      { id: "brown",  label: "ちゃいろ",   src: "images/bag_brown.png" },
+      {
+        id: "blue",
+        label: "青",
+        image: "images/bag_blue.png"
+      },
+      {
+        id: "navy",
+        label: "濃紺",
+        image: "images/bag_navy.png"
+      },
+      {
+        id: "green",
+        label: "みどり",
+        image: "images/bag_green.png"
+      },
+      {
+        id: "brown",
+        label: "ちゃいろ",
+        image: "images/bag_brown.png"
+      }
     ];
 
     const appliques = [
-      { id: "mosasaurus", label: "モササウルス？", src: "images/applique_mosa.png" },
-      { id: "stegosaurus", label: "ステゴ",         src: "images/applique_stego.png" },
-      { id: "brachio",     label: "ブラキオ",       src: "images/applique_brachio.png" },
-      { id: "trex",        label: "ティーレックス", src: "images/applique_trex.png" },
-      { id: "spino",       label: "スピノ",         src: "images/applique_spino.png" },
-   { id: "trike", label: "トリケラトプス", src: "images/applique_trike.png" },
- ];
+      {
+        id: "trex",
+        label: "ティラノ",
+        image: "images/appli_trex.png"
+      },
+      {
+        id: "spino",
+        label: "スピノ",
+        image: "images/appli_spino.png"
+      },
+      {
+        id: "trico",
+        label: "トリケラ",
+        image: "images/appli_tricera.png"
+      },
+      {
+        id: "manta",
+        label: "マンタ",
+        image: "images/appli_manta.png"
+      },
+      {
+        id: "manatee",
+        label: "マナティー",
+        image: "images/appli_manatee.png"
+      },
+      {
+        id: "angler",
+        label: "チョウチンアンコウ",
+        image: "images/appli_angler.png"
+      }
+    ];
 
     const bagImage = document.getElementById("bagImage");
-    const bagChoices = document.getElementById("bagChoices");
-    const appliqueChoices = document.getElementById("appliqueChoices");
-    const workspace = document.getElementById("workspace");
-    const clearBtn = document.getElementById("clearBtn");
+    const appliqueImage = document.getElementById("appliqueImage");
+    const bagChoicesEl = document.getElementById("bagChoices");
+    const appliqueChoicesEl = document.getElementById("appliqueChoices");
 
-    // バッグ候補の表示
+    function createChoice(parent, item, group) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice";
+      btn.dataset.group = group;
+      btn.dataset.id = item.id;
+
+      // 画像が用意できたら img を使う
+      if (item.image) {
+        const img = document.createElement("img");
+        img.src = item.image;
+        img.alt = item.label;
+        btn.appendChild(img);
+      }
+
+      const span = document.createElement("span");
+      span.className = "label";
+      span.textContent = item.label;
+      btn.appendChild(span);
+
+      btn.addEventListener("click", () => {
+        // 同じグループの selected を外す
+        document
+          .querySelectorAll('.choice[data-group="' + group + '"]')
+          .forEach(el => el.classList.remove("selected"));
+
+        btn.classList.add("selected");
+
+        if (group === "bag") {
+          bagImage.src = item.image;
+        } else if (group === "applique") {
+          appliqueImage.src = item.image;
+        }
+      });
+
+      parent.appendChild(btn);
+    }
+
+    // 初期表示をつくる
     bags.forEach((bag, index) => {
-      const div = document.createElement("div");
-      div.className = "choice" + (index === 0 ? " active" : "");
-      div.dataset.id = bag.id;
-
-      const img = document.createElement("img");
-      img.src = bag.src;
-      img.alt = bag.label;
-
-      div.appendChild(img);
-      div.addEventListener("click", () => {
-        bagImage.src = bag.src;
-
-        // active切り替え
-        document.querySelectorAll("#bagChoices .choice")
-          .forEach(c => c.classList.remove("active"));
-        div.classList.add("active");
-      });
-
-      bagChoices.appendChild(div);
+      createChoice(bagChoicesEl, bag, "bag");
+      if (index === 0) {
+        bagImage.src = bag.image;
+      }
     });
 
-    // アップリケ候補の表示
-    appliques.forEach(ap => {
-      const div = document.createElement("div");
-      div.className = "choice";
-      const img = document.createElement("img");
-      img.src = ap.src;
-      img.alt = ap.label;
-      div.appendChild(img);
-
-      div.addEventListener("click", () => {
-        addAppliqueToWorkspace(ap.src, ap.label);
-      });
-
-      appliqueChoices.appendChild(div);
+    appliques.forEach((appli, index) => {
+      createChoice(appliqueChoicesEl, appli, "applique");
+      if (index === 0) {
+        appliqueImage.src = appli.image;
+      }
     });
 
-    // アップリケを作業机上に追加
-    function addAppliqueToWorkspace(src, label) {
-      const img = document.createElement("img");
-      img.className = "applique";
-      img.src = src;
-      img.alt = label;
-
-      // 初期位置：中央あたり
-      img.style.left = "40%";
-      img.style.top = "35%";
-
-      enableDrag(img);
-      workspace.appendChild(img);
-    }
-
-    // ドラッグ機能
-    function enableDrag(el) {
-      let offsetX = 0;
-      let offsetY = 0;
-      let isDragging = false;
-
-      const start = (clientX, clientY) => {
-        const rect = el.getBoundingClientRect();
-        offsetX = clientX - rect.left;
-        offsetY = clientY - rect.top;
-        isDragging = true;
-        el.classList.add("dragging");
-      };
-
-      const move = (clientX, clientY) => {
-        if (!isDragging) return;
-        const rect = workspace.getBoundingClientRect();
-        const x = clientX - rect.left - offsetX;
-        const y = clientY - rect.top - offsetY;
-        el.style.left = x + "px";
-        el.style.top = y + "px";
-      };
-
-      const end = () => {
-        isDragging = false;
-        el.classList.remove("dragging");
-      };
-
-      // マウス
-      el.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        start(e.clientX, e.clientY);
-      });
-      window.addEventListener("mousemove", (e) => move(e.clientX, e.clientY));
-      window.addEventListener("mouseup", end);
-
-      // タッチ
-      el.addEventListener("touchstart", (e) => {
-        const t = e.touches[0];
-        start(t.clientX, t.clientY);
-      }, { passive: false });
-
-      window.addEventListener("touchmove", (e) => {
-        if (!isDragging) return;
-        const t = e.touches[0];
-        move(t.clientX, t.clientY);
-      }, { passive: false });
-
-      window.addEventListener("touchend", end);
-      window.addEventListener("touchcancel", end);
-    }
-
-    // アップリケ全消し
-    clearBtn.addEventListener("click", () => {
-      document.querySelectorAll(".applique").forEach(el => el.remove());
-    });
+    // 最初の選択状態
+    const firstBagBtn = bagChoicesEl.querySelector(".choice");
+    if (firstBagBtn) firstBagBtn.classList.add("selected");
+    const firstAppliBtn = appliqueChoicesEl.querySelector(".choice");
+    if (firstAppliBtn) firstAppliBtn.classList.add("selected");
   </script>
 </body>
 </html>
