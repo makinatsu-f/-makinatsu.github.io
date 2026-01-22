@@ -263,6 +263,46 @@
         currentDrag.style.left = (imgRect.left - parentRect.left) + "px";
         currentDrag.style.top  = (imgRect.top  - parentRect.top) + "px";
       }
+// ===== ピンチでサイズ変更 =====
+let pinchStartDistance = 0;
+let pinchStartScale = 1;
+
+function getDistance(touches) {
+  const x = touches[0].clientX - touches[1].clientX;
+  const y = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(x*x + y*y);
+}
+
+function onPinchStart(e) {
+  if (e.touches.length !== 2) return;
+
+  const img = e.currentTarget;
+  pinchStartDistance = getDistance(e.touches);
+
+  // 現在のscaleを保存
+  const currentScale = parseFloat(img.dataset.scale || 1);
+  pinchStartScale = currentScale;
+
+  e.preventDefault();
+}
+
+function onPinchMove(e) {
+  if (e.touches.length !== 2) return;
+
+  const img = e.currentTarget;
+  const newDistance = getDistance(e.touches);
+
+  let scale = pinchStartScale * (newDistance / pinchStartDistance);
+
+  // 拡大縮小の上限・下限
+  if (scale < 0.3) scale = 0.3;
+  if (scale > 2.5) scale = 2.5;
+
+  img.dataset.scale = scale;
+  img.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+  e.preventDefault();
+}
 
       const point = getPoint(e);
       dragOffsetX = point.x - imgRect.left;
@@ -316,19 +356,23 @@
 
     // ===== アップリケを追加する処理 =====
     function addAppliqueInstance(item) {
-      const img = document.createElement("img");
-      img.src = item.image;
-      img.alt = item.label;
-      img.className = "applique-instance";
-      img.style.width = (item.size || 45) + "%"; // サイズ調整（スピノたちは大きめ）
-      // 最初は中央に置く
-      img.style.left = "50%";
-      img.style.top = "38%";
-      img.style.transform = "translate(-50%, -50%)";
+  const img = document.createElement("img");
+  img.src = item.image;
+  img.alt = item.label;
+  img.className = "applique-instance";
+  img.style.width = (item.size || 45) + "%"; // サイズ調整（スピノたちは大きめ）
+  img.style.left = "50%";
+  img.style.top = "38%";
+  img.style.transform = "translate(-50%, -50%)";
 
-      previewInner.appendChild(img);
-      makeDraggable(img);
-    }
+  // ★ここでピンチ用イベントをつける★
+  img.addEventListener("touchstart", onPinchStart, { passive: false });
+  img.addEventListener("touchmove",  onPinchMove,  { passive: false });
+
+  previewInner.appendChild(img);
+  makeDraggable(img);
+}
+
 
     // ===== 選択ボタンを作る =====
     function createChoice(parent, item, group) {
