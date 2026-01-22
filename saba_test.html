@@ -4,7 +4,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>サバタップゲーム</title>
-  <style>
+  <style>/* ===== HUD（上の表示）===== */
+#hud{
+  position: fixed;
+  left: 12px;
+  top: calc(env(safe-area-inset-top) + 12px);
+  z-index: 99999;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  text-shadow: 0 2px 6px rgba(0,0,0,.35);
+  user-select: none;
+}
+
+#title{
+  font-weight: 800;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+#scoreRow{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#scoreBox{
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: .3px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.18);
+  backdrop-filter: blur(6px);
+}
+
+#resetBtn{
+  font-weight: 800;
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 0;
+  color: #073b4c;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  cursor: pointer;
+}
+
+#resetBtn:active{
+  transform: scale(0.98);
+}
+
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -55,13 +104,16 @@
   </style>
 </head>
 <body>
- <div id="hud">
+<div id="hud">
   <div id="title">サバタップゲーム</div>
 
   <div id="scoreRow">
-    SCORE: <span id="score">0</span>
+    <div id="scoreBox">SCORE: <span id="score">0</span></div>
     <button id="resetBtn" type="button">リセット</button>
   </div>
+</div>
+
+<div class="sea" id="sea"></div>
 
 
 <div class="sea" id="sea"></div>
