@@ -120,7 +120,20 @@
       filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
       transition: transform .08s;
     }
-  </style>
+.homeLinkFixed {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 99999;
+}
+
+.homeLinkFixed a {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+ </style>
 </head>
 <body>
 <div id="hud">
@@ -362,7 +375,11 @@ window.addEventListener("mouseup", onUp);
 scoreBox.addEventListener("touchstart", onDown, {passive:false});
 window.addEventListener("touchmove", onMove, {passive:false});
 window.addEventListener("touchend", onUp);
+</script>
 
-  </script>
+<div class="homeLinkFixed">
+  <a href="saba_games.html">ホームにもどる</a>
+</div>
+
 </body>
 </html>
