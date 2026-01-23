@@ -67,17 +67,18 @@
       letter-spacing: 1px;
     }
 
-    #starIcon {
-      font-size:60px;
-      opacity: 0;
-      transition: opacity .15s ease, transform .15s ease;
-      transform: scale(0.6);
-    }
-    #starIcon.flash {
-      opacity: 1;
-      transform: scale(3.0) rotate(8deg);
+  #starIcon {
+  font-size: 60px;
+  opacity: 0;
+  transition: opacity .15s ease, transform .15s ease;
+  transform: scale(1.2);  /* ← 控えめ・ちょうどいい見た目 */
+}
+#starIcon.flash {
+  opacity: 1;
+  transform: scale(2.0) rotate(8deg);
   filter: drop-shadow(0 0 18px gold) drop-shadow(0 0 28px gold);
-    }
+}
+
 
     /* スコアボックス（ドラッグで動かせる） */
     #scoreBox {
