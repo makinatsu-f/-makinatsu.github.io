@@ -279,7 +279,11 @@
 
     // 魚の設定
     const NORMAL_SABA = {
-      name: "saba",
+     // ★ サバの群れ設定（タイムアタック版にも追加！）★
+const SABA_SCHOOL_CHANCE = 0.25; // 25% の確率で群れ
+const SABA_SCHOOL_COUNT_MIN = 7;
+const SABA_SCHOOL_COUNT_MAX = 14;
+ name: "saba",
       src: "images/saba.png",
       size: 110,
       speedMin: 1.7,
@@ -364,10 +368,29 @@
       fishes.push(fishObj);
     }
 
-    function spawnNormalFish(){
-      spawnFish(false);
-    }
+function spawnNormalFish(){
+  if (!gameRunning) return;
 
+  // ★ 一定確率で「サバの群れ」★
+  if (Math.random() < SABA_SCHOOL_CHANCE){
+    const seaH = sea.clientHeight;
+
+    const baseY = rand(60, Math.max(80, seaH - 220));
+    const count = Math.floor(rand(SABA_SCHOOL_COUNT_MIN, SABA_SCHOOL_COUNT_MAX));
+
+    for(let i=0; i<count; i++){
+      const y = baseY + rand(-60, 60); // 少し散る動き
+      const speed = rand(NORMAL_SABA.speedMin, NORMAL_SABA.speedMax) + i * 0.08;
+
+      spawnFish(false, y, speed);
+    }
+    return;
+  }
+
+  // ★ 通常スポーン
+  spawnFish(false);
+}
+OK?
     // 黄金サバスケジューラ
     function scheduleGolden(){
       clearTimeout(goldenTimerId);
