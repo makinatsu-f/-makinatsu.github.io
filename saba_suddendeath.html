@@ -68,14 +68,15 @@
     }
 
     #starIcon {
-      font-size: 20px;
+      font-size:60px;
       opacity: 0;
       transition: opacity .15s ease, transform .15s ease;
       transform: scale(0.6);
     }
     #starIcon.flash {
       opacity: 1;
-      transform: scale(1.1);
+      transform: scale(3.0) rotate(8deg);
+  filter: drop-shadow(0 0 18px gold) drop-shadow(0 0 28px gold);
     }
 
     /* スコアボックス（ドラッグで動かせる） */
@@ -424,7 +425,7 @@
         if (!gameRunning) return;
         spawnFish(true);      // 黄金サバ
         scheduleGolden();     // 次の黄金
-      }, 600);
+      }, 800);
     }, delay);
   }
 
