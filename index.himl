@@ -1,10 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>マキナツのゲーム広場</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>サバタップゲーム</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(#1c5fa8, #002e55);
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      color: #fff;
+      text-align: center;
+    }
+
+    /* 🌊 海エリア */
+    .sea {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    /* 🐟 背景で泳ぐサバ */
+    .bg-fish {
+      position: absolute;
+      width: 120px;
+      opacity: 0.32;
+      pointer-events: none;
+      user-select: none;
+      transform: scaleX(-1);
+    }
+
+    /* 🐟 サバのアニメーション */
+    @keyframes swim {
+      from { transform: translateX(-200px) scaleX(-1); }
+      to   { transform: translateX(120vw) scaleX(-1); }
+    }
+
+    /* 🧭 中央のメニューコンテナ */
+    .menu {
+      position: relative;
+      z-index: 10;
+      margin-top: 18vh;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 900;
+      margin-bottom: 26px;
+      text-shadow: 0 4px 10px rgba(0,0,0,.4);
+    }
+
+    /* 🐟 ボタン */
+    .btn {
+      display: block;
+      width: 75%;
+      max-width: 320px;
+      margin: 14px auto;
+      padding: 16px 10px;
+      background: #8ECFEA;
+      border-radius: 999px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+  </style>
 </head>
+
 <body>
-  <h1>ここにゲームが増えていくよ！</h1>
+
+  <!-- 🌊 背景の海 -->
+  <div class="sea" id="sea"></div>
+
+  <!-- 🐟 メインメニュー -->
+  <div class="menu">
+    <div class="title">サバタップゲーム</div>
+
+    <a href="saba_test.html" class="btn">かんたんモード</a>
+
+    <a href="saba_timeattack.html" class="btn">タイムアタック</a>
+
+    <a href="saba_suddendeath.html" class="btn">サドンデスモード</a>
+  </div>
+
+  <script>
+    const sea = document.getElementById("sea");
+
+    function createFish() {
+      const img = document.createElement("img");
+      img.src = "images/saba.png"; // 🐟 ノーマルサバ
+      img.className = "bg-fish";
+
+      const size = Math.random() * 40 + 70; // 大きさランダム
+      img.style.width = size + "px";
+
+      const y = Math.random() * 70 + 10; // 画面の高さ
+      img.style.top = y + "vh";
+
+      const duration = Math.random() * 10 + 16; // 泳ぐスピード
+      img.style.animation = `swim ${duration}s linear infinite`;
+
+      sea.appendChild(img);
+
+      // 何匹も生成
+      setTimeout(createFish, Math.random() * 2500 + 1500);
+    }
+
+    createFish();
+  </script>
+
 </body>
 </html>
