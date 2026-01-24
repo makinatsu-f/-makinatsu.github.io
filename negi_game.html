@@ -123,11 +123,13 @@
     .leek:active { transform: translateY(3px) scale(0.97); }
 
     /* 回復アイテム（見分けやすく） */
-    .leek.heal {
-      filter: saturate(1.2);
-      outline: 4px solid rgba(102, 204, 102, 0.55);
-      border-radius: 16px;
-    }
+   .leek.heal {
+  filter: saturate(1.2);
+  outline: 0;
+  /* 代わりにちょい明るくするだけ */
+  filter: brightness(1.1) saturate(1.15);
+}
+
 
     /* 画面内ポップ演出（ふわっと上がる文字） */
     .pop {
