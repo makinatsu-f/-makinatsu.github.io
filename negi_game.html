@@ -62,7 +62,7 @@
     /* 大きいメッセージ表示ゾーン（説明＆コメント） */
     #rule-text {
       text-align: center;
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       line-height: 1.65;
       color: #553322;
       font-weight: 900;
@@ -249,10 +249,10 @@
     const bodyEl = document.body;
 
     // ====== 説明文（上に表示） ======
-    const DEFAULT_RULE_HTML =
-      '枯れネギ・折れネギをタップして取り除こう！<br>' +
-      '金ネギはタップで <b>+10点</b> ＆ <b>5秒間ノーペナルティ</b>✨<br>' +
-      '<b>回復💚</b>（束ネギ）をタップで <b>ライフ+1</b>（最大7）';
+       const DEFAULT_RULE_HTML =
+  '🟤 <b>枯れ/折れ</b> をタップで除去（見逃すとライフ-1）<br>' +
+  '✨ <b>金ネギ +10P</b> ＆ 5秒ノーペナルティ　💚 <b>回復 +1</b>（最大7）';
+
 
     // ====== ゲーム状態 ======
     let score = 0;
