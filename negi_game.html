@@ -179,21 +179,21 @@
   </div>
 
   <script>
-    // ==== 画像とネギタイプ設定 =======================
-    const NEGI_TYPES = {
-      good: [
-        { name: "細ネギ", file: "negi_hoso.png" },
-        { name: "普通ネギ", file: "negi_futsu.png" }, // ファイル名を直したらここも同じに直してね
-        { name: "太ネギ", file: "negi_futo.png" }
-      ],
-      bad: [
-        { name: "枯れネギ", file: "negi_kare.png" },
-        { name: "折れネギ", file: "negi_ore.png" }
-      ],
-      gold: [
-        { name: "金ネギ", file: "negi_gold.png" }
-      ]
-    };
+  // ==== 画像とネギタイプ設定 =========================
+const NEGI_TYPES = {
+  good: [
+    { name: "細ネギ",  file: "negi_hoso.png" },
+    { name: "普通ネギ", file: "negi_futsu.png" },
+    { name: "太ネギ",  file: "negi_futo.png" }
+  ],
+  bad: [
+    { name: "枯れネギ", file: "negi_kare.png" },
+    { name: "折れネギ", file: "negi_ore.png" }
+  ],
+  gold: [
+    { name: "金ネギ", file: "negi_gold.png" }
+  ]
+};
 
     // ==== DOM取得 =======================
     const gameArea = document.getElementById("game-area");
