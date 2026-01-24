@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ネギ収穫ゲーム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+        "Yu Gothic", sans-serif;
+      background-color: #f7f3e9;
+      color: #553322;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* スコア表示ゾーン（上） */
+    .hud {
+      text-align: center;
+      padding: 10px 0 4px;
+    }
+
+    .score {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 2px solid #ffb15a;
+      display: inline-block;
+      background: rgba(255, 248, 235, 0.9);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    }
+
+    .score span {
+      min-width: 60px;
+      display: inline-block;
+      text-align: right;
+    }
+
+    .status-text {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #aa7744;
+      min-height: 1.4em;
+    }
+
+    /* ゲームゾーン（真ん中） */
+    #game-area {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      background-image: url("bg_negi_field.png");
+      background-size: cover;
+      background-position: center bottom;
+      border-top: 2px solid #e2c9a3;
+      border-bottom: 2px solid #e2c9a3;
+    }
+
+    .lane-helper {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 52%;
+      transform: translateY(-50%);
+      height: 0;
+    }
+
+    .leek {
+      position: absolute;
+      bottom: 6vh; /* 畑の上にちょこんと立つ感じ */
+      width: 18vw;
+      max-width: 120px;
+      transform: translateY(0);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.1s;
+    }
+
+    .leek:active {
+      transform: translateY(3px) scale(0.97);
+    }
+
+    .invincible .score {
+      animation: glow 0.6s ease-in-out infinite alternate;
+      border-color: #ffd700;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 6px rgba(255, 215, 0, 0.5); }
+      to   { box-shadow: 0 0 14px rgba(255, 215, 0, 1); }
+    }
+
+    /* ボタンゾーン（下） */
+    .controls {
+      padding: 10px 16px 18px;
+      text-align: center;
+    }
+
+    .btn-main {
+      display: inline-block;
+      padding: 10px 26px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(180deg, #ffb15a, #ff8b3d);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      box-shadow: 0 4px 0 #d96c23;
+      cursor: pointer;
+    }
+
+    .btn-main:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #d96c23;
+    }
+
+    .btn-sub {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #997755;
+      background: none;
+      border: none;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .small-note {
+      margin-top: 4px;
+      font-size: 10px;
+      color: #b2997c;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- 上：スコア -->
+    <header class="hud">
+      <div class="score">
+        SCORE: <span id="score-value">0</span>
+      </div>
+      <div class="status-text" id="status-text"></div>
+    </header>
+
+    <!-- 中：ゲームエリア -->
+    <main id="game-area">
+      <div class="lane-helper" id="lane-helper"></div>
+    </main>
+
+    <!-- 下：ボタン -->
+    <footer class="controls">
+      <button id="start-btn" class="btn-main">収穫開始！</button>
+      <button id="retry-btn" class="btn-sub" style="display:none;">リトライ</button>
+      <div class="small-note">
+        枯れネギ・折れネギをタップして取り除こう！<br />
+        金ネギはタップで +10点 ＆ 5秒間ミスしても減点なし✨
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // ==== 画像とネギタイプ設定 =======================
+    const NEGI_TYPES = {
+      good: [
+        { name: "細ネギ", file: "negi_hoso.PNG" },
+        { name: "普通ネギ", file: "nrgi_futsu.png" }, // ファイル名を直したらここも同じに直してね
+        { name: "太ネギ", file: "negi_futo.png" }
+      ],
+      bad: [
+        { name: "枯れネギ", file: "negi_kare.png" },
+        { name: "折れネギ", file: "negi_ore.png" }
+      ],
+      gold: [
+        { name: "金ネギ", file: "negi_gold.png" }
+      ]
+    };
+
+    // ==== DOM取得 =======================
+    const gameArea = document.getElementById("game-area");
+    const laneHelper = document.getElementById("lane-helper");
+    const scoreValueEl = document.getElementById("score-value");
+    const statusTextEl = document.getElementById("status-text");
+    const startBtn = document.getElementById("start-btn");
+    const retryBtn = document.getElementById("retry-btn");
+    const bodyEl = document.body;
+
+    // ==== ゲーム状態 =====================
+    let score = 0;
+    let gameRunning = false;
+    let leeks = [];
+    let spawnTimer = null;
+    let moveTimer = null;
+    let speed = 2;           // 初期スピード（px / frame）
+    let speedLevelTimer = null;
+    let invincible = false;
+    let invincibleTimeoutId = null;
+
+    const SPAWN_INTERVAL = 800; // 新しいネギが出る間隔(ms)
+    const BASE_SPEED = 2;
+    const SPEED_UP_INTERVAL = 12000; // 12秒ごとにスピードUP
+    const SPEED_UP_AMOUNT = 0.5;
+
+    // ==== ユーティリティ =====================
+    function updateScore(delta) {
+      score += delta;
+      if (score < 0) score = 0;
+      scoreValueEl.textContent = score;
+    }
+
+    function setStatusText(text) {
+      statusTextEl.textContent = text || "";
+    }
+
+    function clearAllLeeks() {
+      leeks.forEach(obj => {
+        if (obj.el && obj.el.parentNode) {
+          obj.el.parentNode.removeChild(obj.el);
+        }
+      });
+      leeks = [];
+    }
+
+    function stopGameTimers() {
+      clearInterval(spawnTimer);
+      clearInterval(moveTimer);
+      clearInterval(speedLevelTimer);
+      spawnTimer = null;
+      moveTimer = null;
+      speedLevelTimer = null;
+    }
+
+    function setInvincible(on) {
+      invincible = on;
+      if (on) {
+        bodyEl.classList.add("invincible");
+        setStatusText("無敵タイム中！ミスしても減点なし✨");
+      } else {
+        bodyEl.classList.remove("invincible");
+        setStatusText("");
+      }
+    }
+
+    // ==== ネギを作って流す =====================
+    function spawnLeek() {
+      if (!gameRunning) return;
+
+      const rand = Math.random();
+      let typeGroup;
+      let kind;
+
+      // 出現確率：
+      //   good 70%（3種類で割る）
+      //   bad 25%
+      //   gold 5%
+      if (rand < 0.70) {
+        typeGroup = NEGI_TYPES.good;
+        kind = "good";
+      } else if (rand < 0.95) {
+        typeGroup = NEGI_TYPES.bad;
+        kind = "bad";
+      } else {
+        typeGroup = NEGI_TYPES.gold;
+        kind = "gold";
+      }
+
+      const data = typeGroup[Math.floor(Math.random() * typeGroup.length)];
+
+      const img = document.createElement("img");
+      img.src = data.file;
+      img.alt = data.name;
+      img.className = "leek";
+
+      // レーンの中央に立てる
+      const laneRect = laneHelper.getBoundingClientRect();
+      const gameRect = gameArea.getBoundingClientRect();
+
+      const yBottom = gameRect.height * 0.20; // 下からちょっと上げる
+      img.style.bottom = yBottom + "px";
+
+      // スタート位置（画面の左外）
+      img.style.left = -30 + "vw";
+
+      // タップ処理
+      img.addEventListener("click", () => handleTapLeek(obj));
+      img.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        handleTapLeek(obj);
+      });
+
+      gameArea.appendChild(img);
+
+      const obj = {
+        el: img,
+        kind,
+        name: data.name,
+        x: -gameRect.width * 0.25,  // 左外からスタート
+        speed: speed + Math.random() * 0.8, // 少しバラつき
+        width: 0                 // 後でセット
+      };
+
+      // width は実際に描画されてから
+      requestAnimationFrame(() => {
+        obj.width = img.getBoundingClientRect().width || 80;
+      });
+
+      leeks.push(obj);
+    }
+
+    function moveLeeks() {
+      if (!gameRunning) return;
+
+      const gameRect = gameArea.getBoundingClientRect();
+      const removeList = [];
+
+      leeks.forEach(obj => {
+        obj.x += obj.speed;
+        obj.el.style.left = obj.x + "px";
+
+        if (obj.x > gameRect.width) {
+          // 右端まで流れ切った
+          handleLeekReachedRight(obj);
+          removeList.push(obj);
+        }
+      });
+
+      // いなくなったネギを削除
+      removeList.forEach(obj => {
+        if (obj.el && obj.el.parentNode) {
+          obj.el.parentNode.removeChild(obj.el);
+        }
+        const idx = leeks.indexOf(obj);
+        if (idx >= 0) leeks.splice(idx, 1);
+      });
+    }
+
+    // ==== スコア判定 =====================
+    function handleLeekReachedRight(obj) {
+      if (obj.kind === "good") {
+        // 良いネギ：右まで流したら +1点
+        updateScore(1);
+      } else if (obj.kind === "bad") {
+        // 悪いネギ：右まで流れると -1点（無敵中は減点なし）
+        if (!invincible) updateScore(-1);
+      } else if (obj.kind === "gold") {
+        // 金ネギ：右まで行ったら +1点
+        updateScore(1);
+      }
+    }
+
+    function handleTapLeek(obj) {
+      if (!gameRunning || !obj.el) return;
+
+      // すでに削除済みなら何もしない
+      if (!gameArea.contains(obj.el)) return;
+
+      if (obj.kind === "good") {
+        // 良いネギを間違えてタップ → -1点（無敵中は減点なし）
+        if (!invincible) {
+          updateScore(-1);
+          setStatusText("あっ…良いネギを取っちゃった💦");
+          setTimeout(() => setStatusText(""), 800);
+        }
+      } else if (obj.kind === "bad") {
+        // 悪いネギをタップで0点（正しい処理）
+        // 演出だけ
+        setStatusText("傷んだネギを取り除いたよ👌");
+        setTimeout(() => setStatusText(""), 600);
+      } else if (obj.kind === "gold") {
+        // 金ネギ：+10点 & 無敵5秒
+        updateScore(10);
+        setStatusText("金ネギゲット！5秒間無敵だよ✨");
+        setInvincible(true);
+        clearTimeout(invincibleTimeoutId);
+        invincibleTimeoutId = setTimeout(() => {
+          setInvincible(false);
+        }, 5000);
+      }
+
+      // ネギを消す
+      if (obj.el && obj.el.parentNode) {
+        obj.el.parentNode.removeChild(obj.el);
+      }
+      const idx = leeks.indexOf(obj);
+      if (idx >= 0) leeks.splice(idx, 1);
+    }
+
+    // ==== ゲーム開始・終了 =====================
+    function startGame() {
+      score = 0;
+      updateScore(0); // 表示を0に
+      clearAllLeeks();
+      stopGameTimers();
+      setStatusText("白ネギを選別中…");
+      setInvincible(false);
+
+      gameRunning = true;
+      speed = BASE_SPEED;
+
+      startBtn.textContent = "プレイ中…";
+      startBtn.disabled = true;
+      retryBtn.style.display = "none";
+
+      spawnTimer = setInterval(spawnLeek, SPAWN_INTERVAL);
+      moveTimer = setInterval(moveLeeks, 1000 / 60); // 60fpsくらい
+      speedLevelTimer = setInterval(() => {
+        speed += SPEED_UP_AMOUNT;
+      }, SPEED_UP_INTERVAL);
+    }
+
+    function stopGame() {
+      gameRunning = false;
+      stopGameTimers();
+      setInvincible(false);
+      setStatusText("収穫終了！");
+      startBtn.textContent = "収穫開始！";
+      startBtn.disabled = false;
+      retryBtn.style.display = "inline-block";
+    }
+
+    // ==== イベント設定 =========================
+    startBtn.addEventListener("click", () => {
+      startGame();
+
+      // 30秒経ったら一旦終了する簡易ルール
+      setTimeout(() => {
+        if (gameRunning) {
+          stopGame();
+          alert("30秒の収穫タイム終了！\nスコア: " + score);
+        }
+      }, 30000);
+    });
+
+    retryBtn.addEventListener("click", () => {
+      startGame();
+    });
+
+    // 画面サイズが変わったとき用（リロードが一番ラクだけど念のため）
+    window.addEventListener("resize", () => {
+      // 位置計算を少しリセット
+      leeks.forEach(obj => {
+        obj.x = parseFloat(obj.el.style.left) || obj.x;
+      });
+    });
+  </script>
+</body>
+</html>
