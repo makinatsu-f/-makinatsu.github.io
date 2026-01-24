@@ -434,6 +434,8 @@
 
       const wf = waveFactor(performance.now());
       const base = BASE_SPEED * wf;
+// 500点を超えたら徐々に加速（最大1.6倍まで）
+const scoreBoost = 1 + Math.min(0.6, Math.max(0, (score - 500) / 500) * 0.6);
 
       let bonus = 0;
       if (kind === "good") bonus = 1.2;
@@ -446,7 +448,8 @@
         kind,
         name: data.name,
         x: -Math.max(200, gameRect.width * 0.35),
-        speed: base + bonus + Math.random() * (2.8 * wf)
+        speed: (base + bonus + Math.random() * (2.8 * wf)) * scoreBoost
+
       };
 
       wrap.addEventListener("click", (e) => handleTapLeek(obj, e));
