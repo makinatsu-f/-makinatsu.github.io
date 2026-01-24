@@ -153,7 +153,18 @@ background-position: center;
       font-size: 10px;
       color: #b2997c;
     }
-  </style>
+#rule-text {
+    text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #553322;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+}  </style>
 </head>
 <body>
   <div class="wrapper">
@@ -163,7 +174,11 @@ background-position: center;
         SCORE: <span id="score-value">0</span>
       </div>
       <div class="status-text" id="status-text"></div>
-    </header>
+   <div id="rule-text">
+    枯れネギ・折れネギをタップして取り除こう！<br>
+    金ネギはタップで +10点 ＆ 5秒間ミスしても減点なし✨
+</div>
+ </header>
 
     <!-- 中：ゲームエリア -->
     <main id="game-area">
