@@ -45,7 +45,6 @@
       background: rgba(255, 248, 235, 0.9);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
     }
-
     .score span { min-width: 60px; display: inline-block; text-align: right; }
 
     .life-bar {
@@ -56,11 +55,11 @@
       border: 2px solid #e2c9a3;
       background: rgba(255, 255, 255, 0.75);
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.05em;
     }
 
-    /* ここを「大きいメッセージ表示ゾーン」にする */
+    /* ここが大きいメッセージ表示ゾーン */
     #rule-text {
       text-align: center;
       font-size: 1.15rem;
@@ -75,7 +74,6 @@
       min-height: 3.2em;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
-
     .rule-flash {
       outline: 3px solid rgba(255, 177, 90, 0.55);
       transform: translateY(-1px);
@@ -85,7 +83,6 @@
       animation: glow 0.6s ease-in-out infinite alternate;
       border-color: #ffd700;
     }
-
     @keyframes glow {
       from { box-shadow: 0 0 6px rgba(255, 215, 0, 0.5); }
       to   { box-shadow: 0 0 14px rgba(255, 215, 0, 1); }
@@ -102,7 +99,6 @@
       border-top: 2px solid #e2c9a3;
       border-bottom: 2px solid #e2c9a3;
     }
-
     .lane-helper {
       position: absolute;
       left: 0; right: 0;
@@ -115,15 +111,44 @@
     .leek {
       position: absolute;
       bottom: 6vh;
-      width: 30vw;          /* 大きく */
-      min-width: 120px;     /* 小さくなり過ぎ防止 */
-      max-width: 220px;     /* 大き過ぎ防止 */
+      width: 30vw;
+      min-width: 120px;
+      max-width: 220px;
       cursor: pointer;
       touch-action: manipulation;
       transition: transform 0.08s;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
     .leek:active { transform: translateY(3px) scale(0.97); }
+
+    /* 回復アイテム（見分けやすく） */
+    .leek.heal {
+      filter: saturate(1.2);
+      outline: 4px solid rgba(102, 204, 102, 0.55);
+      border-radius: 16px;
+    }
+
+    /* 画面内ポップ演出（ふわっと上がる文字） */
+    .pop {
+      position: absolute;
+      pointer-events: none;
+      font-weight: 900;
+      font-size: 18px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.9);
+      border: 2px solid rgba(255, 177, 90, 0.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      transform: translate(-50%, -50%);
+      animation: popUp 0.75s ease-out forwards;
+      white-space: nowrap;
+    }
+    @keyframes popUp {
+      0%   { opacity: 0; transform: translate(-50%, -35%) scale(0.95); }
+      15%  { opacity: 1; transform: translate(-50%, -50%) scale(1.00); }
+      100% { opacity: 0; transform: translate(-50%, -95%) scale(1.03); }
+    }
 
     /* 下：ボタン */
     .controls { padding: 10px 16px 18px; text-align: center; }
@@ -143,20 +168,20 @@
     }
     .btn-main:active { transform: translateY(2px); box-shadow: 0 3px 0 #d96c23; }
 
-    /* リトライを見えやすく、ゲームオーバー時に主役にする */
+    /* リトライを見えやすく */
     .btn-retry {
       display: none;
       margin-top: 10px;
-      width: min(320px, 92%);
+      width: min(360px, 92%);
       padding: 14px 18px;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 900;
       border-radius: 16px;
-      border: 3px solid rgba(255, 177, 90, 0.7);
-      background: rgba(255, 255, 255, 0.92);
+      border: 3px solid rgba(255, 177, 90, 0.85);
+      background: rgba(255, 255, 255, 0.95);
       color: #553322;
       cursor: pointer;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.14);
     }
     .btn-retry:active { transform: translateY(2px); }
 
@@ -166,26 +191,22 @@
 
 <body>
   <div class="wrapper">
-    <!-- 上：スコア -->
     <header class="hud">
       <div class="score">
         SCORE: <span id="score-value">0</span>
       </div>
 
       <div class="life-bar" id="life-bar">
-        ライフ: <span id="life-value">7</span> / 7
+        ライフ: <span id="life-value">7</span> / 7　｜　コンボ: <span id="combo-value">0</span>
       </div>
 
-      <!-- ここに大きくメッセージを出す -->
       <div id="rule-text"></div>
     </header>
 
-    <!-- 中：ゲームエリア -->
     <main id="game-area">
       <div class="lane-helper" id="lane-helper"></div>
     </main>
 
-    <!-- 下：ボタン -->
     <footer class="controls">
       <button id="start-btn" class="btn-main">収穫開始！</button>
       <button id="retry-btn" class="btn-retry">もう一回収穫する！</button>
@@ -198,7 +219,7 @@
   </div>
 
   <script>
-    // ==== 画像とネギタイプ設定 =========================
+    // ==== ネギタイプ設定 =========================
     const NEGI_TYPES = {
       good: [
         { name: "細ネギ",  file: "negi_hoso.png" },
@@ -211,14 +232,18 @@
       ],
       gold: [
         { name: "金ネギ", file: "negi_gold.png" }
+      ],
+      // 回復アイテム（新しい画像なしで動くように、既存の neig_futsu.png を流用）
+      heal: [
+        { name: "救急束ネギ", file: "negi_futsu.png" }
       ]
     };
 
-    // ==== DOM取得 =======================
+    // ==== DOM =======================
     const gameArea = document.getElementById("game-area");
-    const laneHelper = document.getElementById("lane-helper");
     const scoreValueEl = document.getElementById("score-value");
     const lifeValueEl = document.getElementById("life-value");
+    const comboValueEl = document.getElementById("combo-value");
     const startBtn = document.getElementById("start-btn");
     const retryBtn = document.getElementById("retry-btn");
     const bodyEl = document.body;
@@ -234,19 +259,31 @@
     let life = 7;
     let gameRunning = false;
     let leeks = [];
-    let spawnTimer = null;
-    let moveTimer = null;
 
-    let speed = 3.2;                 // 全体の基準スピード（上げた）
-    let speedLevelTimer = null;
     let invincible = false;
     let invincibleTimeoutId = null;
 
-    // 出現と難易度
-    const SPAWN_INTERVAL = 650;      // 出現間隔（少し多め）
-    const BASE_SPEED = 3.2;
-    const SPEED_UP_INTERVAL = 10000; // 10秒ごとに少し上げる（任意）
-    const SPEED_UP_AMOUNT = 0.25;
+    // コンボ
+    let combo = 0;
+    let comboTimer = null;
+    const COMBO_WINDOW_MS = 1200; // これ以内に悪ネギを続けてタップでコンボ継続
+
+    // ==== 出現/難易度（波をつくる） =====================
+    const BASE_SPAWN_INTERVAL = 650; // 平均出現間隔（ms）
+    const BASE_SPEED = 3.2;          // 基準スピード
+    const WAVE_PERIOD_MS = 18000;    // 波の周期（静か→ドッ→落ち着く）
+    const WAVE_MIN = 0.85;           // 波の最低倍率
+    const WAVE_MAX = 1.40;           // 波の最高倍率
+
+    // 出現率（悪いネギ多め + 回復はレア）
+    // good 33% / bad 58% / gold 5% / heal 4%
+    // ※ heal をもっとレアにしたいなら 1〜2% にしてOK
+    const RATE = {
+      good: 0.33,
+      bad:  0.58,
+      gold: 0.05,
+      heal: 0.04
+    };
 
     // ==== 表示系 =====================
     function updateScore(delta) {
@@ -258,21 +295,15 @@
     function setLife(newLife) {
       life = Math.max(0, Math.min(7, newLife));
       lifeValueEl.textContent = life;
-      if (life <= 0) {
-        stopGame(true);
-      }
+      if (life <= 0) stopGame(true);
     }
 
-    // 「ミス」処理（ライフ減少）
-    function registerMiss(message) {
-      if (invincible) {
-        flashRuleMessage("無敵中✨ いまのミスはノーカウント！", 900);
-        return;
-      }
-      setLife(life - 1);
-      flashRuleMessage(message + `（ライフ ${life}/7）`, 1000);
+    function setCombo(newCombo) {
+      combo = Math.max(0, newCombo);
+      comboValueEl.textContent = combo;
     }
 
+    // メッセージ（大きい説明欄に一時表示）
     let ruleMsgTimer = null;
     function flashRuleMessage(html, ms = 900) {
       clearTimeout(ruleMsgTimer);
@@ -284,6 +315,24 @@
       }, ms);
     }
 
+    // 画面内ポップ演出（タップ地点にふわっと）
+    function showPop(text, clientX, clientY) {
+      const rect = gameArea.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      const el = document.createElement("div");
+      el.className = "pop";
+      el.textContent = text;
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      gameArea.appendChild(el);
+
+      setTimeout(() => {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      }, 800);
+    }
+
     function clearAllLeeks() {
       leeks.forEach(obj => {
         if (obj.el && obj.el.parentNode) obj.el.parentNode.removeChild(obj.el);
@@ -292,44 +341,64 @@
     }
 
     function stopGameTimers() {
-      clearInterval(spawnTimer);
-      clearInterval(moveTimer);
-      clearInterval(speedLevelTimer);
-      spawnTimer = null;
-      moveTimer = null;
-      speedLevelTimer = null;
+      // spawn は setTimeout ループなので timerId を消す
+      clearTimeout(spawnTimerId);
+      clearInterval(moveTimerId);
+      spawnTimerId = null;
+      moveTimerId = null;
     }
 
     function setInvincible(on) {
       invincible = on;
-      if (on) {
-        bodyEl.classList.add("invincible");
-      } else {
-        bodyEl.classList.remove("invincible");
-      }
+      if (on) bodyEl.classList.add("invincible");
+      else bodyEl.classList.remove("invincible");
     }
 
-    // ==== ネギを作って流す =====================
+    // ==== ミス処理 =====================
+    function resetCombo() {
+      clearTimeout(comboTimer);
+      comboTimer = null;
+      setCombo(0);
+    }
+
+    function registerMiss(message) {
+      if (invincible) {
+        flashRuleMessage("無敵中✨ いまのミスはノーカウント！", 900);
+        return;
+      }
+      resetCombo();
+      setLife(life - 1);
+      flashRuleMessage(message + `<br>ライフが減った…（残り ${life}/7）`, 1100);
+    }
+
+    // ==== 波の倍率（0.85〜1.40くらいで上下） =====================
+    let startTimeMs = 0;
+    function waveFactor(nowMs) {
+      const t = (nowMs - startTimeMs) % WAVE_PERIOD_MS;
+      const phase = (t / WAVE_PERIOD_MS) * Math.PI * 2; // 0..2π
+      // sin を 0..1 にしてから範囲へ
+      const s01 = (Math.sin(phase - Math.PI/2) + 1) / 2; // 始め静か寄りに
+      return WAVE_MIN + (WAVE_MAX - WAVE_MIN) * s01;
+    }
+
+    // ==== ネギ生成 =====================
+    function pickKind() {
+      const r = Math.random();
+      const a = RATE.good;
+      const b = a + RATE.bad;
+      const c = b + RATE.gold;
+      // 残りが heal
+      if (r < a) return "good";
+      if (r < b) return "bad";
+      if (r < c) return "gold";
+      return "heal";
+    }
+
     function spawnLeek() {
       if (!gameRunning) return;
 
-      const rand = Math.random();
-      let typeGroup;
-      let kind;
-
-      // 出現確率（悪いネギ多めに変更）
-      // good 38% / bad 57% / gold 5%
-      if (rand < 0.38) {
-        typeGroup = NEGI_TYPES.good;
-        kind = "good";
-      } else if (rand < 0.95) {
-        typeGroup = NEGI_TYPES.bad;
-        kind = "bad";
-      } else {
-        typeGroup = NEGI_TYPES.gold;
-        kind = "gold";
-      }
-
+      const kind = pickKind();
+      const typeGroup = NEGI_TYPES[kind];
       const data = typeGroup[Math.floor(Math.random() * typeGroup.length)];
 
       const gameRect = gameArea.getBoundingClientRect();
@@ -342,27 +411,40 @@
       img.draggable = false;
       img.style.bottom = yBottom + "px";
 
-      // まず obj を作ってからイベント登録
+      if (kind === "heal") img.classList.add("heal");
+
       const obj = {
         el: img,
         kind,
         name: data.name,
-        x: -Math.max(180, gameRect.width * 0.35), // 左外から
+        x: -Math.max(180, gameRect.width * 0.35),
         speed: 0,
         width: 0
       };
 
-      // スピードを「早く」「ランダム幅を大きく」する
-      // さらに「白ネギ(good)は少し速め」にする
-      const base = speed + (kind === "good" ? 1.2 : 0.6);
-      obj.speed = base + Math.random() * 2.8; // ランダム幅を大きく
+      // 波 + ランダム + 種類補正
+      const wf = waveFactor(performance.now());
+      const base = BASE_SPEED * wf;
+
+      // 白ネギ（good）は早めランダム幅大きめ
+      // 悪ネギ（bad）もそこそこ速い（追いつかせる）
+      // gold/heal は少し遅めで「狙える」余白
+      let bonus = 0;
+      if (kind === "good") bonus = 1.2;
+      if (kind === "bad")  bonus = 0.8;
+      if (kind === "gold") bonus = 0.2;
+      if (kind === "heal") bonus = 0.2;
+
+      obj.speed = base + bonus + Math.random() * (2.8 * wf);
 
       img.style.left = obj.x + "px";
 
-      img.addEventListener("click", () => handleTapLeek(obj));
+      // クリック/タッチ（タップ地点を取得してポップを出すため、イベント引数を渡す）
+      img.addEventListener("click", (e) => handleTapLeek(obj, e));
       img.addEventListener("touchend", (e) => {
         e.preventDefault();
-        handleTapLeek(obj);
+        const t = e.changedTouches && e.changedTouches[0];
+        handleTapLeek(obj, t || e);
       });
 
       gameArea.appendChild(img);
@@ -374,6 +456,7 @@
       leeks.push(obj);
     }
 
+    // ==== 移動 =====================
     function moveLeeks() {
       if (!gameRunning) return;
 
@@ -397,50 +480,97 @@
       });
     }
 
-    // ==== 判定 =====================
+    // ==== 右端到達処理 =====================
     function handleLeekReachedRight(obj) {
       if (obj.kind === "good") {
-        // 良いネギ：右まで流したら +1点
         updateScore(1);
       } else if (obj.kind === "bad") {
-        // 悪いネギ：見逃しはミス（ライフ-1、無敵中はノーカウント）
-        updateScore(invincible ? 0 : -1);
+        if (!invincible) updateScore(-1);
         registerMiss(`見逃し！${obj.name}が流れちゃった💦`);
       } else if (obj.kind === "gold") {
-        // 金ネギ：右まで行ったら +1点（見逃しでもOK）
         updateScore(1);
+      } else if (obj.kind === "heal") {
+        // 回復アイテムは見逃してもペナルティなし（欲しければここでミスに変更OK）
       }
     }
 
-    function handleTapLeek(obj) {
+    // ==== タップ処理 =====================
+    function keepCombo() {
+      clearTimeout(comboTimer);
+      comboTimer = setTimeout(() => {
+        resetCombo();
+      }, COMBO_WINDOW_MS);
+    }
+
+    function handleTapLeek(obj, e) {
       if (!gameRunning || !obj.el) return;
       if (!gameArea.contains(obj.el)) return;
 
+      const clientX = e && e.clientX ? e.clientX : (window.innerWidth / 2);
+      const clientY = e && e.clientY ? e.clientY : (window.innerHeight / 2);
+
       if (obj.kind === "good") {
-        // 良いネギをタップ → ミス（ライフ-1、無敵中はノーカウント）
-        updateScore(invincible ? 0 : -1);
+        if (!invincible) updateScore(-1);
+        showPop(invincible ? "セーフ✨" : "-1", clientX, clientY);
         registerMiss("ちがう！良いネギを取っちゃった🥲");
-      } else if (obj.kind === "bad") {
-        // 悪いネギをタップ：正解
-        flashRuleMessage("ナイス！傷んだネギを取り除いた👌", 700);
-      } else if (obj.kind === "gold") {
-        // 金ネギ：+10点 & 無敵5秒（減点もライフ減少もなし）
+      }
+
+      if (obj.kind === "bad") {
+        // コンボ加点（+1, +2, +3…）
+        const next = combo + 1;
+        setCombo(next);
+        keepCombo();
+
+        // コンボ得点（気持ちいいやつ）
+        updateScore(next);
+        showPop("+" + next + "👌", clientX, clientY);
+
+        flashRuleMessage(`ナイス！傷んだネギを処理👌<br><b>${next}コンボ！ +${next}点</b>`, 850);
+      }
+
+      if (obj.kind === "gold") {
         updateScore(10);
-        flashRuleMessage("金ネギゲット！5秒間ノーペナルティ✨", 1100);
+        showPop("+10✨", clientX, clientY);
+
+        flashRuleMessage("金ネギゲット！<br><b>5秒間 ノーペナルティ✨</b>", 1100);
         setInvincible(true);
         clearTimeout(invincibleTimeoutId);
         invincibleTimeoutId = setTimeout(() => setInvincible(false), 5000);
       }
 
-      // ネギを消す
+      if (obj.kind === "heal") {
+        // ライフ回復（最大7）
+        const before = life;
+        if (before < 7) setLife(before + 1);
+        showPop(before < 7 ? "ライフ+1💚" : "満タン💚", clientX, clientY);
+
+        flashRuleMessage(before < 7
+          ? "救急束ネギ！<br><b>ライフが1回復💚</b>"
+          : "救急束ネギ！<br><b>ライフは満タンだよ💚</b>", 1000);
+      }
+
+      // タップしたネギを削除
       if (obj.el && obj.el.parentNode) obj.el.parentNode.removeChild(obj.el);
       const idx = leeks.indexOf(obj);
       if (idx >= 0) leeks.splice(idx, 1);
     }
 
-    // ==== ループ =====================
-    function startSpawnLoop() {
-      spawnTimer = setInterval(spawnLeek, SPAWN_INTERVAL);
+    // ==== 出現ループ（波に合わせて間隔を変える） =====================
+    let spawnTimerId = null;
+    let moveTimerId = null;
+
+    function scheduleNextSpawn() {
+      if (!gameRunning) return;
+      const wf = waveFactor(performance.now());
+
+      // 波が高いほど「出現間隔短く」する（ドッと来る）
+      // さらに少しランダム（気持ちいい揺らぎ）
+      const interval = (BASE_SPAWN_INTERVAL / wf) * (0.85 + Math.random() * 0.35);
+
+      spawnTimerId = setTimeout(() => {
+        spawnLeek();
+        scheduleNextSpawn();
+      }, interval);
     }
 
     // ==== ゲーム開始・終了 =====================
@@ -448,56 +578,49 @@
       score = 0;
       updateScore(0);
       setLife(7);
+      resetCombo();
+
       clearAllLeeks();
       stopGameTimers();
-      setInvincible(false);
 
+      setInvincible(false);
       ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
 
       gameRunning = true;
-      speed = BASE_SPEED;
+      startTimeMs = performance.now();
 
       startBtn.textContent = "プレイ中…";
       startBtn.disabled = true;
-
       retryBtn.style.display = "none";
 
-      startSpawnLoop();
-      moveTimer = setInterval(moveLeeks, 1000 / 60);
+      // ループ開始
+      scheduleNextSpawn();
+      moveTimerId = setInterval(moveLeeks, 1000 / 60);
 
-      // 時間制限は無し。難易度だけゆるく上げたい場合はこれが効く
-      speedLevelTimer = setInterval(() => {
-        speed += SPEED_UP_AMOUNT;
-      }, SPEED_UP_INTERVAL);
-
-      flashRuleMessage("収穫スタート！悪いネギを叩けーっ🌿", 900);
+      flashRuleMessage("収穫スタート！<br><b>悪いネギを叩けーっ🌿</b>", 1000);
     }
 
     function stopGame(isGameOver = false) {
       gameRunning = false;
       stopGameTimers();
       setInvincible(false);
+      resetCombo();
 
       startBtn.textContent = "収穫開始！";
       startBtn.disabled = false;
 
       if (isGameOver) {
         ruleTextEl.innerHTML = `ゲームオーバー！<br>最終スコア：<b>${score}</b>`;
-        retryBtn.style.display = "inline-block";
       } else {
         ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
-        retryBtn.style.display = "inline-block";
       }
+
+      retryBtn.style.display = "inline-block";
     }
 
-    // ==== イベント =========================
-    startBtn.addEventListener("click", () => {
-      startGame();
-    });
-
-    retryBtn.addEventListener("click", () => {
-      startGame();
-    });
+    // ==== イベント =====================
+    startBtn.addEventListener("click", () => startGame());
+    retryBtn.addEventListener("click", () => startGame());
 
     window.addEventListener("resize", () => {
       leeks.forEach(obj => {
