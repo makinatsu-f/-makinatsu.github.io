@@ -469,9 +469,12 @@ wrap.appendChild(goldBadge);
 
       const wf = waveFactor(performance.now());
       const base = BASE_SPEED * wf;
+
 // 500点を超えたら徐々に加速（最大1.6倍まで）
 const scoreBoost = 1 + Math.min(0.6, Math.max(0, (score - 500) / 500) * 0.6);
-
+const early  = Math.min(1, score / 200);      // 最初はゆっくり
+const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
+おし
       let bonus = 0;
       if (kind === "good") bonus = 1.2;
       if (kind === "bad")  bonus = 0.8;
@@ -483,7 +486,7 @@ const scoreBoost = 1 + Math.min(0.6, Math.max(0, (score - 500) / 500) * 0.6);
         kind,
         name: data.name,
         x: -Math.max(200, gameRect.width * 0.35),
-        speed: (base + bonus + Math.random() * (2.8 * wf)) * scoreBoost
+       speed: (base + bonus + Math.random() * randMax) * scoreBoost
 
       };
 
