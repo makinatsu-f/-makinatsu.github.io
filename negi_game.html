@@ -858,5 +858,24 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
     </div>
   </div>
 </div>
+window.addEventListener("load", () => {
+  const howtoModal = document.getElementById("howto-modal");
+  const howtoOk = document.getElementById("howto-ok");
+  const howtoClose = document.getElementById("howto-close");
+
+  function openHowto() {
+    if (!howtoModal) return;
+    howtoModal.style.display = "block";
+  }
+  function closeHowto() {
+    if (!howtoModal) return;
+    howtoModal.style.display = "none";
+  }
+
+  if (howtoOk) howtoOk.addEventListener("click", closeHowto);
+  if (howtoClose) howtoClose.addEventListener("click", closeHowto);
+
+  openHowto();
+});
 </body>
 </html>
