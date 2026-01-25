@@ -308,6 +308,20 @@
 
 .howto-item b{ color: #5a3a22; }
 .howto-item span{ color: #6a6a6a; font-weight: 800; }
+<!-- 🎁 タップで発動（ボーナス）赤枠ゾーン -->
+<div class="howto-special">
+  <div class="howto-special-title">🎁 タップで発動（ボーナス）</div>
+
+  <div class="howto-item">
+    <img src="images/negi_gold.png" alt="金ネギ" />
+    <div><b>金ネギ</b><br><span>タップで +10P ＆ 5秒ノーペナ</span></div>
+  </div>
+
+  <div class="howto-item">
+    <img src="images/negi_taba.png" alt="回復束ネギ" />
+    <div><b>回復束ネギ</b><br><span>タップで ライフ+1（最大7）</span></div>
+  </div>
+</div>
 /* 赤枠ゾーン（タップしてOKの特別ネギ） */
 .howto-special {
   margin-top: 10px;
@@ -356,7 +370,30 @@
   color: #fff;
   box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
-  </style>
+ /* 🎁 タップで発動（ボーナス）赤枠ゾーン */
+.howto-special{
+  margin-top: 10px;
+  padding: 10px;
+  border: 3px solid #ff3b30;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.92);
+}
+
+.howto-special-title{
+  font-weight: 900;
+  color: #ff3b30;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+.howto-special .howto-item{
+  margin-bottom: 8px; /* 既存の見た目に合わせる */
+}
+
+.howto-special .howto-item:last-child{
+  margin-bottom: 0;
+}
+ </style>
 </head>
 
 <body>
