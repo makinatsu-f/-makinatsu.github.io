@@ -49,7 +49,9 @@
 
     .life-bar {
       margin: 6px auto 0;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       padding: 8px 12px;
       border-radius: 999px;
       border: 2px solid #e2c9a3;
@@ -57,9 +59,11 @@
       font-size: 14px;
       font-weight: 900;
       letter-spacing: 0.05em;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    /* 大きいメッセージ表示ゾーン（説明＆コメント） */
+    /* 大きいメッセージ表示ゾーン */
     #rule-text {
       text-align: center;
       font-size: 1.05rem;
@@ -100,7 +104,6 @@
       border-bottom: 2px solid #e2c9a3;
     }
 
-    /* ネギはラッパーで持つ（回復ラベル付けるため） */
     .leek-wrap {
       position: absolute;
       bottom: 6vh;
@@ -125,7 +128,7 @@
       transform: translateY(3px) scale(0.97);
     }
 
-    /* 回復バッジ（ハート点滅） */
+    /* 回復バッジ */
     .heal-badge {
       position: absolute;
       top: -10px;
@@ -153,31 +156,30 @@
       from { transform: scale(1.0); filter: brightness(1.0); }
       to   { transform: scale(1.18); filter: brightness(1.3); }
     }
-/* 金バッジ（+10P） */
-.gold-badge {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 14px;
-  font-weight: 900;
-  padding: 6px 10px;
-  border-radius: 999px;
-  color: #7a4c00;
-  background: rgba(255, 250, 220, 0.95);
-  border: 2px solid rgba(255, 215, 0, 0.65);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  display: none;
-  white-space: nowrap;
-}
 
-.leek-wrap.gold .gold-badge { display: inline-block; }
-
-.gold-sparkle {
-  display: inline-block;
-  margin-left: 6px;
-  animation: blinkHeart 0.7s ease-in-out infinite alternate;
-}
+    /* 金バッジ（+10P） */
+    .gold-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #7a4c00;
+      background: rgba(255, 250, 220, 0.95);
+      border: 2px solid rgba(255, 215, 0, 0.65);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      display: none;
+      white-space: nowrap;
+    }
+    .leek-wrap.gold .gold-badge { display: inline-block; }
+    .gold-sparkle {
+      display: inline-block;
+      margin-left: 6px;
+      animation: blinkHeart 0.7s ease-in-out infinite alternate;
+    }
 
     /* 画面内ポップ */
     .pop {
@@ -218,184 +220,112 @@
       cursor: pointer;
     }
     .btn-main:active { transform: translateY(2px); box-shadow: 0 4px 0 #d96c23; }
+
     .btn-mini{
-  margin-left: 10px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 2px solid rgba(255, 177, 90, 0.55);
-  background: rgba(255,255,255,0.78);
-  font-weight: 900;
-  font-size: 12px;
-  cursor: pointer;
-}
-.btn-mini:active{ transform: translateY(1px); }
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 177, 90, 0.55);
+      background: rgba(255,255,255,0.78);
+      font-weight: 900;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-mini:active{ transform: translateY(1px); }
 
-/* 仕分け方モーダル */
-#howto-modal{
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-}
+    /* 仕分け方モーダル */
+    #howto-modal{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+    }
+    .howto-backdrop{
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(2px);
+    }
+    .howto-card{
+      position: relative;
+      width: min(92vw, 720px);
+      max-height: min(78vh, 640px);
+      overflow: auto;
+      margin: 10vh auto 0;
+      background: rgba(255,255,255,0.92);
+      border: 3px solid rgba(255, 177, 90, 0.55);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      padding: 14px 14px 16px;
+    }
+    .howto-head{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    #howto-title{
+      font-weight: 900;
+      font-size: 18px;
+      color: #5a3a22;
+    }
+    .howto-close{
+      border: none;
+      background: rgba(255,255,255,0.8);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .howto-grid{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .howto-col{
+      background: rgba(255,255,255,0.7);
+      border-radius: 14px;
+      padding: 10px;
+      border: 2px solid rgba(0,0,0,0.06);
+    }
+    .howto-col-title{
+      font-weight: 900;
+      color: #5a3a22;
+      margin-bottom: 8px;
+    }
+    .howto-subtitle{
+      margin: 10px 4px 8px;
+      font-weight: 900;
+      color: #ff3b30;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+    }
+    .howto-item{
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid rgba(0,0,0,0.06);
+      margin-bottom: 8px;
+    }
+    .howto-item img{
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+    }
+    .howto-item b{ color: #5a3a22; }
+    .howto-item span{ color: #6a6a6a; font-weight: 800; }
 
-.howto-backdrop{
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(2px);
-}
-
-.howto-card{
-  position: relative;
-  width: min(92vw, 720px);
-  max-height: min(78vh, 640px);
-  overflow: auto;
-  margin: 10vh auto 0;
-  background: rgba(255,255,255,0.92);
-  border: 3px solid rgba(255, 177, 90, 0.55);
-  border-radius: 18px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
-  padding: 14px 14px 16px;
-}
-
-.howto-head{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-#howto-title{
-  font-weight: 900;
-  font-size: 18px;
-  color: #5a3a22;
-}
-
-.howto-close{
-  border: none;
-  background: rgba(255,255,255,0.8);
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.howto-grid{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.howto-col{
-  background: rgba(255,255,255,0.7);
-  border-radius: 14px;
-  padding: 10px;
-  border: 2px solid rgba(0,0,0,0.06);
-}
-
-.howto-col-title{
-  font-weight: 900;
-  color: #5a3a22;
-  margin-bottom: 8px;
-}
-.howto-subtitle{
-  margin: 10px 4px 8px;
-  font-weight: 900;
-  color: #ff3b30;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-}
-
-.howto-item{
-  display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 10px;
-  align-items: center;
-  padding: 8px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.85);
-  border: 1px solid rgba(0,0,0,0.06);
-  margin-bottom: 8px;
-}
-
-.howto-item img{
-  width: 64px;
-  height: 64px;
-  object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
-}
-
-.howto-item b{ color: #5a3a22; }
-.howto-item span{ color: #6a6a6a; font-weight: 800; }
-<!-- 🎁 タップで発動（ボーナス）赤枠ゾーン -->
-
-  </div>
-</div>
-/* 赤枠ゾーン（タップしてOKの特別ネギ） */
-.howto-special {
-  margin-top: 10px;
-  padding: 12px 10px;
-  border: 3px solid #ff3b30;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.9);
-  text-align: center;
-}
-
-.howto-special-title {
-  font-weight: 900;
-  color: #ff3b30;
-  margin-bottom: 6px;
-  letter-spacing: 0.02em;
-  font-size: 14px;
-}
-
-.howto-special .howto-special-item {
-  font-weight: 900;
-  color: #5a3a22;
-  line-height: 1.6;
-  font-size: 14px;
-}
-
-.howto-special .howto-special-item small {
-  display: block;
-  color: #6a6a6a;
-  font-weight: 800;
-  margin-top: 2px;
-}
-
-
-
-}
- /* 🎁 タップで発動（ボーナス）赤枠ゾーン */
-.howto-special{
-  margin-top: 10px;
-  padding: 10px;
-  border: 3px solid #ff3b30;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.92);
-}
-
-.howto-special-title{
-  font-weight: 900;
-  color: #ff3b30;
-  margin-bottom: 8px;
-  letter-spacing: 0.02em;
-}
-
-.howto-special .howto-item{
-  margin-bottom: 8px; /* 既存の見た目に合わせる */
-}
-
-.howto-special .howto-item:last-child{
-  margin-bottom: 0;
-}
-@media (max-width: 560px){
-  .howto-grid{ grid-template-columns: 1fr; }
-  .howto-card{ width: min(94vw, 720px); }
- .howto-subtitle{
-  margin-top: 10px;
-}
- </style>
+    @media (max-width: 560px){
+      .howto-grid{ grid-template-columns: 1fr; }
+      .howto-card{ width: min(94vw, 720px); }
+    }
+  </style>
 </head>
 
 <body>
@@ -406,8 +336,8 @@
       </div>
 
       <div class="life-bar">
-        ライフ: <span id="life-value">7</span> / 7　｜　コンボ: <span id="combo-value">0</span>　｜　最高: <span id="best-value">0</span><button id="howto-btn" class="btn-mini" type="button">仕分け方</button>
-
+        ライフ: <span id="life-value">7</span> / 7　｜　コンボ: <span id="combo-value">0</span>　｜　最高: <span id="best-value">0</span>
+        <button id="howto-btn" class="btn-mini" type="button">仕分け方</button>
       </div>
 
       <div id="rule-text"></div>
@@ -416,9 +346,74 @@
     <main id="game-area"></main>
 
     <footer class="controls">
-      <!-- ボタンは1個だけ（ゲームオーバー後に文言が変わる） -->
       <button id="main-btn" class="btn-main">収穫開始！</button>
     </footer>
+  </div>
+
+  <!-- 遊び方モーダル（仕分けパネル） -->
+  <div id="howto-modal">
+    <div class="howto-backdrop"></div>
+    <div class="howto-card" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+      <div class="howto-head">
+        <div id="howto-title">仕分け方</div>
+        <button id="howto-close" class="howto-close" aria-label="閉じる">×</button>
+      </div>
+
+      <div class="howto-grid">
+        <div class="howto-col">
+          <div class="howto-col-title">✅ タップで除去する（出荷できない）</div>
+
+          <div class="howto-item">
+            <img src="images/negi_kare.png" alt="枯れネギ" />
+            <div><b>枯れネギ</b><br><span>放置するとライフ-1</span></div>
+          </div>
+
+          <div class="howto-item">
+            <img src="images/negi_ore.png" alt="折れネギ" />
+            <div><b>折れネギ</b><br><span>放置するとライフ-1</span></div>
+          </div>
+
+          <div class="howto-col-title howto-subtitle">🎁 タップで発動（ボーナス）</div>
+
+          <div class="howto-item">
+            <img src="images/negi_gold.png" alt="金ネギ" />
+            <div><b>金ネギ</b><br><span>タップで +10P ＆ 5秒ノーペナ</span></div>
+          </div>
+
+          <div class="howto-item">
+            <img src="images/negi_taba.png" alt="回復束ネギ" />
+            <div><b>回復束ネギ</b><br><span>タップで ライフ+1（最大7）</span></div>
+          </div>
+
+          <div class="howto-col-title howto-subtitle">❌ タップしない（出荷できる作物）</div>
+
+          <div class="howto-item">
+            <img src="images/negi_hoso.png" alt="細ネギ" />
+            <div><b>細ネギ（2枚葉）</b><br><span>出荷OK。触るとミス</span></div>
+          </div>
+
+          <div class="howto-item">
+            <img src="images/negi_futsu.png" alt="普通ネギ" />
+            <div><b>普通ネギ</b><br><span>出荷OK。触るとミス</span></div>
+          </div>
+
+          <div class="howto-item">
+            <img src="images/negi_futo.png" alt="太ネギ" />
+            <div><b>太ネギ</b><br><span>出荷OK。触るとミス</span></div>
+          </div>
+        </div>
+
+        <!-- 2カラム目を空にしておく（あとで説明を増やせる） -->
+        <div class="howto-col">
+          <div class="howto-col-title">メモ</div>
+          <div style="font-weight:900;color:#6a6a6a;line-height:1.7;">
+            ・プレイ中に「仕分け方」を押すと自動で一時停止します。<br>
+            ・閉じたら「再開」で続きから戻れます。
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <script>
@@ -450,42 +445,28 @@
     const ruleTextEl = document.getElementById("rule-text");
     const mainBtn = document.getElementById("main-btn");
     const bodyEl = document.body;
-    
-document.addEventListener("DOMContentLoaded", () => {
-  const howtoModal = document.getElementById("howto-modal");
-const openHowto = () => { if (howtoModal) howtoModal.style.display = "block"; };
-const closeHowto = () => { if (howtoModal) howtoModal.style.display = "none"; };
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (!howtoModal) return;
+    const howtoBtn = document.getElementById("howto-btn");
+    const howtoModal = document.getElementById("howto-modal");
+    const howtoClose = document.getElementById("howto-close");
+    const howtoBackdrop = howtoModal.querySelector(".howto-backdrop");
 
-  const howtoClose = document.getElementById("howto-close");
-  if (howtoClose) howtoClose.addEventListener("click", closeHowto);
+    const openHowto = () => { howtoModal.style.display = "block"; };
+    const closeHowto = () => { howtoModal.style.display = "none"; };
 
-  const backdrop = howtoModal.querySelector(".howto-backdrop");
-  if (backdrop) backdrop.addEventListener("click", closeHowto);
-
-  // ★ここ重要：最初に勝手に開かない
-  // openHowto(); ← これがあったら消す
-});
-
-   // ====== 説明文（上に表示） ======
-const DEFAULT_RULE_HTML =
- '🟤 <b>枯れ/折れ</b> をタップで除去（見逃すとライフ-1）<br>' +
-  '✨ <b>金ネギ</b> はタップで +10P ＆ 5秒ノーペナ<br>' +
-  '💚 <b>回復束ネギ</b> はタップで ライフ+1（最大7）';
-
+    // ====== 説明文（上に表示） ======
+    const DEFAULT_RULE_HTML =
+      '🟤 <b>枯れ/折れ</b> をタップで除去（見逃すとライフ-1）<br>' +
+      '✨ <b>金ネギ</b> はタップで +10P ＆ 5秒ノーペナ<br>' +
+      '💚 <b>回復束ネギ</b> はタップで ライフ+1（最大7）';
 
     // ====== ゲーム状態 ======
-   let paused = false;
-let invincibleRemainingMs = 0;
-let comboRemainingMs = 0;
- let score = 0;
-  
+    let score = 0;
     let life = 7;
     let combo = 0;
+
     let gameRunning = false;
-let paused = false;
+    let paused = false;
 
     let invincible = false;
     let invincibleTimeoutId = null;
@@ -509,7 +490,7 @@ let paused = false;
     // 出現率（悪い多め）
     const RATE = { good: 0.33, bad: 0.58, gold: 0.05, heal: 0.04 };
 
-    // キリ番演出（20/50/…/425）
+    // キリ番演出
     const MILESTONES = [20, 50, 100, 150, 200, 250, 300, 350, 400, 425];
     let firedMilestones = new Set();
 
@@ -593,8 +574,6 @@ let paused = false;
       score += delta;
       if (score < 0) score = 0;
       scoreValueEl.textContent = String(score);
-
-      // プラス点の時だけキリ番チェック
       if (delta > 0) handleMilestones(prev, score);
     }
 
@@ -604,7 +583,7 @@ let paused = false;
         return;
       }
       resetCombo();
-      if (!invincible) updateScore(-1);
+      updateScore(-1);
       setLife(life - 1);
       flashRuleMessage(`${message}<br>ライフが減った…（残り <b>${life}</b>/7）`, 1100);
     }
@@ -639,27 +618,25 @@ let paused = false;
       const gameRect = gameArea.getBoundingClientRect();
       const yBottom = gameRect.height * 0.20;
 
-      // wrapper
       const wrap = document.createElement("div");
-     wrap.className =
-  "leek-wrap" +
-  (kind === "heal" ? " heal" : "") +
-  (kind === "gold" ? " gold" : "");
+      wrap.className =
+        "leek-wrap" +
+        (kind === "heal" ? " heal" : "") +
+        (kind === "gold" ? " gold" : "");
 
       wrap.style.bottom = yBottom + "px";
       wrap.style.left = "-200px";
 
-      // badge (heal only)
-      const badge = document.createElement("div");
-      badge.className = "heal-badge";
-      badge.innerHTML = `回復 <span class="heal-heart">💚</span>`;
-      wrap.appendChild(badge);
-const goldBadge = document.createElement("div");
-goldBadge.className = "gold-badge";
-goldBadge.innerHTML = `+10P <span class="gold-sparkle">✨</span>`;
-wrap.appendChild(goldBadge);
+      const healBadge = document.createElement("div");
+      healBadge.className = "heal-badge";
+      healBadge.innerHTML = `回復 <span class="heal-heart">💚</span>`;
+      wrap.appendChild(healBadge);
 
-      // image
+      const goldBadge = document.createElement("div");
+      goldBadge.className = "gold-badge";
+      goldBadge.innerHTML = `+10P <span class="gold-sparkle">✨</span>`;
+      wrap.appendChild(goldBadge);
+
       const img = document.createElement("img");
       img.className = "leek-img";
       img.src = "images/" + data.file;
@@ -670,10 +647,10 @@ wrap.appendChild(goldBadge);
       const wf = waveFactor(performance.now());
       const base = BASE_SPEED * wf;
 
-// 500点を超えたら徐々に加速（最大1.6倍まで）
-const scoreBoost = 1 + Math.min(0.6, Math.max(0, (score - 500) / 500) * 0.6);
-const early  = Math.min(1, score / 200);      // 最初はゆっくり
-const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
+      // 500点を超えたら徐々に加速（最大1.6倍まで）
+      const scoreBoost = 1 + Math.min(0.6, Math.max(0, (score - 500) / 500) * 0.6);
+      const early  = Math.min(1, score / 200);
+      const randMax = (1.2 + 1.6 * early) * wf;
 
       let bonus = 0;
       if (kind === "good") bonus = 1.2;
@@ -686,8 +663,7 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
         kind,
         name: data.name,
         x: -Math.max(200, gameRect.width * 0.35),
-       speed: (base + bonus + Math.random() * randMax) * scoreBoost
-
+        speed: (base + bonus + Math.random() * randMax) * scoreBoost
       };
 
       wrap.addEventListener("click", (e) => handleTapLeek(obj, e));
@@ -736,25 +712,21 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
       }
     }
 
-   function handleLeekReachedRight(obj) {
-  if (obj.kind === "good") {
-    updateScore(1);
-  } else if (obj.kind === "bad") {
-    registerMiss(`見逃し！<b>${obj.name}</b>が流れちゃった💦`);
-  } else if (obj.kind === "gold") {
-    // 見逃しても発動しない（タップのみ）
-    flashRuleMessage("金ネギ逃した…！<br><b>タップで +10P＆5秒ノーペナ</b>", 900);
-  } else if (obj.kind === "heal") {
-    // 見逃しても発動しない（タップのみ）
-    // 何もなし or メッセージだけ出す
-    // flashRuleMessage("回復ネギ逃した…！<br><b>タップでライフ+1</b>", 900);
-  }
-}
-
+    function handleLeekReachedRight(obj) {
+      if (obj.kind === "good") {
+        updateScore(1);
+      } else if (obj.kind === "bad") {
+        registerMiss(`見逃し！<b>${obj.name}</b>が流れちゃった💦`);
+      } else if (obj.kind === "gold") {
+        flashRuleMessage("金ネギ逃した…！<br><b>タップで +10P＆5秒ノーペナ</b>", 900);
+      } else if (obj.kind === "heal") {
+        // 見逃しは無反応でOK（必要ならメッセージ追加できる）
+      }
+    }
 
     // ====== タップ処理 ======
     function handleTapLeek(obj, e) {
-      if (!gameRunning) return;
+      if (!gameRunning || paused) return;
       if (!gameArea.contains(obj.el)) return;
 
       const clientX = e && e.clientX ? e.clientX : (window.innerWidth / 2);
@@ -763,9 +735,7 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
       if (obj.kind === "good") {
         registerMiss("ちがう！良いネギを取っちゃった🥲");
         showPop(invincible ? "セーフ✨" : "-1", clientX, clientY);
-      }
-
-      if (obj.kind === "bad") {
+      } else if (obj.kind === "bad") {
         combo += 1;
         comboValueEl.textContent = String(combo);
         keepCombo();
@@ -773,9 +743,7 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
         updateScore(combo);
         showPop("+" + combo + "👌", clientX, clientY);
         flashRuleMessage(`ナイス！傷んだネギを処理👌<br><b>${combo}コンボ！ +${combo}点</b>`, 850);
-      }
-
-      if (obj.kind === "gold") {
+      } else if (obj.kind === "gold") {
         updateScore(10);
         showPop("+10✨", clientX, clientY);
 
@@ -783,9 +751,7 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
         setInvincible(true);
         clearTimeout(invincibleTimeoutId);
         invincibleTimeoutId = setTimeout(() => setInvincible(false), 5000);
-      }
-
-      if (obj.kind === "heal") {
+      } else if (obj.kind === "heal") {
         const before = life;
         if (before < 7) setLife(before + 1);
         showPop(before < 7 ? "ライフ+1💚" : "満タン💚", clientX, clientY);
@@ -803,7 +769,7 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
       if (idx >= 0) leeks.splice(idx, 1);
     }
 
-    // ====== 開始/終了 ======
+    // ====== 開始/停止/一時停止 ======
     function clearAllLeeks() {
       for (const obj of leeks) obj.el.remove();
       leeks = [];
@@ -816,81 +782,14 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
       moveTimerId = null;
     }
 
-   function pauseGame() {
-  if (!gameRunning || paused) return;
-  paused = true;
+    function startGameTimers() {
+      stopGameTimers();
+      scheduleNextSpawn();
+      moveTimerId = setInterval(moveLeeks, 1000 / 60);
+    }
 
-  // タイマー停止
-  clearTimeout(spawnTimerId);
-  clearInterval(moveTimerId);
-  spawnTimerId = null;
-  moveTimerId = null;
-
-  mainBtn.textContent = "再開";
-  mainBtn.disabled = false;
-}
-
-function resumeGame() {
-  if (!gameRunning || !paused) return;
-  paused = false;
-
-  // タイマー再開（あなたの既存の再開処理をここに）
-  startTimersAgain(); // ←ここは既存の「再開処理」に合わせて
-  mainBtn.textContent = "一時停止";
-  mainBtn.disabled = false;
-}
-
-function startGame() {
-  gameRunning = true;
-  paused = false;
-
-  mainBtn.textContent = "一時停止";
-  mainBtn.disabled = false;
-
-  // ゲーム開始の既存処理（初期化・タイマー開始など）
-  initGame();         // ←既存に合わせて
-  startTimersAgain(); // ←既存に合わせて
-}
-
-  // 再スタート（出現と移動）
-  scheduleNextSpawn();
-  moveTimerId = setInterval(moveLeeks, 1000 / 60);
-
-  flashRuleMessage("▶️ 再開！<br>悪いネギを叩けーっ🌿", 850);
-
-  mainBtn.textContent = "一時停止";
-  mainBtn.disabled = false;
-}
-  // 無敵の残り時間を保存
-  if (invincible) {
-    invincibleRemainingMs = Math.max(0, invincibleTimeoutId ? 0 : 0); // 保険
-    // いまのコードはtimeout一本なので、残り時間を簡易保存する形にするなら↓の方法がおすすめ
-  }
-
-  // コンボ残り時間（簡易）
-  if (comboTimer) {
-    clearTimeout(comboTimer);
-    comboTimer = null;
-    comboRemainingMs = COMBO_WINDOW_MS; // ざっくり復帰でOKならこれで十分
-  }
-
-  flashRuleMessage("⏸ 一時停止中<br>「仕分け」で確認できるよ", 900);
-  mainBtn.textContent = "再開";
-  mainBtn.disabled = false;
-}
-
-function resumeGame() {
-  if (!gameRunning || !paused) return;
-  paused = false;
-
-  // 再開
-  scheduleNextSpawn();
-  moveTimerId = setInterval(moveLeeks, 1000 / 60);
-
-  flashRuleMessage("▶️ 再開！<br>悪いネギを叩けーっ🌿", 700);
-  mainBtn.textContent = "一時停止";
-}
- // 初期化
+    function startGame() {
+      // 初期化
       score = 0;
       life = 7;
       combo = 0;
@@ -902,28 +801,43 @@ function resumeGame() {
 
       setInvincible(false);
       clearTimeout(invincibleTimeoutId);
+      resetCombo();
 
       clearAllLeeks();
       stopGameTimers();
 
       gameRunning = true;
+      paused = false;
       startTimeMs = performance.now();
 
       ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
 
-      paused = false;
-mainBtn.textContent = "一時停止";
-mainBtn.disabled = false;
+      mainBtn.textContent = "一時停止";
+      mainBtn.disabled = false;
 
-
-      scheduleNextSpawn();
-      moveTimerId = setInterval(moveLeeks, 1000 / 60);
-
+      startGameTimers();
       flashRuleMessage("収穫スタート！<br><b>悪いネギを叩けーっ🌿</b>", 950);
+    }
+
+    function pauseGame() {
+      if (!gameRunning || paused) return;
+      paused = true;
+      stopGameTimers();
+      flashRuleMessage("⏸ 一時停止中<br>「仕分け方」で確認できるよ", 900);
+      mainBtn.textContent = "再開";
+    }
+
+    function resumeGame() {
+      if (!gameRunning || !paused) return;
+      paused = false;
+      startGameTimers();
+      flashRuleMessage("▶️ 再開！<br>悪いネギを叩けーっ🌿", 700);
+      mainBtn.textContent = "一時停止";
     }
 
     function stopGame(isGameOver = false) {
       gameRunning = false;
+      paused = false;
       stopGameTimers();
       setInvincible(false);
       resetCombo();
@@ -932,12 +846,10 @@ mainBtn.disabled = false;
       const best = loadBest();
 
       if (isGameOver) {
-        // 畑っぽいメッセージ
         ruleTextEl.innerHTML =
           `🌙 収穫おつかれさま<br>` +
           `最終スコア：<b>${score}</b><br>` +
           `最高スコア：<b>${best}</b>`;
-
         mainBtn.textContent = "もう一度収穫する！";
         mainBtn.disabled = false;
       } else {
@@ -948,81 +860,26 @@ mainBtn.disabled = false;
     }
 
     // ====== イベント ======
-  mainBtn.addEventListener("click", () => {
-  if (!gameRunning) return startGame();
-  if (!paused) return pauseGame();
-  return resumeGame();
-});
+    mainBtn.addEventListener("click", () => {
+      if (!gameRunning) return startGame();
+      if (!paused) return pauseGame();
+      return resumeGame();
+    });
 
+    // 仕分け方ボタン：プレイ中は自動一時停止して開く
+    howtoBtn.addEventListener("click", () => {
+      if (gameRunning && !paused) pauseGame();
+      openHowto();
+    });
+
+    howtoClose.addEventListener("click", closeHowto);
+    howtoBackdrop.addEventListener("click", closeHowto);
 
     // 初期表示
     ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
     bestValueEl.textContent = String(loadBest());
   </script>
-<!-- 遊び方モーダル（仕分けパネル） -->
-<div id="howto-modal" style="display:none;">
-
-  <div class="howto-backdrop"></div>
-  <div class="howto-card" role="dialog" aria-modal="true" aria-labelledby="howto-title">
-    <div class="howto-head">
-      <div class="howto-title" id="howto-title">仕分け方</div>
-      <button id="howto-close" class="howto-close" aria-label="閉じる">×</button>
-    </div>
-
-    <div class="howto-grid">
-  <div class="howto-col">
-
-    <div class="howto-col-title">✅ タップで除去する（出荷できない）</div>
-
-    <div class="howto-item">
-      <img src="images/negi_kare.png" alt="枯れネギ" />
-      <div><b>枯れネギ</b><br><span>放置するとライフ-1</span></div>
-    </div>
-
-    <div class="howto-item">
-      <img src="images/negi_ore.png" alt="折れネギ" />
-      <div><b>折れネギ</b><br><span>放置するとライフ-1</span></div>
-    </div>
-
-    <div class="howto-col-title howto-subtitle">🎁 タップで発動（ボーナス）</div>
-
-    <div class="howto-item">
-      <img src="images/negi_gold.png" alt="金ネギ" />
-      <div><b>金ネギ</b><br><span>タップで +10P ＆ 5秒ノーペナ</span></div>
-    </div>
-
-    <div class="howto-item">
-      <img src="images/negi_taba.png" alt="回復束ネギ" />
-      <div><b>回復束ネギ</b><br><span>タップで ライフ+1（最大7）</span></div>
-    </div>
-
-    <div class="howto-col-title howto-subtitle">❌ タップしない（出荷できる作物）</div>
-
-    <div class="howto-item">
-      <img src="images/negi_hoso.png" alt="細ネギ" />
-      <div><b>細ネギ（2枚葉）</b><br><span>出荷OK。触るとミス</span></div>
-    </div>
-
-    <div class="howto-item">
-      <img src="images/negi_futsu.png" alt="普通ネギ" />
-      <div><b>普通ネギ</b><br><span>出荷OK。触るとミス</span></div>
-    </div>
-
-    <div class="howto-item">
-      <img src="images/negi_futo.png" alt="太ネギ" />
-      <div><b>太ネギ</b><br><span>出荷OK。触るとミス</span></div>
-    </div>
-
-  </div>
-</div>
-
-      
-        </div>
-      </div>
-    </div>
-
-    
-  </div>
-</div>
 </body>
 </html>
+
+ 
