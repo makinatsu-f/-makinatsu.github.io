@@ -485,6 +485,7 @@ let comboRemainingMs = 0;
     let life = 7;
     let combo = 0;
     let gameRunning = false;
+let paused = false;
 
     let invincible = false;
     let invincibleTimeoutId = null;
@@ -630,7 +631,7 @@ let comboRemainingMs = 0;
 
     // ====== 生成 ======
     function spawnLeek() {
-      if (!gameRunning) return;
+      if (!gameRunning || paused) return;
 
       const kind = pickKind();
       const data = NEGI_TYPES[kind][Math.floor(Math.random() * NEGI_TYPES[kind].length)];
@@ -701,7 +702,7 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
     }
 
     function scheduleNextSpawn() {
-      if (!gameRunning) return;
+      if (!gameRunning || paused) return;
       const wf = waveFactor(performance.now());
       const interval = (BASE_SPAWN_INTERVAL / wf) * (0.85 + Math.random() * 0.35);
 
@@ -713,7 +714,7 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
 
     // ====== 移動 ======
     function moveLeeks() {
-      if (!gameRunning) return;
+      if (!gameRunning || paused) return;
 
       const gameRect = gameArea.getBoundingClientRect();
       const removeList = [];
@@ -823,7 +824,28 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
   // タイマー停止
   clearTimeout(spawnTimerId);
   clearInterval(moveTimerId);
+pawnTimerId = null;
+  moveTimerId = null;
 
+  flashRuleMessage("⏸ 一時停止中<br>「見分け方」で確認できるよ", 900);
+
+  mainBtn.textContent = "再開";
+  mainBtn.disabled = false;
+}
+
+function resumeGame() {
+  if (!gameRunning || !paused) return;
+  paused = false;
+
+  // 再スタート（出現と移動）
+  scheduleNextSpawn();
+  moveTimerId = setInterval(moveLeeks, 1000 / 60);
+
+  flashRuleMessage("▶️ 再開！<br>悪いネギを叩けーっ🌿", 850);
+
+  mainBtn.textContent = "一時停止";
+  mainBtn.disabled = false;
+}
   // 無敵の残り時間を保存
   if (invincible) {
     invincibleRemainingMs = Math.max(0, invincibleTimeoutId ? 0 : 0); // 保険
@@ -874,8 +896,10 @@ function resumeGame() {
 
       ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
 
-      mainBtn.textContent = "プレイ中…";
-      mainBtn.disabled = true;
+      paused = false;
+mainBtn.textContent = "一時停止";
+mainBtn.disabled = false;
+
 
       scheduleNextSpawn();
       moveTimerId = setInterval(moveLeeks, 1000 / 60);
@@ -909,7 +933,12 @@ function resumeGame() {
     }
 
     // ====== イベント ======
-    mainBtn.addEventListener("click", () => startGame());
+  mainBtn.addEventListener("click", () => {
+  if (!gameRunning) return startGame();
+  if (!paused) return pauseGame();
+  return resumeGame();
+});
+
 
     // 初期表示
     ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
