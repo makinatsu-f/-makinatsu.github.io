@@ -218,6 +218,113 @@
       cursor: pointer;
     }
     .btn-main:active { transform: translateY(2px); box-shadow: 0 4px 0 #d96c23; }
+/* 見分け方モーダル */
+#howto-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.howto-backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+}
+
+.howto-card{
+  position: relative;
+  width: min(92vw, 720px);
+  max-height: min(78vh, 640px);
+  overflow: auto;
+  margin: 10vh auto 0;
+  background: rgba(255,255,255,0.92);
+  border: 3px solid rgba(255, 177, 90, 0.55);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  padding: 14px 14px 16px;
+}
+
+.howto-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+#howto-title{
+  font-weight: 900;
+  font-size: 18px;
+  color: #5a3a22;
+}
+
+.howto-close{
+  border: none;
+  background: rgba(255,255,255,0.8);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.howto-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.howto-col{
+  background: rgba(255,255,255,0.7);
+  border-radius: 14px;
+  padding: 10px;
+  border: 2px solid rgba(0,0,0,0.06);
+}
+
+.howto-col-title{
+  font-weight: 900;
+  color: #5a3a22;
+  margin-bottom: 8px;
+}
+
+.howto-item{
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(0,0,0,0.06);
+  margin-bottom: 8px;
+}
+
+.howto-item img{
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+}
+
+.howto-item b{ color: #5a3a22; }
+.howto-item span{ color: #6a6a6a; font-weight: 800; }
+
+.howto-foot{
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.howto-ok{
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 900;
+  cursor: pointer;
+  background: rgba(255, 177, 90, 0.95);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
   </style>
 </head>
 
@@ -275,6 +382,29 @@
 
     // ====== 説明文（上に表示） ======
       const DEFAULT_RULE_HTML =
+        // ===== 見分け方パネル（スタート前に表示） =====
+const howtoModal = document.getElementById("howto-modal");
+const howtoOk = document.getElementById("howto-ok");
+const howtoClose = document.getElementById("howto-close");
+
+function openHowto() {
+  if (!howtoModal) return;
+  howtoModal.style.display = "block";
+}
+function closeHowto() {
+  if (!howtoModal) return;
+  howtoModal.style.display = "none";
+}
+
+// OK / × ボタンで閉じる
+if (howtoOk) howtoOk.addEventListener("click", closeHowto);
+if (howtoClose) howtoClose.addEventListener("click", closeHowto);
+
+// ページ読み込み時に自動で開く（スタート前の説明）
+window.addEventListener("load", () => {
+  openHowto();
+});
+
   '🟤 <b>枯れ/折れ</b> をタップで除去（見逃すとライフ-1）<br>' +
   '✨ <b>金ネギ +10P</b> ＆ 5秒ノーペナルティ<br>' +
   '💚 <b>回復 +1</b>（最大7）';
@@ -675,5 +805,57 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
     ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
     bestValueEl.textContent = String(loadBest());
   </script>
+<!-- 遊び方モーダル（見分け方パネル） -->
+<div id="howto-modal" style="display:none;">
+  <div class="howto-backdrop"></div>
+  <div class="howto-card" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+    <div class="howto-head">
+      <div class="howto-title" id="howto-title">見分け方</div>
+      <button id="howto-close" class="howto-close" aria-label="閉じる">×</button>
+    </div>
+
+    <div class="howto-grid">
+      <div class="howto-col">
+        <div class="howto-col-title">✅ タップする（除去）</div>
+        <div class="howto-item">
+          <img src="images/negi_kare.png" alt="枯れネギ" />
+          <div><b>枯れネギ</b><br><span>放置するとライフ-1</span></div>
+        </div>
+        <div class="howto-item">
+          <img src="images/negi_ore.png" alt="折れネギ" />
+          <div><b>折れネギ</b><br><span>放置するとライフ-1</span></div>
+        </div>
+      </div>
+
+      <div class="howto-col">
+        <div class="howto-col-title">❌ タップしない（作物）</div>
+        <div class="howto-item">
+          <img src="images/negi_hoso.png" alt="細ネギ" />
+          <div><b>細ネギ（2枚葉）</b><br><span>出荷OK。触るとミス</span></div>
+        </div>
+        <div class="howto-item">
+          <img src="images/negi_futsu.png" alt="普通ネギ" />
+          <div><b>普通ネギ</b><br><span>触るとミス</span></div>
+        </div>
+        <div class="howto-item">
+          <img src="images/negi_futo.png" alt="太ネギ" />
+          <div><b>太ネギ</b><br><span>触るとミス</span></div>
+        </div>
+        <div class="howto-item">
+          <img src="images/negi_gold.png" alt="金ネギ" />
+          <div><b>金ネギ</b><br><span>見逃して発動：5秒ノーペナ</span></div>
+        </div>
+        <div class="howto-item">
+          <img src="images/negi_taba.png" alt="回復束ネギ" />
+          <div><b>回復束ネギ</b><br><span>見逃して発動：ライフ+1（最大7）</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="howto-foot">
+      <button id="howto-ok" class="howto-ok">OK！収穫へ</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
