@@ -396,7 +396,10 @@
 @media (max-width: 560px){
   .howto-grid{ grid-template-columns: 1fr; }
   .howto-card{ width: min(94vw, 720px); }
-  </style>
+ .howto-subtitle{
+  margin-top: 10px;
+}
+ </style>
 </head>
 
 <body>
@@ -885,46 +888,52 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
     </div>
 
     <div class="howto-grid">
-      <div class="howto-col">
-        <div class="howto-col-title">✅ タップで除去する（出荷できない）</div>
-        <div class="howto-item">
-          <img src="images/negi_kare.png" alt="枯れネギ" />
-          <div><b>枯れネギ</b><br><span>放置するとライフ-1</span></div>
-        </div>
-        <div class="howto-item">
-    <img src="images/negi_ore.png" alt="折れネギ" />
-          <div><b>折れネギ</b><br><span>放置するとライフ-1</span></div>
-     </div>
-        
-        <div class="howto-subtitle">🎁 タップで発動（ボーナス）</div>
+  <div class="howto-col">
 
-<div class="howto-item">
-  <img src="images/negi_gold.png" alt="金ネギ" />
-  <div><b>金ネギ</b><br><span>タップで +10P ＆ 5秒ノーペナ</span></div>
-</div>
+    <div class="howto-col-title">✅ タップで除去する（出荷できない）</div>
 
-<div class="howto-item">
-  <img src="images/negi_taba.png" alt="回復束ネギ" />
-  <div><b>回復束ネギ</b><br><span>タップで ライフ+1（最大7）</span></div>
-</div>
-</div>
+    <div class="howto-item">
+      <img src="images/negi_kare.png" alt="枯れネギ" />
+      <div><b>枯れネギ</b><br><span>放置するとライフ-1</span></div>
+    </div>
+
+    <div class="howto-item">
+      <img src="images/negi_ore.png" alt="折れネギ" />
+      <div><b>折れネギ</b><br><span>放置するとライフ-1</span></div>
+    </div>
+
+    <div class="howto-col-title howto-subtitle">🎁 タップで発動（ボーナス）</div>
+
+    <div class="howto-item">
+      <img src="images/negi_gold.png" alt="金ネギ" />
+      <div><b>金ネギ</b><br><span>タップで +10P ＆ 5秒ノーペナ</span></div>
+    </div>
+
+    <div class="howto-item">
+      <img src="images/negi_taba.png" alt="回復束ネギ" />
+      <div><b>回復束ネギ</b><br><span>タップで ライフ+1（最大7）</span></div>
+    </div>
+
+    <div class="howto-col-title howto-subtitle">❌ タップしない（作物）</div>
+
+    <div class="howto-item">
+      <img src="images/negi_hoso.png" alt="細ネギ" />
+      <div><b>細ネギ（2枚葉）</b><br><span>出荷OK。触るとミス</span></div>
+    </div>
+
+    <div class="howto-item">
+      <img src="images/negi_futsu.png" alt="普通ネギ" />
+      <div><b>普通ネギ</b><br><span>触るとミス</span></div>
+    </div>
+
+    <div class="howto-item">
+      <img src="images/negi_futo.png" alt="太ネギ" />
+      <div><b>太ネギ</b><br><span>触るとミス</span></div>
+    </div>
+
   </div>
-      </div>
+</div>
 
-      <div class="howto-col">
-        <div class="howto-col-title">❌ タップしない（出荷OK）</div>
-        <div class="howto-item">
-          <img src="images/negi_hoso.png" alt="細ネギ" />
-          <div><b>細ネギ（2枚葉）</b><br><span>出荷OK。触るとミス</span></div>
-        </div>
-        <div class="howto-item">
-          <img src="images/negi_futsu.png" alt="普通ネギ" />
-          <div><b>普通ネギ</b><br><span>出荷OK。触るとミス</span></div>
-        </div>
-        <div class="howto-item">
-          <img src="images/negi_futo.png" alt="太ネギ" />
-          <div><b>太ネギ</b><br><span>出荷OK。触るとミス</span></div>
-        </div>
       
         </div>
       </div>
