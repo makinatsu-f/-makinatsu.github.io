@@ -368,9 +368,7 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
-@media (max-width: 560px){
-  .howto-grid{ grid-template-columns: 1fr; }
-  .howto-card{ width: min(94vw, 720px); }
+
 }
  /* 🎁 タップで発動（ボーナス）赤枠ゾーン */
 .howto-special{
@@ -395,7 +393,10 @@
 .howto-special .howto-item:last-child{
   margin-bottom: 0;
 }
- </style>
+@media (max-width: 560px){
+  .howto-grid{ grid-template-columns: 1fr; }
+  .howto-card{ width: min(94vw, 720px); }
+  </style>
 </head>
 
 <body>
