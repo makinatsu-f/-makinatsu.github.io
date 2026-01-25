@@ -440,7 +440,8 @@
     
 document.addEventListener("DOMContentLoaded", () => {
   const howtoModal = document.getElementById("howto-modal");
-  
+  const howtoClose = document.getElementById("howto-close");
+if (!howtoModal) return;
 
   const openHowto = () => { howtoModal.style.display = "block"; };
   const closeHowto = () => { howtoModal.style.display = "none"; };
