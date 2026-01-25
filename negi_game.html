@@ -379,32 +379,27 @@
     const ruleTextEl = document.getElementById("rule-text");
     const mainBtn = document.getElementById("main-btn");
     const bodyEl = document.body;
-
-    // ====== 説明文（上に表示） ======
-      const DEFAULT_RULE_HTML =
-        // ===== 見分け方パネル（スタート前に表示） =====
-const howtoModal = document.getElementById("howto-modal");
-const howtoOk = document.getElementById("howto-ok");
-const howtoClose = document.getElementById("howto-close");
-
-function openHowto() {
+    
+document.addEventListener("DOMContentLoaded", () => {
+  const howtoModal = document.getElementById("howto-modal");
+  const howtoOk = document.getElementById("howto-ok");
+  const howtoClose = document.getElementById("howto-close");
   if (!howtoModal) return;
-  howtoModal.style.display = "block";
-}
-function closeHowto() {
-  if (!howtoModal) return;
-  howtoModal.style.display = "none";
-}
 
-// OK / × ボタンで閉じる
-if (howtoOk) howtoOk.addEventListener("click", closeHowto);
-if (howtoClose) howtoClose.addEventListener("click", closeHowto);
+  const openHowto = () => { howtoModal.style.display = "block"; };
+  const closeHowto = () => { howtoModal.style.display = "none"; };
 
-// ページ読み込み時に自動で開く（スタート前の説明）
-window.addEventListener("load", () => {
+  if (howtoOk) howtoOk.addEventListener("click", closeHowto);
+  if (howtoClose) howtoClose.addEventListener("click", closeHowto);
+
+  const backdrop = howtoModal.querySelector(".howto-backdrop");
+  if (backdrop) backdrop.addEventListener("click", closeHowto);
+
   openHowto();
 });
 
+   // ====== 説明文（上に表示） ======
+const DEFAULT_RULE_HTML =
   '🟤 <b>枯れ/折れ</b> をタップで除去（見逃すとライフ-1）<br>' +
   '✨ <b>金ネギ +10P</b> ＆ 5秒ノーペナルティ<br>' +
   '💚 <b>回復 +1</b>（最大7）';
@@ -858,24 +853,5 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
     </div>
   </div>
 </div>
-window.addEventListener("load", () => {
-  const howtoModal = document.getElementById("howto-modal");
-  const howtoOk = document.getElementById("howto-ok");
-  const howtoClose = document.getElementById("howto-close");
-
-  function openHowto() {
-    if (!howtoModal) return;
-    howtoModal.style.display = "block";
-  }
-  function closeHowto() {
-    if (!howtoModal) return;
-    howtoModal.style.display = "none";
-  }
-
-  if (howtoOk) howtoOk.addEventListener("click", closeHowto);
-  if (howtoClose) howtoClose.addEventListener("click", closeHowto);
-
-  openHowto();
-});
 </body>
 </html>
