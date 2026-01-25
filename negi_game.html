@@ -406,7 +406,7 @@
       </div>
 
       <div class="life-bar">
-        ライフ: <span id="life-value">7</span> / 7　｜　コンボ: <span id="combo-value">0</span>　｜　最高: <span id="best-value">0</span><button id="howto-btn" class="btn-mini" type="button">見分け方</button>
+        ライフ: <span id="life-value">7</span> / 7　｜　コンボ: <span id="combo-value">0</span>　｜　最高: <span id="best-value">0</span><button id="howto-btn" class="btn-mini" type="button">仕分け方</button>
 
       </div>
 
@@ -816,18 +816,15 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
       moveTimerId = null;
     }
 
-    function startGame() {
-     function pauseGame() {
+   function pauseGame() {
   if (!gameRunning || paused) return;
   paused = true;
 
   // タイマー停止
   clearTimeout(spawnTimerId);
   clearInterval(moveTimerId);
-pawnTimerId = null;
+  spawnTimerId = null;
   moveTimerId = null;
-
-  flashRuleMessage("⏸ 一時停止中<br>「見分け方」で確認できるよ", 900);
 
   mainBtn.textContent = "再開";
   mainBtn.disabled = false;
@@ -836,6 +833,24 @@ pawnTimerId = null;
 function resumeGame() {
   if (!gameRunning || !paused) return;
   paused = false;
+
+  // タイマー再開（あなたの既存の再開処理をここに）
+  startTimersAgain(); // ←ここは既存の「再開処理」に合わせて
+  mainBtn.textContent = "一時停止";
+  mainBtn.disabled = false;
+}
+
+function startGame() {
+  gameRunning = true;
+  paused = false;
+
+  mainBtn.textContent = "一時停止";
+  mainBtn.disabled = false;
+
+  // ゲーム開始の既存処理（初期化・タイマー開始など）
+  initGame();         // ←既存に合わせて
+  startTimersAgain(); // ←既存に合わせて
+}
 
   // 再スタート（出現と移動）
   scheduleNextSpawn();
@@ -859,7 +874,7 @@ function resumeGame() {
     comboRemainingMs = COMBO_WINDOW_MS; // ざっくり復帰でOKならこれで十分
   }
 
-  flashRuleMessage("⏸ 一時停止中<br>「見分け方」で確認できるよ", 900);
+  flashRuleMessage("⏸ 一時停止中<br>「仕分け」で確認できるよ", 900);
   mainBtn.textContent = "再開";
   mainBtn.disabled = false;
 }
@@ -944,13 +959,13 @@ mainBtn.disabled = false;
     ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
     bestValueEl.textContent = String(loadBest());
   </script>
-<!-- 遊び方モーダル（見分け方パネル） -->
+<!-- 遊び方モーダル（仕分けパネル） -->
 <div id="howto-modal" style="display:none;">
 
   <div class="howto-backdrop"></div>
   <div class="howto-card" role="dialog" aria-modal="true" aria-labelledby="howto-title">
     <div class="howto-head">
-      <div class="howto-title" id="howto-title">見分け方</div>
+      <div class="howto-title" id="howto-title">仕分け方</div>
       <button id="howto-close" class="howto-close" aria-label="閉じる">×</button>
     </div>
 
