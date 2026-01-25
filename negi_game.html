@@ -456,9 +456,7 @@
     
 document.addEventListener("DOMContentLoaded", () => {
   const howtoModal = document.getElementById("howto-modal");
-  const howtoOk = document.getElementById("howto-ok");
-  const howtoClose = document.getElementById("howto-close");
-  if (!howtoModal) return;
+  
 
   const openHowto = () => { howtoModal.style.display = "block"; };
   const closeHowto = () => { howtoModal.style.display = "none"; };
@@ -939,9 +937,7 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
       </div>
     </div>
 
-    <div class="howto-foot">
-      <button id="howto-ok" class="howto-ok">OK！収穫へ</button>
-    </div>
+    
   </div>
 </div>
 </body>
