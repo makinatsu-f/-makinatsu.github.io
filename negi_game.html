@@ -218,6 +218,18 @@
       cursor: pointer;
     }
     .btn-main:active { transform: translateY(2px); box-shadow: 0 4px 0 #d96c23; }
+    .btn-mini{
+  margin-left: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 177, 90, 0.55);
+  background: rgba(255,255,255,0.78);
+  font-weight: 900;
+  font-size: 12px;
+  cursor: pointer;
+}
+.btn-mini:active{ transform: translateY(1px); }
+
 /* 見分け方モーダル */
 #howto-modal{
   position: fixed;
@@ -394,7 +406,8 @@
       </div>
 
       <div class="life-bar">
-        ライフ: <span id="life-value">7</span> / 7　｜　コンボ: <span id="combo-value">0</span>　｜　最高: <span id="best-value">0</span>
+        ライフ: <span id="life-value">7</span> / 7　｜　コンボ: <span id="combo-value">0</span>　｜　最高: <span id="best-value">0</span><button id="howto-btn" class="btn-mini" type="button">見分け方</button>
+
       </div>
 
       <div id="rule-text"></div>
@@ -440,19 +453,20 @@
     
 document.addEventListener("DOMContentLoaded", () => {
   const howtoModal = document.getElementById("howto-modal");
+const openHowto = () => { if (howtoModal) howtoModal.style.display = "block"; };
+const closeHowto = () => { if (howtoModal) howtoModal.style.display = "none"; };
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (!howtoModal) return;
+
   const howtoClose = document.getElementById("howto-close");
-if (!howtoModal) return;
-
-  const openHowto = () => { howtoModal.style.display = "block"; };
-  const closeHowto = () => { howtoModal.style.display = "none"; };
-
- 
   if (howtoClose) howtoClose.addEventListener("click", closeHowto);
 
   const backdrop = howtoModal.querySelector(".howto-backdrop");
   if (backdrop) backdrop.addEventListener("click", closeHowto);
 
-  openHowto();
+  // ★ここ重要：最初に勝手に開かない
+  // openHowto(); ← これがあったら消す
 });
 
    // ====== 説明文（上に表示） ======
@@ -463,7 +477,11 @@ const DEFAULT_RULE_HTML =
 
 
     // ====== ゲーム状態 ======
-    let score = 0;
+   let paused = false;
+let invincibleRemainingMs = 0;
+let comboRemainingMs = 0;
+ let score = 0;
+  
     let life = 7;
     let combo = 0;
     let gameRunning = false;
@@ -798,7 +816,44 @@ const randMax = (1.2 + 1.6 * early) * wf;     // 1.2wf → 2.8wf に育つ
     }
 
     function startGame() {
-      // 初期化
+     function pauseGame() {
+  if (!gameRunning || paused) return;
+  paused = true;
+
+  // タイマー停止
+  clearTimeout(spawnTimerId);
+  clearInterval(moveTimerId);
+
+  // 無敵の残り時間を保存
+  if (invincible) {
+    invincibleRemainingMs = Math.max(0, invincibleTimeoutId ? 0 : 0); // 保険
+    // いまのコードはtimeout一本なので、残り時間を簡易保存する形にするなら↓の方法がおすすめ
+  }
+
+  // コンボ残り時間（簡易）
+  if (comboTimer) {
+    clearTimeout(comboTimer);
+    comboTimer = null;
+    comboRemainingMs = COMBO_WINDOW_MS; // ざっくり復帰でOKならこれで十分
+  }
+
+  flashRuleMessage("⏸ 一時停止中<br>「見分け方」で確認できるよ", 900);
+  mainBtn.textContent = "再開";
+  mainBtn.disabled = false;
+}
+
+function resumeGame() {
+  if (!gameRunning || !paused) return;
+  paused = false;
+
+  // 再開
+  scheduleNextSpawn();
+  moveTimerId = setInterval(moveLeeks, 1000 / 60);
+
+  flashRuleMessage("▶️ 再開！<br>悪いネギを叩けーっ🌿", 700);
+  mainBtn.textContent = "一時停止";
+}
+ // 初期化
       score = 0;
       life = 7;
       combo = 0;
