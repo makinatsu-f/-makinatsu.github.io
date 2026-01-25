@@ -77,7 +77,8 @@
       backdrop-filter: blur(4px);
       min-height: 3.4em;
       box-shadow: 0 2px 10px rgba(0,0,0,0.10);
-    }
+   display: none;
+ }
     .rule-flash {
       outline: 3px solid rgba(255, 177, 90, 0.55);
       transform: translateY(-1px);
@@ -455,7 +456,7 @@
     const closeHowto = () => { howtoModal.style.display = "none"; };
 
     // ====== 説明文（上に表示） ======
-    const DEFAULT_RULE_HTML =
+    const DEFAULT_RULE_HTML ="";
       '🟤 <b>枯れ/折れ</b> をタップで除去（見逃すとライフ-1）<br>' +
       '✨ <b>金ネギ</b> はタップで +10P ＆ 5秒ノーペナ<br>' +
       '💚 <b>回復束ネギ</b> はタップで ライフ+1（最大7）';
@@ -513,7 +514,7 @@
       ruleTextEl.classList.add("rule-flash");
       flashRuleMessage._t = setTimeout(() => {
         ruleTextEl.classList.remove("rule-flash");
-        ruleTextEl.innerHTML = DEFAULT_RULE_HTML;
+        
       }, ms);
     }
 
