@@ -184,7 +184,7 @@ input[type="range"] {
 .bag-preview {
   position: relative;
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
   margin: 0 auto;
   aspect-ratio: 4 / 3;
   display: flex;
