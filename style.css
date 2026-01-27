@@ -339,3 +339,26 @@ input[type="range"] {
     padding-top: 12px;
   }
 }
+/* ▼ スマホ（幅600px以下）のときだけ調整するゾーン ▼ */
+@media (max-width: 600px) {
+
+  /* バッグ全体を少し小さめに */
+  .preview-image-wrapper {
+    max-width: 320px;      /* 480px → 320px に縮める */
+    aspect-ratio: 4 / 3;   /* 比率はそのまま */
+  }
+
+  /* アップリケも、ちょっと小さめスタートに */
+  .preview-image-wrapper img#appliquePreviewImage {
+    max-width: 45%;        /* 55% → 45% に */
+  }
+
+  /* プレビューカードの上下の余白も少し詰める */
+  .preview-card {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .preview-text {
+    font-size: 0.9rem;
+  }
+}
