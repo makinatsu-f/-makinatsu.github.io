@@ -1,341 +1,123 @@
-/* ベース */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>マキナツ オーダーカタログ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Zen Maru Gothic", "Quicksand", system-ui, -apple-system,
-    BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-  background: #f6f4f0;
-  color: #333;
-}
+  <!-- フォント（BASEに近い雰囲気） -->
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
 
-.page {
-  min-height: 100vh;
-  max-width: 480px;
-  margin: 0 auto;
-  background: #fdfbf8;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-}
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <h1 class="logo-text">マキナツ オーダーカタログ</h1>
+    </header>
 
-/* ヘッダー */
+    <!-- モード切り替えタブ -->
+    <nav class="mode-tabs">
+      <button class="mode-tab active" data-mode="custom">カスタムモード</button>
+      <button class="mode-tab" data-mode="snapshot">スクショ専用モード</button>
+    </nav>
 
-.page-header {
-  padding: 16px 20px 8px;
-  border-bottom: 1px solid #e3dfd6;
-}
+    <!-- カスタムモード -->
+    <main class="main main-custom" id="mode-custom">
+      <section class="form-section">
+        <h2 class="section-title">バッグカラーを選ぶ</h2>
+        <div class="select-row">
+          <select id="bagSelect"></select>
+        </div>
 
-.logo-text {
-  margin: 0;
-  font-size: 20px;
-  letter-spacing: 0.08em;
-  font-weight: 700;
-}
+        <h2 class="section-title">アップリケを選ぶ</h2>
+        <div class="category-row">
+          <button class="category-btn active" data-category="恐竜">恐竜</button>
+          <button class="category-btn" data-category="海">海の生き物</button>
+          <button class="category-btn" data-category="その他">その他の生き物</button>
+        </div>
+        <div class="select-row">
+          <select id="appliqueSelect"></select>
+        </div>
 
-/* モードタブ */
+        <div class="control-group">
+          <label class="control-label" for="appliqueSize">アップリケの大きさ</label>
+          <input type="range" id="appliqueSize" min="60" max="140" value="100" />
+        </div>
 
-.mode-tabs {
-  display: flex;
-  padding: 8px 10px 0;
-  gap: 8px;
-}
+        <div class="control-group flip-row">
+          <span class="control-label">向き</span>
+          <button id="flipButton" class="pill-btn">左右反転</button>
+        </div>
 
-.mode-tab {
-  flex: 1;
-  border: none;
-  border-radius: 999px;
-  padding: 8px 10px;
-  font-size: 13px;
-  background: #e7e2d7;
-  color: #666;
-  cursor: pointer;
-}
+        <p class="hint">
+          アップリケは指でドラッグして位置を動かせます。
+          スマホならそのまま指でぐいっと動かしてね。
+        </p>
+      </section>
 
-.mode-tab.active {
-  background: #4da08c;
-  color: #fff;
-}
+      <section class="preview-section">
+        <h2 class="section-title">バッグプレビュー</h2>
+        <div class="preview-frame">
+          <div class="bag-preview" id="bagPreview">
+            <img id="bagImage" class="bag-image" src="" alt="バッグ" />
+            <img id="appliqueImage" class="applique-image" src="" alt="アップリケ" />
+          </div>
+        </div>
 
-/* メイン */
+        <div class="info-panel">
+          <p><strong>バッグ色：</strong><span id="bagNameLabel"></span></p>
+          <p><strong>アップリケ：</strong><span id="appliqueNameLabel"></span></p>
+        </div>
 
-.main {
-  padding: 12px 16px 20px;
-}
+        <button id="toSnapshot" class="primary-btn">
+          選んだ組み合わせをスクショ表示する
+        </button>
 
-.main-custom {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
+        <p class="note">
+          ※実物の生地のお色と多少異なる場合があります。
+        </p>
+      </section>
+    </main>
 
-@media (min-width: 720px) {
-  .main-custom {
-    grid-template-columns: 1.1fr 1.1fr;
-  }
-}
+    <!-- スクショ専用モード -->
+    <main class="main main-snapshot hidden" id="mode-snapshot">
+      <section class="snapshot-header">
+        <button class="back-btn" id="backToCustom">＜ カスタム画面にもどる</button>
+        <h2 class="snapshot-title">【スクショ専用モード】</h2>
+        <p class="snapshot-sub">お作りするバッグの組み合わせ</p>
+      </section>
 
-.main-snapshot {
-  display: block;
-}
+      <section class="snapshot-preview">
+        <div class="snapshot-frame">
+          <div class="bag-preview snapshot-bag" id="snapshotBagPreview">
+            <img id="snapshotBagImage" class="bag-image" src="" alt="バッグ" />
+            <img id="snapshotAppliqueImage" class="applique-image" src="" alt="アップリケ" />
+          </div>
+        </div>
 
-.hidden {
-  display: none !important;
-}
+        <div class="snapshot-info">
+          <p>・バッグ色：<span id="snapshotBagLabel"></span></p>
+          <p>・アップリケ：<span id="snapshotAppliqueLabel"></span></p>
+          <p class="snapshot-note">
+            ※ 実際のお色と多少違う場合があります。
+          </p>
+        </div>
 
-/* セクション */
+        <section class="snapshot-howto">
+          <h3 class="snapshot-howto-title">📷 この画面をスクショしてください</h3>
+          <p class="snapshot-howto-text">
+            スクショを撮ったら、下のLINEボタンからマキナツに送ってください。
+          </p>
+        </section>
 
-.section-title {
-  font-size: 16px;
-  margin: 10px 0 4px;
-}
+        <a class="line-button" href="https://lin.ee/BuwMWM2" target="_blank" rel="noopener">
+          LINEでマキナツに送る
+        </a>
+      </section>
+    </main>
+  </div>
 
-.form-section,
-.preview-section {
-  background: #fffdf8;
-  border-radius: 18px;
-  padding: 12px 14px 14px;
-  border: 1px solid #e8e1d4;
-}
-
-/* セレクトなど */
-
-.select-row {
-  margin: 4px 0 10px;
-}
-
-select {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 999px;
-  border: 1px solid #d8d1c5;
-  font-size: 15px;
-  background: #faf7f2;
-}
-
-.category-row {
-  display: flex;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.category-btn {
-  flex: 1;
-  padding: 6px 4px;
-  border-radius: 999px;
-  border: 1px solid #cfc6b8;
-  background: #f5f0e6;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.category-btn.active {
-  background: #4da08c;
-  border-color: #4da08c;
-  color: #fff;
-}
-
-/* コントロール */
-
-.control-group {
-  margin: 8px 0;
-}
-
-.control-label {
-  font-size: 12px;
-  color: #777;
-  display: block;
-  margin-bottom: 4px;
-}
-
-input[type="range"] {
-  width: 100%;
-}
-
-.flip-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.pill-btn {
-  border-radius: 999px;
-  border: 1px solid #cfc6b8;
-  padding: 6px 12px;
-  font-size: 12px;
-  background: #f5f0e6;
-  cursor: pointer;
-}
-
-/* プレビュー */
-
-.preview-frame {
-  padding: 10px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, #fbf7f2 0%, #f0ebe4 100%);
-  border: 1px solid #e5ddcf;
-}
-
-.bag-preview {
-  position: relative;
-  width: 100%;
-  max-width: 320px;
-  margin: 0 auto;
-  aspect-ratio: 4 / 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bag-image {
-  max-width: 92%;
-  height: auto;
-  display: block;
-}
-
-.applique-image {
-  position: absolute;
-  width: 32%;
-  max-width: 38%;
-  touch-action: none;
-  cursor: grab;
-}
-
-/* 情報パネル */
-
-.info-panel {
-  margin-top: 8px;
-  font-size: 13px;
-}
-
-.info-panel p {
-  margin: 2px 0;
-}
-
-.note {
-  margin-top: 8px;
-  font-size: 11px;
-  color: #888;
-}
-
-.hint {
-  margin-top: 6px;
-  font-size: 11px;
-  color: #888;
-}
-
-/* ボタン */
-
-.primary-btn {
-  margin-top: 10px;
-  width: 100%;
-  border-radius: 999px;
-  border: none;
-  padding: 10px;
-  font-size: 14px;
-  background: #e0595d;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* スクショモード */
-
-.snapshot-header {
-  text-align: center;
-  margin-bottom: 4px;
-}
-
-.back-btn {
-  border: none;
-  background: none;
-  font-size: 13px;
-  color: #555;
-  cursor: pointer;
-  margin-bottom: 4px;
-}
-
-.snapshot-title {
-  margin: 4px 0 0;
-  font-size: 18px;
-}
-
-.snapshot-sub {
-  margin: 4px 0 8px;
-  font-size: 13px;
-  color: #777;
-}
-
-.snapshot-preview {
-  background: #fffdf8;
-  border-radius: 18px;
-  padding: 12px 14px 20px;
-  border: 1px solid #e8e1d4;
-}
-
-.snapshot-frame {
-  padding: 10px;
-  border-radius: 16px;
-  background: #f6f1e9;
-  border: 1px solid #e0d7c8;
-}
-
-.snapshot-bag {
-  max-width: 340px;
-}
-
-.snapshot-info {
-  margin-top: 10px;
-  font-size: 13px;
-}
-
-.snapshot-note {
-  font-size: 11px;
-  color: #888;
-}
-
-/* 使い方 */
-
-.snapshot-howto {
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px dotted #d9d0c4;
-}
-
-.snapshot-howto-title {
-  margin: 0 0 4px;
-  font-size: 14px;
-}
-
-.snapshot-howto-text {
-  margin: 0;
-  font-size: 12px;
-  color: #666;
-}
-
-/* LINEボタン */
-
-.line-button {
-  display: block;
-  margin-top: 16px;
-  text-align: center;
-  text-decoration: none;
-  border-radius: 999px;
-  padding: 12px 10px;
-  font-size: 15px;
-  background: #00b900;
-  color: #fff;
-  font-weight: 700;
-}
-
-/* ちょっと余白調整 */
-
-@media (max-width: 480px) {
-  .page-header {
-    padding-top: 12px;
-  }
-}
+  <script src="script.js"></script>
+</body>
+</html>
