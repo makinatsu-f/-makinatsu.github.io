@@ -381,19 +381,27 @@ input[type="range"] {
   cursor: grab;
 }
 
-/* スマホ用の微調整 */
+/* ▼ スマホ（幅600px以下）のときだけ調整するゾーン ▼ */
 @media (max-width: 600px) {
+
+  /* ヘッダーの余白ちょい減らす */
+  .page-header {
+    padding-top: 12px;
+    padding-bottom: 8px;
+  }
+
+  /* バッグプレビューの枠の幅（スマホ用） */
   .preview-image-wrapper {
-    max-width: 340px;  /* ここを 320〜360 の間で好みで調整してOK */
-  }
-}
-
-  /* プレビューカードの上下の余白も少し詰める */
-  .preview-card {
-    padding: 1.5rem 0.75rem;
+    max-width: 340px;   /* 大きさはここで調整（320〜360くらいで好みでOK） */
   }
 
+  /* 情報テキストを少し小さく */
   .preview-text {
     font-size: 0.9rem;
+  }
+
+  /* カードの上下の余白も少しだけ詰める */
+  .preview-card {
+    padding: 1.5rem 0.75rem;
   }
 }
