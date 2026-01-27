@@ -19,112 +19,47 @@
 
 <main>
 
-    <!-- バッグ選択 -->
-    <section class="selector-section">
-        <h2>バッグカラーを選ぶ</h2>
-        <select id="bagSelect">
-            <option value="">選択してください</option>
-            <option value="egg-yellow">エッグ</option>
-            <option value="deep-bordeaux">ボルドー</option>
-            <option value="soft-pink">ソフトピンク</option>
-            <option value="true-blue">ブルー</option>
-            <option value="sax-blue">サックス</option>
-
-            <option value="ash-gray">グレー</option>
-            <option value="deep-navy">ネイビー</option>
-            <option value="night-black">ブラック</option>
-            <option value="sage-khaki">カーキ</option>
-            <option value="forest-green">フォレスト</option>
-            <option value="cocoa-brown">ココアブラウン</option>
-        </select>
-    </section>
-
-    <!-- アップリケ選択 -->
-    <section class="selector-section">
-        <h2>アップリケを選ぶ</h2>
-        <select id="appliqueSelect">
-            <option value="">選択してください</option>
-
-            <!-- 恐竜 -->
-            <optgroup label="🦕 恐竜">
-                <option value="trex-red">ティラノサウルス（赤）</option>
-                <option value="trex-ochre">ティラノサウルス（オーカー）</option>
-                <option value="spinosaurus">スピノサウルス</option>
-                <option value="stegosaurus">ステゴサウルス</option>
-                <option value="diplodocus">ディプロドクス</option>
-                <option value="triceratops">トリケラトプス</option>
-                <option value="velociraptor">ヴェロキラプトル</option>
-                <option value="mosasaurus">モササウルス</option>
-                <option value="dunkleosteus">ダンクルオステウス</option>
-                <option value="dunkleosteus-02">ダンクルオステウス（大）</option>
-                <option value="trex-green">ティラノサウルス（緑）</option>
-            </optgroup>
-
-            <!-- 海の生き物 -->
-            <optgroup label="🌊 海の生き物">
-                <option value="greatwhite-shark">ホホジロザメ</option>
-                <option value="catshark">ネコザメ</option>
-                <option value="whale-shark">ジンベエザメ</option>
-                <option value="sand-tiger-shark">シロワニ</option>
-                <option value="zebra-shark">トラフザメ</option>
-                <option value="syumoku-shark">シュモクザメ</option>
-                <option value="manta">マンタ</option>
-                <option value="sunfish">マンボウ</option>
-                <option value="anomalocaris">アノマロカリス</option>
-                <option value="houlai-eso">ホウライエソ</option>
-                <option value="megalodon">メガロドン</option>
-                <option value="humpback-whale">ザトウクジラ</option>
-                <option value="blue-whale">シロナガスクジラ</option>
-                <option value="orca">シャチ</option>
-                <option value="orca-pink">シャチ（ピンク）</option>
-                <option value="sea-turtle">ウミガメ</option>
-                <option value="manatee">マナティー</option>
-                <option value="aori-ika">アオリイカ</option>
-                <option value="mendako-orange">メンダコ（オレンジ）</option>
-                <option value="sailfish">バショウカジキ</option>
-            </optgroup>
-
-            <!-- その他 -->
-            <optgroup label="🐾 その他の生き物">
-                <option value="ranchu">ランチュウ</option>
-                <option value="ranchu-02">ランチュウ（2匹版）</option>
-                <option value="tai">タイ</option>
-                <option value="saba">サバ</option>
-                <option value="maguro">マグロ</option>
-
-                <option value="hercules-beetle">ヘラクレスオオカブト</option>
-                <option value="beetle">カブトムシ</option>
-                <option value="giraffa-stagbeetle">ギラファ</option>
-                <option value="oo_kuwagata">オオクワガタ</option>
-
-                <option value="chameleon">カメレオン</option>
-                <option value="african-spurred-tortoise">ケヅメリクガメ</option>
-                <option value="horse">ウマ</option>
-
-                <option value="axolotl">ウーパールーパー</option>
-                <option value="lobster">ロブスター</option>
-                <option value="panda">パンダ</option>
-                <option value="emperor-penguin-family">エンペラーペンギン親子</option>
-                <option value="parent-penguin">親ペンギン</option>
-                <option value="chick-penguin">ひなペンギン</option>
-            </optgroup>
-        </select>
-    </section>
-
     <!-- プレビュー -->
-    <section id="previewArea">
-        <div id="bagPreview"></div>
-        <img id="appliquePreview" alt="">
+    <div id="preview-area">
+        <img id="bag-preview" src="assets/bags/bag-egg-yellow.png" />
+        <img id="applique-preview" src="" />
+    </div>
+
+    <!-- 選択結果 -->
+    <div id="selection-text">
+        バッグ：<span id="bag-name">bag-egg-yellow</span><br>
+        アップリケ：<span id="applique-name">未選択</span>
+    </div>
+
+    <!-- バッグ選択 -->
+    <section>
+        <h2>バッグの色を選ぶ</h2>
+        <div id="bag-list" class="scroll-row"></div>
     </section>
 
-    <!-- 選んだ内容表示 -->
-    <section id="choices">
-        <p>バッグ：<span id="selectedBag">未選択</span></p>
-        <p>アップリケ：<span id="selectedApplique">未選択</span></p>
+    <!-- アップリケ（カテゴリ切替） -->
+    <section>
+        <h2>アップリケを選ぶ</h2>
+        <div id="tabs">
+            <button class="tab active" data-tab="dino">恐竜</button>
+            <button class="tab" data-tab="sea">海の生き物</button>
+            <button class="tab" data-tab="other">その他の生き物</button>
+        </div>
+
+        <div id="applique-list" class="scroll-grid"></div>
     </section>
+
+    <!-- 操作ボタン -->
+    <div id="actions">
+        <button id="reset-btn">リセット</button>
+        <button id="screenshot-btn">スクショ用表示</button>
+    </div>
 
 </main>
 
+<script src="script.js"></script>
+
 </body>
 </html>
+
 
