@@ -1,1 +1,52 @@
+body {
+    margin: 0;
+    font-family: "Zen Maru Gothic", "Quicksand", sans-serif;
+    background: #fafafa;
+    color: #333;
+    text-align: center;
+}
+
+header {
+    background: #fff;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+h1 {
+    font-size: 1.6rem;
+}
+
+.selector-section {
+    margin: 20px;
+}
+
+select {
+    width: 80%;
+    padding: 12px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+}
+
+#previewArea {
+    margin-top: 20px;
+    position: relative;
+    width: 100%;
+    height: 420px;
+}
+
+#bagPreview {
+    width: 320px;
+    height: 320px;
+    margin: 0 auto;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+#appliquePreview {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    width: 160px;
+    transform: translateX(-50%);
+}
 
