@@ -181,29 +181,40 @@ input[type="range"] {
   border: 1px solid #e5ddcf;
 }
 
-.bag-preview {
+/* ============================= */
+/*   バッグプレビューの画像枠   */
+/* ============================= */
+
+.preview-image-wrapper {
   position: relative;
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;  /* ← スマホにちょうどいい幅 */
+  aspect-ratio: 4 / 3; /* ← 枠の高さを自動で作る！絶対必要！ */
   margin: 0 auto;
-  aspect-ratio: 4 / 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden; /* ← はみ出し防止！ */
 }
 
-.bag-image {
-  max-width: 92%;
-  height: auto;
-  display: block;
-}
-
-.applique-image {
+/* バッグ画像 */
+#bagPreviewImage {
   position: absolute;
-  width: 32%;
-  max-width: 38%;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* アップリケ画像 */
+#appliquePreviewImage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 35%; /* 初期サイズ */
+  transform: translate(-50%, -50%);
+  z-index: 2;
   touch-action: none;
-  cursor: grab;
 }
 
 /* 情報パネル */
