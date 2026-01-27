@@ -172,7 +172,7 @@ input[type="range"] {
   cursor: pointer;
 }
 
-/* プレビュー */
+/* プレビュー ------------------------------------------------------ */
 
 .preview-frame {
   padding: 10px;
@@ -181,20 +181,19 @@ input[type="range"] {
   border: 1px solid #e5ddcf;
 }
 
-/* ============================= */
-/*   バッグプレビューの画像枠   */
-/* ============================= */
+/* バッグプレビューの画像枠 */
 
 .preview-image-wrapper {
   position: relative;
   width: 100%;
-  max-width: 360px;  /* ← スマホにちょうどいい幅 */
-  aspect-ratio: 4 / 3; /* ← 枠の高さを自動で作る！絶対必要！ */
+  max-width: 380px;          /* ← バッグの「最大幅」ここで調整（大きさUP） */
+  aspect-ratio: 4 / 3;       /* ← 枠の縦横比。必須！ */
   margin: 0 auto;
-  overflow: hidden; /* ← はみ出し防止！ */
+  overflow: hidden;          /* ← はみ出し防止 */
 }
 
 /* バッグ画像 */
+
 #bagPreviewImage {
   position: absolute;
   top: 50%;
@@ -207,11 +206,12 @@ input[type="range"] {
 }
 
 /* アップリケ画像 */
+
 #appliquePreviewImage {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 35%; /* 初期サイズ */
+  width: 35%;                /* 初期サイズ。大きさスライダーで変える */
   transform: translate(-50%, -50%);
   z-index: 2;
   touch-action: none;
@@ -254,7 +254,7 @@ input[type="range"] {
   cursor: pointer;
 }
 
-/* スクショモード */
+/* スクショモード -------------------------------------------------- */
 
 .snapshot-header {
   text-align: center;
@@ -343,65 +343,23 @@ input[type="range"] {
   font-weight: 700;
 }
 
-/* ちょっと余白調整 */
+/* ちょっと余白調整 ----------------------------------------------- */
 
 @media (max-width: 480px) {
   .page-header {
     padding-top: 12px;
   }
 }
-/* ▼ スマホ（幅600px以下）のときだけ調整するゾーン ▼ */
+
+/* スマホ用の微調整（幅600px以下） */
+
 @media (max-width: 600px) {
-
-/* バッグプレビューエリア -------------------------------------------------- */
-.preview-image-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 360px;   /* スマホでもPCでもこの幅を上限に */
-  margin: 0 auto;
-  aspect-ratio: 4 / 3; /* 横長の枠（バッグに合わせてる） */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* バッグ画像（できるだけ枠いっぱいに表示） */
-.preview-image-wrapper img#bagPreviewImage {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* アップリケ画像（上に重ねる） */
-.preview-image-wrapper img#appliquePreviewImage {
-  position: absolute;
-  width: 40%;      /* 初期サイズ。大きさスライダーで拡大縮小 */
-  max-width: 45%;
-  touch-action: none;
-  cursor: grab;
-}
-
-/* ▼ スマホ（幅600px以下）のときだけ調整するゾーン ▼ */
-@media (max-width: 600px) {
-
-  /* ヘッダーの余白ちょい減らす */
   .page-header {
     padding-top: 12px;
     padding-bottom: 8px;
   }
 
-  /* バッグプレビューの枠の幅（スマホ用） */
   .preview-image-wrapper {
-    max-width: 340px;   /* 大きさはここで調整（320〜360くらいで好みでOK） */
-  }
-
-  /* 情報テキストを少し小さく */
-  .preview-text {
-    font-size: 0.9rem;
-  }
-
-  /* カードの上下の余白も少しだけ詰める */
-  .preview-card {
-    padding: 1.5rem 0.75rem;
+    max-width: 360px;   /* スマホ時のバッグ幅。もっと大きくしたければ 380 でもOK */
   }
 }
