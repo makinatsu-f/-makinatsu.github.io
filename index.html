@@ -1,87 +1,123 @@
 <!DOCTYPE html>
-<html lang="ja"> 
-<head> 
- <meta charset="UTF-8" />
- <title>マキナツ オーダーカタログ</title> 
- <meta name="viewport" content="width=device-width, initial-scale=1" /> 
-  
-  <!-- フォント（BASE風） --> 
-  <link href="https://fonts.googleapis.com/css2?
-  family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;
-  600&display=swap" rel="stylesheet" /> 
-  
-  <link rel="stylesheet" href="style.css" /> 
-  </head>
-  <body> 
-   <div class="page">
-     <header class="page-header">
-  <h1 class="logo-text">マキナツ オーダーカタログ</h1>
-</header>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>マキナツ オーダーカタログ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<nav class="mode-tabs">
-  <button class="mode-tab active" data-mode="custom">カスタムモード</button>
-  <button class="mode-tab" data-mode="snapshot">スクショ専用モード</button>
-</nav>
+  <!-- フォント（BASEに近い雰囲気） -->
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
 
-<!-- カスタムモード -->
-<main class="main main-custom" id="mode-custom">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <h1 class="logo-text">マキナツ オーダーカタログ</h1>
+    </header>
 
-  <!-- ① プレビュー -->
-  <section class="preview-section">
-    <h2 class="section-title">バッグプレビュー</h2>
+    <!-- モード切り替えタブ -->
+    <nav class="mode-tabs">
+      <button class="mode-tab active" data-mode="custom">カスタムモード</button>
+      <button class="mode-tab" data-mode="snapshot">スクショ専用モード</button>
+    </nav>
 
-    <div class="preview-image-wrapper">
-      <img id="bagPreviewImage" src="assets/bags/bag-egg-yellow.png" alt="">
-      <img id="appliquePreviewImage" src="assets/appliques/axolotl.png" alt="">
-    </div>
+    <!-- カスタムモード -->
+    <main class="main main-custom" id="mode-custom">
+      <section class="form-section">
+        <h2 class="section-title">バッグカラーを選ぶ</h2>
+        <div class="select-row">
+          <select id="bagSelect"></select>
+        </div>
 
-    <div class="info-panel">
-      <p>バッグ色：<span id="bagColorLabel">エッグ</span></p>
-      <p>アップリケ：<span id="appliqueLabel">ウーパールーパー</span></p>
-    </div>
-  </section>
+        <h2 class="section-title">アップリケを選ぶ</h2>
+        <div class="category-row">
+          <button class="category-btn active" data-category="恐竜">恐竜</button>
+          <button class="category-btn" data-category="海">海の生き物</button>
+          <button class="category-btn" data-category="その他">その他の生き物</button>
+        </div>
+        <div class="select-row">
+          <select id="appliqueSelect"></select>
+        </div>
 
-  <!-- ② コントロール -->
-  <section class="form-section">
-    <h2 class="section-title">バッグカラーを選ぶ</h2>
-    <select id="bagColorSelect"></select>
+        <div class="control-group">
+          <label class="control-label" for="appliqueSize">アップリケの大きさ</label>
+          <input type="range" id="appliqueSize" min="60" max="140" value="100" />
+        </div>
 
-    <h2 class="section-title">アップリケを選ぶ</h2>
+        <div class="control-group flip-row">
+          <span class="control-label">向き</span>
+          <button id="flipButton" class="pill-btn">左右反転</button>
+        </div>
 
-    <div class="category-row">
-      <button class="category-btn active" data-category="dinosaur">恐竜</button>
-      <button class="category-btn" data-category="sea">海の生き物</button>
-      <button class="category-btn" data-category="other">その他の生き物</button>
-    </div>
+        <p class="hint">
+          アップリケは指でドラッグして位置を動かせます。
+          スマホならそのまま指でぐいっと動かしてね。
+        </p>
+      </section>
 
-    <select id="appliqueSelect"></select>
+      <section class="preview-section">
+        <h2 class="section-title">バッグプレビュー</h2>
+        <div class="preview-frame">
+          <div class="bag-preview" id="bagPreview">
+            <img id="bagImage" class="bag-image" src="" alt="バッグ" />
+            <img id="appliqueImage" class="applique-image" src="" alt="アップリケ" />
+          </div>
+        </div>
 
-    <h2 class="section-title">アップリケの大きさ</h2>
-    <input type="range" id="appliqueSizeRange" min="0.4" max="1.2" step="0.02" value="0.45">
+        <div class="info-panel">
+          <p><strong>バッグ色：</strong><span id="bagNameLabel"></span></p>
+          <p><strong>アップリケ：</strong><span id="appliqueNameLabel"></span></p>
+        </div>
 
-    <h2 class="section-title">向き</h2>
-    <button id="flipButton" class="pill-btn">左右反転</button>
+        <button id="toSnapshot" class="primary-btn">
+          選んだ組み合わせをスクショ表示する
+        </button>
 
-    <p class="hint">
-      アップリケは指でドラッグできます。
-    </p>
-  </section>
+        <p class="note">
+          ※実物の生地のお色と多少異なる場合があります。
+        </p>
+      </section>
+    </main>
 
-</main>
+    <!-- スクショ専用モード -->
+    <main class="main main-snapshot hidden" id="mode-snapshot">
+      <section class="snapshot-header">
+        <button class="back-btn" id="backToCustom">＜ カスタム画面にもどる</button>
+        <h2 class="snapshot-title">【スクショ専用モード】</h2>
+        <p class="snapshot-sub">お作りするバッグの組み合わせ</p>
+      </section>
 
-<!-- スクショ専用モード -->
-<main class="main main-snapshot hidden" id="mode-snapshot">
-  <div class="snapshot-preview">
-    <h2 class="snapshot-title">【スクショ専用モード】</h2>
-    <p class="snapshot-sub">下の画面をスクショしてね</p>
+      <section class="snapshot-preview">
+        <div class="snapshot-frame">
+          <div class="bag-preview snapshot-bag" id="snapshotBagPreview">
+            <img id="snapshotBagImage" class="bag-image" src="" alt="バッグ" />
+            <img id="snapshotAppliqueImage" class="applique-image" src="" alt="アップリケ" />
+          </div>
+        </div>
 
-    <div class="snapshot-frame">
-      <img id="snapshotBag" class="snapshot-bag" src="">
-      <div class="snapshot-info">
-        バッグ色：<span id="snapBagColor"></span><br>
-        アップリケ：<span id="snapApplique"></span>
-      </div>
-    </div>
+        <div class="snapshot-info">
+          <p>・バッグ色：<span id="snapshotBagLabel"></span></p>
+          <p>・アップリケ：<span id="snapshotAppliqueLabel"></span></p>
+          <p class="snapshot-note">
+            ※ 実際のお色と多少違う場合があります。
+          </p>
+        </div>
 
+        <section class="snapshot-howto">
+          <h3 class="snapshot-howto-title">📷 この画面をスクショしてください</h3>
+          <p class="snapshot-howto-text">
+            スクショを撮ったら、下のLINEボタンからマキナツに送ってください。
+          </p>
+        </section>
+
+        <a class="line-button" href="https://lin.ee/BuwMWM2" target="_blank" rel="noopener">
+          LINEでマキナツに送る
+        </a>
+      </section>
+    </main>
   </div>
-</main>
+
+  <script src="script.js"></script>
+</body>
+</html>
