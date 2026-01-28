@@ -99,7 +99,7 @@ const appliques = [
 
   { id: "african-spurred-tortoise",  label: "ケヅメリクガメ",          file: "african-spurred-tortoise.png",category: "その他" },
 
-  { id: "horse",                     label: "ウマ",                    file: "horse.png",                   category: "その他" },
+  { id: "horse",                     label: "ウマ",                    file: "uma_brown.png",                   category: "その他" },
   { id: "panda",                     label: "パンダ",                  file: "panda.png",                   category: "その他" }
 ];
 
