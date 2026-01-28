@@ -87,7 +87,7 @@ const appliques = [
   { id: "hercules-beetle",           label: "ヘラクレスオオカブト",    file: "hercules-beetle.png",         category: "その他" },
   { id: "beetle",                    label: "カブトムシ",              file: "beetle.png",                  category: "その他" },
   { id: "giraffa-stagbeetle",        label: "ギラファノコギリクワガタ",file: "giraffa-stagbeetle.png",      category: "その他" },
-  { id: "ookuwagata",                label: "オオクワガタ",            file: "ookuwagata.png",              category: "その他" },
+  { id: "ookuwagata",                label: "オオクワガタ",            file: "oo_kuwagata.png",              category: "その他" },
 
   { id: "chameleon",                 label: "カメレオン",              file: "chameleon.png",               category: "その他" },
   { id: "axolotl",                   label: "ウーパールーパー",        file: "axolotl.png",                 category: "その他" },
