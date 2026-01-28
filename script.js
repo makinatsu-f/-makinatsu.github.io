@@ -50,7 +50,7 @@ const appliques = [
   { id: "whale-shark",       label: "ジンベエザメ",                    file: "whale-shark.png",         category: "海" },
   { id: "sand-tiger-shark",  label: "シロワニ",                        file: "sand-tiger-shark.png",    category: "海" },
   { id: "zebra-shark",       label: "トラフザメ",                      file: "zebra-shark.png",         category: "海" },
-  { id: "hammerhead-shark",  label: "シュモクザメ",                    file: "hammerhead-shark.png",    category: "海" },
+  { id: "hammerhead-shark",  label: "シュモクザメ",                    file: "syumoku-shark.png",    category: "海" },
   { id: "goblin-shark",      label: "ゴブリンシャーク",                file: "goblin-shark.png",        category: "海" },
 
   { id: "tai",               label: "タイ",                            file: "tai.png",                 category: "海" },
