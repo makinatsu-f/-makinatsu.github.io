@@ -197,7 +197,7 @@ input[type="range"] {
 .bag-preview {
   position: relative;
   width: 100%;
-  max-width: 380px;   /* ここでバッグの最大幅を調整 */
+  max-width: 320px;   /* ここでバッグの最大幅を調整 */
   margin: 0 auto;
   aspect-ratio: 4 / 3;
   display: flex;
@@ -207,7 +207,7 @@ input[type="range"] {
 }
 
 .bag-image {
-  width: 100%;
+  width: 92%;
   height: auto;
   display: block;
 }
