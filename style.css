@@ -214,8 +214,8 @@ input[type="range"] {
 
 .applique-image {
   position: absolute;
-  width: 32%;
-  max-width: 40%;
+  width: 40%;
+  max-width: 55%;
   touch-action: none;
   cursor: grab;
   transform: translate(-50%, -50%);
