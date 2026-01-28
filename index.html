@@ -24,6 +24,40 @@
 
     <!-- カスタムモード -->
     <main class="main main-custom" id="mode-custom">
+
+      <!-- ① 先にプレビュー -->
+      <section class="preview-section">
+        <h2 class="section-title">バッグプレビュー</h2>
+        <div class="preview-frame">
+          <div class="bag-preview" id="bagPreview">
+            <img id="bagImage" class="bag-image" src="" alt="バッグ" />
+            <img id="appliqueImage" class="applique-image" src="" alt="アップリケ" />
+          </div>
+        </div>
+
+        <div class="info-panel">
+          <p>
+            <strong>バッグ色：</strong>
+            <img id="bagNameIcon" class="label-icon" src="" alt="" />
+            <span id="bagNameLabel"></span>
+          </p>
+          <p>
+            <strong>アップリケ：</strong>
+            <img id="appliqueNameIcon" class="label-icon" src="" alt="" />
+            <span id="appliqueNameLabel"></span>
+          </p>
+        </div>
+
+        <button id="toSnapshot" class="primary-btn">
+          選んだ組み合わせをスクショ表示する
+        </button>
+
+        <p class="note">
+          ※実物の生地のお色と多少異なる場合があります。
+        </p>
+      </section>
+
+      <!-- ② 下にカスタム用フォーム -->
       <section class="form-section">
         <h2 class="section-title">バッグカラーを選ぶ</h2>
         <div class="select-row">
@@ -55,29 +89,6 @@
           スマホならそのまま指でぐいっと動かしてね。
         </p>
       </section>
-
-      <section class="preview-section">
-        <h2 class="section-title">バッグプレビュー</h2>
-        <div class="preview-frame">
-          <div class="bag-preview" id="bagPreview">
-            <img id="bagImage" class="bag-image" src="" alt="バッグ" />
-            <img id="appliqueImage" class="applique-image" src="" alt="アップリケ" />
-          </div>
-        </div>
-
-        <div class="info-panel">
-          <p><strong>バッグ色：</strong><span id="bagNameLabel"></span></p>
-          <p><strong>アップリケ：</strong><span id="appliqueNameLabel"></span></p>
-        </div>
-
-        <button id="toSnapshot" class="primary-btn">
-          選んだ組み合わせをスクショ表示する
-        </button>
-
-        <p class="note">
-          ※実物の生地のお色と多少異なる場合があります。
-        </p>
-      </section>
     </main>
 
     <!-- スクショ専用モード -->
@@ -97,8 +108,16 @@
         </div>
 
         <div class="snapshot-info">
-          <p>・バッグ色：<span id="snapshotBagLabel"></span></p>
-          <p>・アップリケ：<span id="snapshotAppliqueLabel"></span></p>
+          <p>
+            ・バッグ色：
+            <img id="snapshotBagIcon" class="label-icon" src="" alt="" />
+            <span id="snapshotBagLabel"></span>
+          </p>
+          <p>
+            ・アップリケ：
+            <img id="snapshotAppliqueIcon" class="label-icon" src="" alt="" />
+            <span id="snapshotAppliqueLabel"></span>
+          </p>
           <p class="snapshot-note">
             ※ 実際のお色と多少違う場合があります。
           </p>
