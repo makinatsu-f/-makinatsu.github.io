@@ -241,7 +241,7 @@ function updateApplique() {
 }
 
 function updateAppliqueScale() {
-  const scale = sizeRange.value / 100;
+  const scale = sizeRange.value / 150;
   const flip = isFlipped ? " scaleX(-1)" : "";
   appliqueImage.style.transform = `translate(-50%, -50%) scale(${scale})${flip}`;
 }
