@@ -341,6 +341,27 @@ function copyToSnapshot() {
   snapshotAppliqueImage.style.left = appliqueImage.style.left;
   snapshotAppliqueImage.style.top = appliqueImage.style.top;
 }
+// 使い方モーダル関連
+const howtoButton = document.getElementById('howtoButton');
+const howtoModal  = document.getElementById('howtoModal');
+const howtoClose  = document.querySelector('.howto-close');
+
+// 「使い方」ボタンを押したら開く
+howtoButton.addEventListener('click', () => {
+  howtoModal.classList.add('show');
+});
+
+// ×ボタンで閉じる
+howtoClose.addEventListener('click', () => {
+  howtoModal.classList.remove('show');
+});
+
+// グレーの背景をタップしても閉じる
+howtoModal.addEventListener('click', (event) => {
+  if (event.target === howtoModal) {
+    howtoModal.classList.remove('show');
+  }
+});
 
 // ==== スタート =====================================================
 
