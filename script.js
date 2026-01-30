@@ -343,25 +343,34 @@ function copyToSnapshot() {
 }
 // 使い方モーダル関連
 const howtoButton = document.getElementById('howtoButton');
-const howtoModal  = document.getElementById('howtoModal');
-const howtoClose  = document.querySelector('.howto-close');
+const howtoModal = document.getElementById('howtoModal');
+const howtoClose = document.querySelector('.howto-close');
 
-// 「使い方」ボタンを押したら開く
-howtoButton.addEventListener('click', () => {
-  howtoModal.classList.add('show');
-});
+// ※ カタログページだけで動くように保険をかける
+if (howtoButton && howtoModal && howtoClose) {
 
-// ×ボタンで閉じる
-howtoClose.addEventListener('click', () => {
-  howtoModal.classList.remove('show');
-});
+  // 「使い方」ボタンを押したら開く
+  howtoButton.addEventListener('click', () => {
+    howtoModal.classList.add('show');
+  });
 
-// グレーの背景をタップしても閉じる
-howtoModal.addEventListener('click', (event) => {
-  if (event.target === howtoModal) {
+  // ×ボタンで閉じる
+  howtoClose.addEventListener('click', () => {
     howtoModal.classList.remove('show');
-  }
-});
+  });
+
+  // グレーの背景をタップしても閉じる
+  howtoModal.addEventListener('click', (event) => {
+    if (event.target === howtoModal) {
+      howtoModal.classList.remove('show');
+    }
+  });
+
+  // ★ページを開いたときに自動で表示（毎回）
+  window.addEventListener('load', () => {
+    howtoModal.classList.add('show');
+  });
+}
 
 // ==== スタート =====================================================
 
