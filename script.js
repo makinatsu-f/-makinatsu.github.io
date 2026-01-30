@@ -256,7 +256,7 @@ function toggleFlip() {
 }
 
 function resetAppliqueTransform() {
-  sizeRange.value = 100;
+  sizeRange.value = 130;
   isFlipped = false;
   appliqueImage.style.left = "60%";
   appliqueImage.style.top = "55%";
