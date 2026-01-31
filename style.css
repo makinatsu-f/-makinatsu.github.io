@@ -435,4 +435,7 @@ input[type="range"] {
   font-weight: 600;
   background: #ffffff;
 }
+#appliqueImage {
+  touch-action: none;
+}
 
