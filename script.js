@@ -232,7 +232,6 @@ function updateApplique() {
   const src = `./assets/appliques/${app.file}`;
   appliqueImage.src = src;
   snapshotAppliqueImage.src = src;
-  resetAppliqueToBase();
 
   appliqueNameLabel.textContent = app.label;
   snapshotAppliqueLabel.textContent = app.label;
@@ -263,14 +262,6 @@ function resetAppliqueTransform() {
   appliqueImage.style.top = "55%";
   updateAppliqueScale();
 }
-function resetAppliqueToBase() {
-  currentX = 0;
-  currentY = 0;
-  currentScale = 1;  // ← 今日の初期サイズにしたいなら 1 にしておく
-  updateTransformDirect();
-}
-
-
 
 function setupDrag() {
   const target = appliqueImage;
@@ -384,68 +375,4 @@ if (howtoButton && howtoModal && howtoClose) {
 // ==== スタート =====================================================
 
 document.addEventListener("DOMContentLoaded", init);
-// ===== アップリケのドラッグ & ピンチ拡大 =====
-
-const applique = document.getElementById("appliqueImage");
-
-let currentX = 0;
-let currentY = 0;
-let currentScale = 1;
-
-let startX = 0;
-let startY = 0;
-let startScale = 1;
-let startDistance = 0;
-
-// 2本指の距離
-function getDistance(touches) {
-  const dx = touches[0].clientX - touches[1].clientX;
-  const dy = touches[0].clientY - touches[1].clientY;
-  return Math.hypot(dx, dy);
-}
-
-// transform 更新
-function updateTransformDirect() {
-  applique.style.transform =
-    `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
-}
-
-// タッチ開始
-applique.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-
-  const touches = e.touches;
-
-  if (touches.length === 1) {
-    startX = touches[0].clientX - currentX;
-    startY = touches[0].clientY - currentY;
-
-  } else if (touches.length === 2) {
-    startDistance = getDistance(touches);
-    startScale = currentScale;
-  }
-});
-
-// タッチ中
-applique.addEventListener("touchmove", (e) => {
-  e.preventDefault();
-
-  const touches = e.touches;
-
-  if (touches.length === 1) {
-    // ドラッグ
-    currentX = touches[0].clientX - startX;
-    currentY = touches[0].clientY - startY;
-    updateTransformDirect();
-
-  } else if (touches.length === 2) {
-    // ピンチ
-    const newDistance = getDistance(touches);
-    const ratio = newDistance / startDistance;
-    currentScale = startScale * ratio;
-    updateTransformDirect();
-  }
-});
-
-
 
