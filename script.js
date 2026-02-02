@@ -345,6 +345,9 @@ function copyToSnapshot() {
 const howtoButton = document.getElementById('howtoButton');
 const howtoModal = document.getElementById('howtoModal');
 const howtoClose = document.querySelector('.howto-close');
+const howtoCloseBottom = document.querySelector('.howto-close-bottom');
+
+
 
 // ※ カタログページだけで動くように保険をかける
 if (howtoButton && howtoModal && howtoClose) {
@@ -359,6 +362,12 @@ if (howtoButton && howtoModal && howtoClose) {
     howtoModal.classList.remove('show');
   });
 
+  // ★ 下の「× 閉じる」でも閉じる
+ if (howtoCloseBottom) {
+  howtoCloseBottom.addEventListener('click', () => {
+    howtoModal.classList.remove('show');
+  });
+}
   // グレーの背景をタップしても閉じる
   howtoModal.addEventListener('click', (event) => {
     if (event.target === howtoModal) {
