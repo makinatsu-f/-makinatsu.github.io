@@ -435,3 +435,17 @@ input[type="range"] {
   font-weight: 600;
   background: #ffffff;
 }
+.howto-close-bottom {
+  margin-top: 16px;
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: none;
+  border: none;
+  color: #00816a;
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
