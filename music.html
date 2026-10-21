@@ -309,6 +309,52 @@
   mak inatsu<br>
   CREATURES &amp; APPLIQUE
 </footer>
+  
+<script>
+  const players = Array.from(document.querySelectorAll(".song audio"));
 
+  players.forEach((player, index) => {
+    // 各曲にリピート用のチェック欄を追加
+    const label = document.createElement("label");
+    label.style.cssText =
+      "display:block; margin-top:14px; font-size:14px; cursor:pointer;";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+
+    label.append(checkbox, " 🔁 この曲をリピート");
+    player.after(label);
+
+    // チェックすると同じ曲を繰り返す
+    checkbox.addEventListener("change", () => {
+      player.loop = checkbox.checked;
+    });
+
+    // 別の曲を再生したら、それまでの曲を止める
+    player.addEventListener("play", () => {
+      players.forEach((other) => {
+        if (other !== player) other.pause();
+      });
+    });
+
+    // リピートしていなければ、曲の終了後に次へ進む
+    player.addEventListener("ended", async () => {
+      if (player.loop) return;
+
+      const next = players[(index + 1) % players.length];
+      next.currentTime = 0;
+
+      try {
+        await next.play();
+      } catch (error) {
+        next.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }
+    });
+  });
+</script>
+  
 </body>
 </html>
