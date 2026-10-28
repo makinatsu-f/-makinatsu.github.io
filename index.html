@@ -52,8 +52,8 @@
 
     <!-- モード切り替えタブ -->
     <nav class="mode-tabs">
-      <button class="mode-tab active" data-mode="custom">カスタムモード</button>
-      <button class="mode-tab" data-mode="snapshot">スクショ専用モード</button>
+      <button class="mode-tab active" data-mode="custom">バッグを選ぶ</button>
+      <button class="mode-tab" data-mode="snapshot">選んだバッグを確認</button>
     </nav>
 
     <!-- カスタムモード -->
@@ -87,26 +87,25 @@
         </button>
 
         <p class="note">
-          ※実物の生地のお色と多少異なる場合があります。
+          ※実物の生地のお色と多少異なる場合があります。<br>大きさ・配置はご相談用のイメージです。
         </p>
       </section>
 
       <!-- ② 下にカスタム用フォーム -->
       <section class="form-section">
         <h2 class="section-title">バッグカラーを選ぶ</h2>
-        <div class="select-row">
-          <select id="bagSelect"></select>
-        </div>
+        <div class="select-row"><label class="sr-only" for="bagSelect">バッグカラー</label><select id="bagSelect"></select></div>
 
         <h2 class="section-title">アップリケを選ぶ</h2>
         <div class="category-row">
-          <button class="category-btn active" data-category="恐竜">恐竜</button>
+          <button class="category-btn active" data-category="恐竜">恐竜・古生物</button>
           <button class="category-btn" data-category="海">海の生き物</button>
           <button class="category-btn" data-category="その他">その他の生き物</button>
         </div>
-        <div class="select-row">
-          <select id="appliqueSelect"></select>
-        </div>
+        <div class="search-row"><label for="appliqueSearch">名前で探す</label><input id="appliqueSearch" type="search" placeholder="例：ウミガメ、ティラノ" autocomplete="off"></div>
+        <div class="select-row"><label class="sr-only" for="appliqueSelect">アップリケ一覧</label><select id="appliqueSelect"></select></div>
+        <p id="appliqueCount" class="result-count" aria-live="polite"></p>
+        <div id="appliqueGallery" class="applique-gallery" aria-label="アップリケを写真で選ぶ"></div>
 
         <div class="control-group">
           <label class="control-label" for="appliqueSize">アップリケの大きさ</label>
@@ -129,8 +128,8 @@
     <main class="main main-snapshot hidden" id="mode-snapshot">
       <section class="snapshot-header">
         <button class="back-btn" id="backToCustom">＜ カスタム画面にもどる</button>
-        <h2 class="snapshot-title">【スクショ専用モード】</h2>
-        <p class="snapshot-sub">お作りするバッグの組み合わせ</p>
+        <h2 class="snapshot-title">選んだバッグ</h2>
+        <p class="snapshot-sub">ご相談用の完成イメージ</p>
       </section>
 
       <section class="snapshot-preview">
@@ -165,7 +164,7 @@
         </section>
 
         <a class="line-button" href="https://lin.ee/BuwMWM2" target="_blank" rel="noopener">
-          LINEでマキナツに送る
+          LINEを開いてスクショを送る
         </a>
       </section>
     </main>
