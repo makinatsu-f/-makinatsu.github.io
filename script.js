@@ -134,6 +134,9 @@ const mainSnapshot = document.getElementById("mode-snapshot");
 const toSnapshotButton = document.getElementById("toSnapshot");
 const backToCustomButton = document.getElementById("backToCustom");
 
+const appliqueSearch = document.getElementById("appliqueSearch");
+const appliqueGallery = document.getElementById("appliqueGallery");
+
 const categoryButtons = document.querySelectorAll(".category-btn");
 let currentCategory = "恐竜";
 
@@ -161,6 +164,9 @@ function init() {
   updateBag();
   updateApplique();
 
+  renderGallery();
+  appliqueSearch.addEventListener("input", renderGallery);
+
   // イベント
   bagSelect.addEventListener("change", updateBag);
   appliqueSelect.addEventListener("change", () => {
@@ -175,6 +181,7 @@ function init() {
       categoryButtons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       currentCategory = btn.dataset.category;
+      appliqueSearch.value = "";
       populateAppliques();
       const first = appliques.find((a) => a.category === currentCategory);
       if (first) {
@@ -237,6 +244,7 @@ function updateApplique() {
   appliqueNameLabel.textContent = app.label;
   snapshotAppliqueLabel.textContent = app.label;
 
+  renderGallery();
   appliqueNameIcon.src = src;
   snapshotAppliqueIcon.src = src;
 }
@@ -323,6 +331,7 @@ function setupDrag() {
 // ==== モード切り替え & スクショ用コピー ===========================
 
 function switchMode(mode) {
+  if (mode === "snapshot") copyToSnapshot();
   modeTabs.forEach((t) =>
     t.classList.toggle("active", t.dataset.mode === mode)
   );
@@ -386,3 +395,39 @@ if (howtoButton && howtoModal && howtoClose) {
 
 document.addEventListener("DOMContentLoaded", init);
 
+
+// 写真から選ぶ。検索時はすべてのカテゴリーを対象にする。
+function renderGallery() {
+  const query = appliqueSearch.value.trim().normalize("NFKC").toLowerCase();
+  const matches = appliques.filter(a => query
+    ? a.label.normalize("NFKC").toLowerCase().includes(query)
+    : a.category === currentCategory);
+  document.getElementById("appliqueCount").textContent = matches.length
+    ? matches.length + "種類から選べます"
+    : "見つかりませんでした。別の名前で探してみてください。";
+  appliqueGallery.replaceChildren();
+  matches.forEach(a => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "applique-card";
+    button.setAttribute("aria-pressed", String(a.id === appliqueSelect.value));
+    const img = document.createElement("img");
+    img.src = "./assets/appliques/" + a.file;
+    img.alt = "";
+    img.loading = "lazy";
+    const label = document.createElement("span");
+    label.textContent = a.label;
+    button.append(img, label);
+    button.addEventListener("click", () => {
+      if (currentCategory !== a.category) {
+        currentCategory = a.category;
+        categoryButtons.forEach(b => b.classList.toggle("active", b.dataset.category === currentCategory));
+        populateAppliques();
+      }
+      appliqueSelect.value = a.id;
+      resetAppliqueTransform();
+      updateApplique();
+    });
+    appliqueGallery.append(button);
+  });
+}
