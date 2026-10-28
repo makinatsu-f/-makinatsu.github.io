@@ -449,3 +449,38 @@ input[type="range"] {
 }
 
 
+
+
+/* 写真で選べるカタログと、画面幅に合わせた配置 */
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.search-row { margin:14px 0 8px; }
+.search-row label { display:block; font-size:13px; margin-bottom:5px; }
+.search-row input { width:100%; min-height:44px; padding:10px 12px; border:1px solid #d8d1c5; border-radius:12px; background:white; font:inherit; font-size:15px; }
+.result-count { font-size:12px; color:#5b645e; margin:12px 0 8px; }
+.applique-gallery { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.applique-card { min-width:0; padding:8px 4px; border:2px solid #e8e1d4; border-radius:12px; background:#fff; color:#333; font:inherit; cursor:pointer; }
+.applique-card img { display:block; width:100%; height:78px; object-fit:contain; margin-bottom:6px; }
+.applique-card span { display:block; font-size:11px; line-height:1.5; overflow-wrap:anywhere; }
+.applique-card[aria-pressed="true"] { border-color:#397f6e; background:#eaf4ec; box-shadow:0 0 0 1px #397f6e; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid #b65a33; outline-offset:3px; }
+.category-btn { min-height:44px; }
+.page-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.howto-button { flex-shrink:0; border:1px solid #cfc6b8; border-radius:20px; padding:8px 12px; background:#fffdf8; color:#397f6e; cursor:pointer; }
+.logo-text { font-size:clamp(15px,3.7vw,22px); }
+.control-group { margin-top:20px; }
+.main-snapshot { width:100%; max-width:540px; margin:0 auto; }
+@media (min-width:720px) {
+  .page { max-width:1120px; }
+  .page-header { padding:24px 28px 16px; }
+  .mode-tabs { padding:16px 28px 0; max-width:600px; width:100%; }
+  .main-custom { padding:20px 28px 36px; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); align-items:start; gap:24px; }
+  .preview-section { position:sticky; top:20px; }
+  .bag-preview { max-width:440px; }
+  .applique-card img { height:95px; }
+  .applique-card span { font-size:12px; }
+  .main-snapshot { padding-top:24px; }
+}
+@media (max-width:359px) {
+  .applique-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .page-header { padding-left:12px; padding-right:12px; }
+}
