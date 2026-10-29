@@ -204,6 +204,7 @@ function init() {
 
   // ドラッグ
   setupDrag();
+  setupComparison();
 }
 
 function populateAppliques() {
@@ -331,6 +332,7 @@ function setupDrag() {
 // ==== モード切り替え & スクショ用コピー ===========================
 
 function switchMode(mode) {
+  document.getElementById("comparison").classList.toggle("hidden", mode !== "custom");
   if (mode === "snapshot") copyToSnapshot();
   modeTabs.forEach((t) =>
     t.classList.toggle("active", t.dataset.mode === mode)
@@ -385,10 +387,7 @@ if (howtoButton && howtoModal && howtoClose) {
     }
   });
 
-  // ★ページを開いたときに自動で表示（毎回）
-  window.addEventListener('load', () => {
-    howtoModal.classList.add('show');
-  });
+  // 説明は「使い方」ボタンを押したときだけ表示する。
 }
 
 // ==== スタート =====================================================
@@ -430,4 +429,141 @@ function renderGallery() {
     });
     appliqueGallery.append(button);
   });
+}
+
+// 保存・比較。保存データはこのブラウザーだけに保持する。
+function setupComparison() {
+  const key = "makinatsu-catalog-saved-v1";
+  const list = document.getElementById("savedCombinations");
+  const status = document.getElementById("saveStatus");
+  const mini = document.getElementById("miniPreview");
+  const preview = document.querySelector(".preview-section");
+  let saved = [];
+  function valid(s) {
+    return s && bags.some(b => b.id === s.bag) && appliques.some(a => a.id === s.applique)
+      && Number.isFinite(s.size) && s.size >= 60 && s.size <= 230
+      && Number.isFinite(s.left) && s.left >= 10 && s.left <= 90
+      && Number.isFinite(s.top) && s.top >= 20 && s.top <= 80
+      && typeof s.flipped === "boolean";
+  }
+  try {
+    const data = JSON.parse(localStorage.getItem(key) || "[]");
+    if (Array.isArray(data)) saved = data.filter(valid).slice(0, 3);
+  } catch (_) {}
+  function state() {
+    return {bag:bagSelect.value, applique:appliqueSelect.value,
+      size:Number(sizeRange.value), flipped:isFlipped,
+      left:parseFloat(appliqueImage.style.left || "60"),
+      top:parseFloat(appliqueImage.style.top || "55")};
+  }
+  function persist() {
+    try { localStorage.setItem(key, JSON.stringify(saved)); return true; }
+    catch (_) { return false; }
+  }
+  function picture(s) {
+    const frame = document.createElement("div");
+    frame.className = "bag-preview saved-bag";
+    const bag = document.createElement("img");
+    bag.className = "bag-image";
+    bag.alt = "";
+    bag.src = "./assets/bags/" + bags.find(b => b.id === s.bag).file;
+    const app = document.createElement("img");
+    app.className = "applique-image";
+    app.alt = "";
+    app.src = "./assets/appliques/" + appliques.find(a => a.id === s.applique).file;
+    app.style.left = s.left + "%";
+    app.style.top = s.top + "%";
+    app.style.transform = "translate(-50%, -50%) scale(" + s.size / 150 + ")" + (s.flipped ? " scaleX(-1)" : "");
+    frame.append(bag, app);
+    return frame;
+  }
+  function render() {
+    list.replaceChildren();
+    document.getElementById("savedCount").textContent = saved.length + " / 3";
+    if (!saved.length) {
+      const empty = document.createElement("p");
+      empty.className = "compare-note";
+      empty.textContent = "気になる組み合わせを、バッグの下のボタンから保存してね。";
+      list.append(empty);
+    }
+    saved.forEach((s, i) => {
+      const card = document.createElement("article");
+      card.className = "saved-card";
+      const title = document.createElement("h3");
+      title.textContent = "候補 " + (i + 1);
+      const label = document.createElement("p");
+      label.textContent = bags.find(b => b.id === s.bag).label + "／" + appliques.find(a => a.id === s.applique).label;
+      const restore = document.createElement("button");
+      restore.type = "button";
+      restore.textContent = "このバッグに戻す";
+      restore.addEventListener("click", () => {
+        const a = appliques.find(a => a.id === s.applique);
+        bagSelect.value = s.bag;
+        currentCategory = a.category;
+        appliqueSearch.value = "";
+        categoryButtons.forEach(b => b.classList.toggle("active", b.dataset.category === currentCategory));
+        populateAppliques();
+        appliqueSelect.value = s.applique;
+        sizeRange.value = String(s.size);
+        isFlipped = s.flipped;
+        appliqueImage.style.left = s.left + "%";
+        appliqueImage.style.top = s.top + "%";
+        updateBag(); updateApplique(); updateAppliqueScale();
+        switchMode("custom");
+        preview.scrollIntoView({behavior:"smooth", block:"start"});
+      });
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "remove-saved";
+      remove.textContent = "削除";
+      remove.setAttribute("aria-label", "候補" + (i + 1) + "を削除");
+      remove.addEventListener("click", () => {
+        saved.splice(i, 1);
+        const persisted = persist(); render();
+        status.textContent = persisted ? "候補を削除しました。" : "候補を削除しました。この画面を閉じると変更が残らない場合があります。";
+      });
+      card.append(title, picture(s), label, restore, remove);
+      list.append(card);
+    });
+  }
+  document.getElementById("saveCombination").addEventListener("click", () => {
+    const s = state();
+    if (saved.some(x => JSON.stringify(x) === JSON.stringify(s))) {
+      status.textContent = "この組み合わせは保存済みです。"; return;
+    }
+    if (saved.length >= 3) {
+      status.textContent = "３点保存済みです。比較欄で不要な候補を削除すると追加できます。";
+      document.getElementById("comparison").scrollIntoView({behavior:"smooth", block:"start"});
+      return;
+    }
+    saved.push(s);
+    const persisted = persist(); render();
+    status.textContent = persisted ? "候補" + saved.length + "に保存しました。下の比較欄で見られます。" : "この画面では保存できました。ブラウザーの設定により、閉じると消える場合があります。";
+  });
+  document.getElementById("returnToPreview").addEventListener("click", () => preview.scrollIntoView({behavior:"smooth", block:"start"}));
+  document.getElementById("jumpToComparison").addEventListener("click", () => document.getElementById("comparison").scrollIntoView({behavior:"smooth", block:"start"}));
+  let queued = false;
+  function syncMini() {
+    const bag = document.getElementById("miniBagImage");
+    const app = document.getElementById("miniAppliqueImage");
+    bag.src = bagImage.src;
+    app.src = appliqueImage.src;
+    app.style.cssText = appliqueImage.style.cssText;
+    document.getElementById("miniLabel").textContent = bagNameLabel.textContent + "／" + appliqueNameLabel.textContent;
+    const pastPreview = preview.getBoundingClientRect().bottom <= 0;
+    const atComparison = document.getElementById("comparison").getBoundingClientRect().top < window.innerHeight;
+    mini.classList.toggle("hidden", window.innerWidth >= 720 || !pastPreview || atComparison || mainCustom.classList.contains("hidden"));
+  }
+  function scheduleMini() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; syncMini(); });
+  }
+  const observer = new MutationObserver(scheduleMini);
+  observer.observe(appliqueImage, {attributes:true, attributeFilter:["src","style"]});
+  observer.observe(bagImage, {attributes:true, attributeFilter:["src"]});
+  observer.observe(mainCustom, {attributes:true, attributeFilter:["class"]});
+  window.addEventListener("scroll", scheduleMini, {passive:true});
+  window.addEventListener("resize", scheduleMini);
+  render(); syncMini();
 }
