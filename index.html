@@ -8,7 +8,7 @@
   <!-- フォント（BASEに近い雰囲気） -->
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20261029-setup" />
+  <link rel="stylesheet" href="style.css?v=20261029-basic" />
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="images/makinatsu_icon_192.png">
 <meta name="theme-color" content="#ffffff">
@@ -72,7 +72,10 @@
         <div class="preview-controls">
         <div class="control-group">
           <label class="control-label" for="appliqueSize">アップリケの大きさ</label>
-          <input type="range" id="appliqueSize" min="60" max="230" value="130" step="0.1" />
+          <input type="range" id="appliqueSize" min="60" max="230" value="103.4" step="0.1" />
+          <div class="size-marker-row" aria-hidden="true"><span id="basicSizeMarker" class="basic-size-marker">基本</span></div>
+          <div class="basic-size-actions"><span id="basicSizeFeedback"></span><button id="resetBasicSize" type="button" class="pill-btn">基本サイズに戻す</button></div>
+          <p class="basic-size-note">基本サイズは制作の目安です。大きさは自由に変えて楽しめます。</p>
         </div>
 
         <div class="control-group flip-row">
@@ -205,6 +208,6 @@
     </div>
     <div class="mini-details"><span id="miniLabel"></span><button id="returnToPreview" type="button">大きく見て調整 ↑</button><button id="jumpToComparison" type="button">保存したバッグを比べる</button></div>
   </aside>
-  <script src="script.js?v=20261029-setup"></script>
+  <script src="script.js?v=20261029-basic"></script>
 </body>
 </html>
