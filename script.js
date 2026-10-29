@@ -176,7 +176,6 @@ const appliqueNameLabel = document.getElementById("appliqueNameLabel");
 const bagNameIcon = document.getElementById("bagNameIcon");
 const appliqueNameIcon = document.getElementById("appliqueNameIcon");
 
-const sizeRange = document.getElementById("appliqueSize");
 const flipButton = document.getElementById("flipButton");
 
 const snapshotBagImage = document.getElementById("snapshotBagImage");
@@ -197,7 +196,6 @@ const appliqueGallery = document.getElementById("appliqueGallery");
 
 const categoryButtons = document.querySelectorAll(".category-btn");
 let currentCategory = "恐竜";
-let calibrationController = null;
 
 // ==== 初期化 =======================================================
 
@@ -232,11 +230,6 @@ function init() {
     resetAppliqueTransform();
     updateApplique();
   });
-  sizeRange.addEventListener("input", () => updateAppliqueScale(true));
-  document.getElementById("resetBasicSize").addEventListener("click", () => {
-    sizeRange.value = String(getBasicSize());
-    updateAppliqueScale(true);
-  });
   flipButton.addEventListener("click", toggleFlip);
 
   categoryButtons.forEach((btn) => {
@@ -268,7 +261,6 @@ function init() {
   // ドラッグ
   setupDrag();
   setupComparison();
-  setupCalibration();
 }
 
 function populateAppliques() {
@@ -312,15 +304,12 @@ function updateApplique() {
   renderGallery();
   appliqueNameIcon.src = src;
   snapshotAppliqueIcon.src = src;
-  if (calibrationController) calibrationController.selectionChanged();
 }
 
-function updateAppliqueScale(userGesture = false) {
-  const scale = sizeRange.value / 150;
+function updateAppliqueScale() {
+  const scale = getBasicSize() / 150;
   const flip = isFlipped ? " scaleX(-1)" : "";
   appliqueImage.style.transform = `translate(-50%, -50%) scale(${scale})${flip}`;
-  updateBasicSizeMarker(userGesture);
-  if (calibrationController) calibrationController.refresh();
 }
 
 // ==== フリップ & ドラッグ =========================================
@@ -333,7 +322,6 @@ function toggleFlip() {
 }
 
 function resetAppliqueTransform() {
-  sizeRange.value = String(getBasicSize());
   isFlipped = false;
   appliqueImage.style.left = "60%";
   appliqueImage.style.top = "55%";
@@ -342,50 +330,30 @@ function resetAppliqueTransform() {
 
 function setupDrag() {
   const surface = document.getElementById("bagPreview");
-  const pointers = new Map();
+  let activePointer = null;
   let baseline = null;
-  const distance = points => Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y);
-  function rebase() {
-    const points = [...pointers.values()];
-    baseline = points.length ? {
-      x: points[0].x, y: points[0].y,
-      left: parseFloat(appliqueImage.style.left || "60"),
-      top: parseFloat(appliqueImage.style.top || "55"),
-      size: Number(sizeRange.value),
-      distance: points.length >= 2 ? distance(points) : 0
-    } : null;
-  }
   function down(e) {
-    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (activePointer !== null || (e.pointerType === "mouse" && e.button !== 0)) return;
     e.preventDefault();
-    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    activePointer = e.pointerId;
+    baseline = {x:e.clientX, y:e.clientY,
+      left:parseFloat(appliqueImage.style.left || "60"),
+      top:parseFloat(appliqueImage.style.top || "55")};
     surface.setPointerCapture(e.pointerId);
-    rebase();
   }
   function move(e) {
-    if (!pointers.has(e.pointerId)) return;
+    if (e.pointerId !== activePointer) return;
     e.preventDefault();
-    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
-    const points = [...pointers.values()];
-    if (points.length >= 2) {
-      if (baseline.distance > 0) {
-        const value = baseline.size * distance(points) / baseline.distance;
-        sizeRange.value = String(Math.min(Number(sizeRange.max), Math.max(Number(sizeRange.min), value)));
-        updateAppliqueScale(true);
-      } else rebase();
-    } else {
-      const rect = surface.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const left = baseline.left + (points[0].x - baseline.x) / rect.width * 100;
-      const top = baseline.top + (points[0].y - baseline.y) / rect.height * 100;
-      appliqueImage.style.left = Math.min(90, Math.max(10, left)) + "%";
-      appliqueImage.style.top = Math.min(80, Math.max(20, top)) + "%";
-    }
+    const rect = surface.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    appliqueImage.style.left = Math.min(90, Math.max(10, baseline.left + (e.clientX - baseline.x) / rect.width * 100)) + "%";
+    appliqueImage.style.top = Math.min(80, Math.max(20, baseline.top + (e.clientY - baseline.y) / rect.height * 100)) + "%";
   }
   function up(e) {
-    if (!pointers.delete(e.pointerId)) return;
+    if (e.pointerId !== activePointer) return;
+    activePointer = null;
+    baseline = null;
     if (surface.hasPointerCapture(e.pointerId)) surface.releasePointerCapture(e.pointerId);
-    rebase();
   }
   resetAppliqueTransform();
   surface.addEventListener("pointerdown", down);
@@ -393,7 +361,7 @@ function setupDrag() {
   surface.addEventListener("pointerup", up);
   surface.addEventListener("pointercancel", up);
   surface.addEventListener("lostpointercapture", up);
-  window.addEventListener("blur", () => { pointers.clear(); rebase(); });
+  window.addEventListener("blur", () => { activePointer = null; baseline = null; });
 }
 
 // ==== モード切り替え & スクショ用コピー ===========================
@@ -508,18 +476,17 @@ function setupComparison() {
   let saved = [];
   function valid(s) {
     return s && bags.some(b => b.id === s.bag) && appliques.some(a => a.id === s.applique)
-      && Number.isFinite(s.size) && s.size >= 60 && s.size <= 230
       && Number.isFinite(s.left) && s.left >= 10 && s.left <= 90
       && Number.isFinite(s.top) && s.top >= 20 && s.top <= 80
       && typeof s.flipped === "boolean";
   }
   try {
     const data = JSON.parse(localStorage.getItem(key) || "[]");
-    if (Array.isArray(data)) saved = data.filter(valid).slice(0, 3);
+    if (Array.isArray(data)) saved = data.filter(valid).slice(0, 3).map(s => ({...s, size:basicSizes[s.applique] ?? 130}));
   } catch (_) {}
   function state() {
     return {bag:bagSelect.value, applique:appliqueSelect.value,
-      size:Number(sizeRange.value), flipped:isFlipped,
+      size:getBasicSize(), flipped:isFlipped,
       left:parseFloat(appliqueImage.style.left || "60"),
       top:parseFloat(appliqueImage.style.top || "55")};
   }
@@ -540,7 +507,7 @@ function setupComparison() {
     app.src = "./assets/appliques/" + appliques.find(a => a.id === s.applique).file;
     app.style.left = s.left + "%";
     app.style.top = s.top + "%";
-    app.style.transform = "translate(-50%, -50%) scale(" + s.size / 150 + ")" + (s.flipped ? " scaleX(-1)" : "");
+    app.style.transform = "translate(-50%, -50%) scale(" + (basicSizes[s.applique] ?? 130) / 150 + ")" + (s.flipped ? " scaleX(-1)" : "");
     frame.append(bag, app);
     return frame;
   }
@@ -571,7 +538,6 @@ function setupComparison() {
         categoryButtons.forEach(b => b.classList.toggle("active", b.dataset.category === currentCategory));
         populateAppliques();
         appliqueSelect.value = s.applique;
-        sizeRange.value = String(s.size);
         isFlipped = s.flipped;
         appliqueImage.style.left = s.left + "%";
         appliqueImage.style.top = s.top + "%";
@@ -635,122 +601,7 @@ function setupComparison() {
   render(); syncMini();
 }
 
-// 登録値は公開設定と分離し、作者が確認してからサイトへ反映する。
-function setupCalibration() {
-  if (new URLSearchParams(window.location.search).get("setup") !== "1") return;
-  const panel = document.getElementById("calibrationPanel");
-  if (!panel) return;
-  panel.classList.remove("hidden");
-  const storageKey = "makinatsu-catalog-basic-size-drafts-v1";
-  const status = document.getElementById("calibrationStatus");
-  const current = document.getElementById("calibrationCurrent");
-  const progress = document.getElementById("calibrationProgress");
-  const output = document.getElementById("basicSizesExport");
-  const copyStatus = document.getElementById("calibrationCopyStatus");
-  const next = document.getElementById("nextUnconfigured");
-  let drafts = {};
-  let canPersist = true;
-  try {
-    const data = JSON.parse(localStorage.getItem(storageKey) || "{}");
-    if (data && typeof data === "object" && !Array.isArray(data)) {
-      appliques.forEach(a => {
-        const value = data[a.id];
-        if (Number.isFinite(value) && value >= Number(sizeRange.min) && value <= Number(sizeRange.max)) drafts[a.id] = value;
-      });
-    }
-  } catch (_) { canPersist = false; }
-  function refresh() {
-    const a = appliques.find(a => a.id === appliqueSelect.value);
-    if (!a) return;
-    const registered = Object.prototype.hasOwnProperty.call(drafts, a.id);
-    current.textContent = a.label + "｜今の大きさ：" + Number(sizeRange.value).toFixed(1)
-      + (registered ? "｜登録済み：" + drafts[a.id] : "｜まだ未登録");
-    const count = Object.keys(drafts).length;
-    progress.textContent = count + " / " + appliques.length + "種類を登録済み";
-    next.disabled = count === appliques.length;
-    output.value = "マキナツカタログ 基本サイズ設定\n" + JSON.stringify({
-      version:1,
-      sizes:appliques.filter(a => Object.prototype.hasOwnProperty.call(drafts, a.id))
-        .map(a => ({id:a.id, name:a.label, size:drafts[a.id]}))
-    }, null, 2);
-  }
-  function selectionChanged() {
-    const value = drafts[appliqueSelect.value];
-    status.textContent = "";
-    if (Number.isFinite(value)) {
-      sizeRange.value = String(value);
-      updateAppliqueScale();
-    }
-    refresh();
-  }
-  calibrationController = {refresh, selectionChanged};
-  document.getElementById("registerBasicSize").addEventListener("click", () => {
-    const a = appliques.find(a => a.id === appliqueSelect.value);
-    if (!a) return;
-    const value = Math.round(Number(sizeRange.value) * 10) / 10;
-    if (!Number.isFinite(value) || value < Number(sizeRange.min) || value > Number(sizeRange.max)) return;
-    drafts[a.id] = value;
-    try { localStorage.setItem(storageKey, JSON.stringify(drafts)); canPersist = true; }
-    catch (_) { canPersist = false; }
-    status.textContent = a.label + "の基本サイズを登録しました。" + (canPersist ? "" : " このブラウザーでは保存できないため、閉じる前に設定をコピーしてください。");
-    copyStatus.textContent = "";
-    refresh();
-  });
-  next.addEventListener("click", () => {
-    const index = appliques.findIndex(a => a.id === appliqueSelect.value);
-    const ordered = appliques.slice(index + 1).concat(appliques.slice(0, index + 1));
-    const a = ordered.find(a => !Object.prototype.hasOwnProperty.call(drafts, a.id));
-    if (!a) return;
-    currentCategory = a.category;
-    appliqueSearch.value = "";
-    categoryButtons.forEach(b => b.classList.toggle("active", b.dataset.category === currentCategory));
-    populateAppliques();
-    appliqueSelect.value = a.id;
-    resetAppliqueTransform();
-    updateApplique();
-    document.querySelector(".preview-section").scrollIntoView({behavior:"smooth", block:"start"});
-  });
-  document.getElementById("copyBasicSizes").addEventListener("click", async () => {
-    if (!Object.keys(drafts).length) {
-      copyStatus.textContent = "まず１種類の基本サイズを登録してください。"; return;
-    }
-    try {
-      await navigator.clipboard.writeText(output.value);
-      copyStatus.textContent = "コピーしました。チャッピーとのチャットに貼り付けて送ってね。";
-    } catch (_) {
-      output.focus(); output.select();
-      copyStatus.textContent = "自動コピーができませんでした。下の欄を長押しし、全文をコピーしてください。";
-    }
-  });
-  if (!canPersist) status.textContent = "保存データを読み込めませんでした。登録後は閉じる前に設定をコピーしてください。";
-  selectionChanged();
-}
-
-let previousBasicFeedback = null;
+// 制作に使用する、生き物ごとの指定サイズ。
 function getBasicSize() {
   return basicSizes[appliqueSelect.value] ?? 130;
-}
-function updateBasicSizeMarker(userGesture = false) {
-  const marker = document.getElementById("basicSizeMarker");
-  const feedback = document.getElementById("basicSizeFeedback");
-  if (!marker || !feedback) return;
-  const base = getBasicSize();
-  const value = Number(sizeRange.value);
-  const fraction = (base - Number(sizeRange.min)) / (Number(sizeRange.max) - Number(sizeRange.min));
-  marker.style.left = (fraction * 100) + "%";
-  marker.classList.toggle("marker-at-start", fraction < 0.08);
-  const near = Math.abs(value - base) <= 0.6;
-  marker.classList.toggle("at-basic", near);
-  const description = near ? "基本サイズです" : value < base ? "基本より小さめ" : "基本より大きめ";
-  feedback.textContent = description;
-  feedback.classList.toggle("at-basic", near);
-  sizeRange.setAttribute("aria-valuetext", description);
-  const prev = previousBasicFeedback;
-  const same = prev && prev.id === appliqueSelect.value;
-  const entered = same && !prev.near && near;
-  const crossed = same && !prev.near && !near && (prev.value - base) * (value - base) < 0;
-  if (userGesture && (entered || crossed) && typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
-    try { navigator.vibrate(15); } catch (_) {}
-  }
-  previousBasicFeedback = {id:appliqueSelect.value, value, near};
 }
