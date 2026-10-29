@@ -532,3 +532,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .minne-button { display:block; margin-top:10px; padding:12px 10px; border:1px solid #193f35; border-radius:999px; color:#193f35; background:#fffdf8; text-decoration:none; text-align:center; font-size:14px; }
 .howto-steps { padding-left:24px; font-size:14px; line-height:1.8; }
 .howto-steps li { margin:10px 0; }
+
+/* 相談前に、スクショする内容と価格の目安を一緒に確認できる。 */
+.snapshot-summary { min-width:0; }
+.snapshot-info p { margin:6px 0; line-height:1.5; }
+.snapshot-price { margin-top:10px; padding:10px 12px; background:#eef2e9; border:1px solid #dce2d5; border-radius:12px; color:#193f35; }
+.snapshot-price p { margin:3px 0; font-size:12px; line-height:1.5; }
+.snapshot-price .snapshot-price-title { font-size:14px; }
+.snapshot-price-title strong { font-size:20px; white-space:nowrap; }
+.snapshot-price .snapshot-price-note { font-size:11px; color:#5b645e; }
+.consultation-note { margin-top:14px; padding:12px; background:#f5f1e7; border-radius:12px; }
+.consultation-note p { margin:4px 0; font-size:13px; line-height:1.7; color:#193f35; }
+.consultation-note p:last-child { font-size:12px; color:#5b645e; }
+@media(max-width:480px) {
+ .main-snapshot { padding-top:8px; }
+ .snapshot-header { margin-bottom:6px; }
+ .snapshot-preview { padding:10px 12px 16px; }
+ .snapshot-frame { padding:6px; }
+ .snapshot-summary .snapshot-bag { max-width:340px; }
+}
