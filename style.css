@@ -534,3 +534,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .calibration-export summary { cursor:pointer; font-size:13px; line-height:1.7; }
 .calibration-export label { font-size:12px; line-height:1.7; display:block; }
 #basicSizesExport { width:100%; box-sizing:border-box; padding:8px; font-size:16px; margin-top:8px; border:1px solid #cfc6b8; border-radius:8px; }
+
+/* 生き物ごとの基本サイズ。つまみと独立した目盛りを表示する。 */
+.size-marker-row { position:relative; margin:0 10px; height:25px; }
+.basic-size-marker { position:absolute; top:0; transform:translateX(-50%); font-size:11px; color:#555; white-space:nowrap; }
+.basic-size-marker::before { content:""; position:absolute; height:8px; width:2px; background:#397f6e; left:50%; top:-9px; }
+.basic-size-marker.marker-at-start { transform:none; }
+.basic-size-marker.marker-at-start::before { left:0; }
+.basic-size-actions { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+#basicSizeFeedback { font-size:12px; color:#666; }
+.basic-size-marker.at-basic, #basicSizeFeedback.at-basic { color:#285e50; font-weight:bold; background:#e1edde; border-radius:6px; }
+.basic-size-note { margin:6px 0 10px; color:#666; font-size:11px; line-height:1.6; }
