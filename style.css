@@ -521,3 +521,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 #bagPreview .applique-image { will-change: transform; }
+
+/* 作家用サイズ登録。専用URLでのみ表示する。 */
+.calibration-panel { margin:14px 0; padding:14px; background:#f3f0df; border:2px solid #397f6e; border-radius:14px; }
+.calibration-panel h3 { margin:0 0 8px; font-size:15px; color:#285e50; }
+.calibration-note { font-size:12px; line-height:1.7; color:#555; }
+.calibration-panel button { display:block; width:100%; padding:11px 8px; min-height:44px; margin:8px 0; border:1px solid #397f6e; border-radius:10px; color:#285e50; background:white; font:inherit; font-size:13px; cursor:pointer; }
+#registerBasicSize { background:#285e50; color:white; }
+#calibrationCurrent { font-size:13px; line-height:1.7; font-weight:bold; }
+#calibrationStatus, #calibrationProgress, #calibrationCopyStatus { font-size:12px; line-height:1.7; }
+.calibration-export { margin-top:14px; border-top:1px solid #cfc6b8; padding-top:12px; }
+.calibration-export summary { cursor:pointer; font-size:13px; line-height:1.7; }
+.calibration-export label { font-size:12px; line-height:1.7; display:block; }
+#basicSizesExport { width:100%; box-sizing:border-box; padding:8px; font-size:16px; margin-top:8px; border:1px solid #cfc6b8; border-radius:8px; }
