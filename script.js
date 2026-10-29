@@ -104,6 +104,64 @@ const appliques = [
   { id: "jellyfish-vinyl", label: "クラゲ（ビニール）", file: "jellyfish-vinyl.png", category: "その他" },
 ];
 
+const basicSizes = {
+  "trex-red": 103.4,
+  "trex-ochre": 103.4,
+  "spinosaurus": 96.2,
+  "stegosaurus": 100.6,
+  "diplodocus": 102.9,
+  "triceratops": 105.7,
+  "velociraptor": 87.3,
+  "mosasaurus": 80,
+  "dunkleosteus": 83.4,
+  "trex-green": 75.6,
+  "anomalocaris": 79.5,
+  "dunkleosteus-02": 94.5,
+  "greatwhite-shark": 94.5,
+  "catshark": 92.8,
+  "whale-shark": 105.1,
+  "sand-tiger-shark": 90.6,
+  "zebra-shark": 97.9,
+  "hammerhead-shark": 104.5,
+  "goblin-shark": 90.1,
+  "tai": 72.8,
+  "saba": 85.6,
+  "maguro": 90.6,
+  "manta": 96.2,
+  "anglerfish": 85.1,
+  "aori-ika": 88.4,
+  "mendako-orange": 72.8,
+  "blue-whale": 105.1,
+  "orca": 94,
+  "orca-pink": 87.3,
+  "bottlenose-blue": 99.5,
+  "manatee": 108.4,
+  "humpback-whale": 109.6,
+  "sunfish": 85.6,
+  "houlai-eso": 94,
+  "megalodon": 87.8,
+  "sailfish": 107.9,
+  "sea-turtle": 119.6,
+  "ranchu": 60,
+  "ranchu-02": 94.5,
+  "crocodile-gray": 92.8,
+  "crocodile-green": 134.6,
+  "hercules-beetle": 89,
+  "beetle": 81.2,
+  "giraffa-stagbeetle": 99,
+  "ookuwagata": 77.3,
+  "chameleon": 94.5,
+  "axolotl": 71.1,
+  "lobster": 101.2,
+  "emperor-penguin-family": 82.3,
+  "chick-penguin": 60,
+  "parent-penguin": 83.4,
+  "african-spurred-tortoise": 81.7,
+  "horse": 85.6,
+  "panda": 73.4,
+  "jellyfish-vinyl": 71.1
+};
+
 // ==== 要素取得 =====================================================
 
 const bagSelect = document.getElementById("bagSelect");
@@ -174,7 +232,11 @@ function init() {
     resetAppliqueTransform();
     updateApplique();
   });
-  sizeRange.addEventListener("input", updateAppliqueScale);
+  sizeRange.addEventListener("input", () => updateAppliqueScale(true));
+  document.getElementById("resetBasicSize").addEventListener("click", () => {
+    sizeRange.value = String(getBasicSize());
+    updateAppliqueScale(true);
+  });
   flipButton.addEventListener("click", toggleFlip);
 
   categoryButtons.forEach((btn) => {
@@ -253,10 +315,11 @@ function updateApplique() {
   if (calibrationController) calibrationController.selectionChanged();
 }
 
-function updateAppliqueScale() {
+function updateAppliqueScale(userGesture = false) {
   const scale = sizeRange.value / 150;
   const flip = isFlipped ? " scaleX(-1)" : "";
   appliqueImage.style.transform = `translate(-50%, -50%) scale(${scale})${flip}`;
+  updateBasicSizeMarker(userGesture);
   if (calibrationController) calibrationController.refresh();
 }
 
@@ -270,7 +333,7 @@ function toggleFlip() {
 }
 
 function resetAppliqueTransform() {
-  sizeRange.value = 130;
+  sizeRange.value = String(getBasicSize());
   isFlipped = false;
   appliqueImage.style.left = "60%";
   appliqueImage.style.top = "55%";
@@ -308,7 +371,7 @@ function setupDrag() {
       if (baseline.distance > 0) {
         const value = baseline.size * distance(points) / baseline.distance;
         sizeRange.value = String(Math.min(Number(sizeRange.max), Math.max(Number(sizeRange.min), value)));
-        updateAppliqueScale();
+        updateAppliqueScale(true);
       } else rebase();
     } else {
       const rect = surface.getBoundingClientRect();
@@ -661,4 +724,33 @@ function setupCalibration() {
   });
   if (!canPersist) status.textContent = "保存データを読み込めませんでした。登録後は閉じる前に設定をコピーしてください。";
   selectionChanged();
+}
+
+let previousBasicFeedback = null;
+function getBasicSize() {
+  return basicSizes[appliqueSelect.value] ?? 130;
+}
+function updateBasicSizeMarker(userGesture = false) {
+  const marker = document.getElementById("basicSizeMarker");
+  const feedback = document.getElementById("basicSizeFeedback");
+  if (!marker || !feedback) return;
+  const base = getBasicSize();
+  const value = Number(sizeRange.value);
+  const fraction = (base - Number(sizeRange.min)) / (Number(sizeRange.max) - Number(sizeRange.min));
+  marker.style.left = (fraction * 100) + "%";
+  marker.classList.toggle("marker-at-start", fraction < 0.08);
+  const near = Math.abs(value - base) <= 0.6;
+  marker.classList.toggle("at-basic", near);
+  const description = near ? "基本サイズです" : value < base ? "基本より小さめ" : "基本より大きめ";
+  feedback.textContent = description;
+  feedback.classList.toggle("at-basic", near);
+  sizeRange.setAttribute("aria-valuetext", description);
+  const prev = previousBasicFeedback;
+  const same = prev && prev.id === appliqueSelect.value;
+  const entered = same && !prev.near && near;
+  const crossed = same && !prev.near && !near && (prev.value - base) * (value - base) < 0;
+  if (userGesture && (entered || crossed) && typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+    try { navigator.vibrate(15); } catch (_) {}
+  }
+  previousBasicFeedback = {id:appliqueSelect.value, value, near};
 }
