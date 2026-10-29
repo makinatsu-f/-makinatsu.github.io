@@ -139,6 +139,7 @@ const appliqueGallery = document.getElementById("appliqueGallery");
 
 const categoryButtons = document.querySelectorAll(".category-btn");
 let currentCategory = "恐竜";
+let calibrationController = null;
 
 // ==== 初期化 =======================================================
 
@@ -205,6 +206,7 @@ function init() {
   // ドラッグ
   setupDrag();
   setupComparison();
+  setupCalibration();
 }
 
 function populateAppliques() {
@@ -248,12 +250,14 @@ function updateApplique() {
   renderGallery();
   appliqueNameIcon.src = src;
   snapshotAppliqueIcon.src = src;
+  if (calibrationController) calibrationController.selectionChanged();
 }
 
 function updateAppliqueScale() {
   const scale = sizeRange.value / 150;
   const flip = isFlipped ? " scaleX(-1)" : "";
   appliqueImage.style.transform = `translate(-50%, -50%) scale(${scale})${flip}`;
+  if (calibrationController) calibrationController.refresh();
 }
 
 // ==== フリップ & ドラッグ =========================================
@@ -566,4 +570,95 @@ function setupComparison() {
   window.addEventListener("scroll", scheduleMini, {passive:true});
   window.addEventListener("resize", scheduleMini);
   render(); syncMini();
+}
+
+// 登録値は公開設定と分離し、作者が確認してからサイトへ反映する。
+function setupCalibration() {
+  if (new URLSearchParams(window.location.search).get("setup") !== "1") return;
+  const panel = document.getElementById("calibrationPanel");
+  if (!panel) return;
+  panel.classList.remove("hidden");
+  const storageKey = "makinatsu-catalog-basic-size-drafts-v1";
+  const status = document.getElementById("calibrationStatus");
+  const current = document.getElementById("calibrationCurrent");
+  const progress = document.getElementById("calibrationProgress");
+  const output = document.getElementById("basicSizesExport");
+  const copyStatus = document.getElementById("calibrationCopyStatus");
+  const next = document.getElementById("nextUnconfigured");
+  let drafts = {};
+  let canPersist = true;
+  try {
+    const data = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      appliques.forEach(a => {
+        const value = data[a.id];
+        if (Number.isFinite(value) && value >= Number(sizeRange.min) && value <= Number(sizeRange.max)) drafts[a.id] = value;
+      });
+    }
+  } catch (_) { canPersist = false; }
+  function refresh() {
+    const a = appliques.find(a => a.id === appliqueSelect.value);
+    if (!a) return;
+    const registered = Object.prototype.hasOwnProperty.call(drafts, a.id);
+    current.textContent = a.label + "｜今の大きさ：" + Number(sizeRange.value).toFixed(1)
+      + (registered ? "｜登録済み：" + drafts[a.id] : "｜まだ未登録");
+    const count = Object.keys(drafts).length;
+    progress.textContent = count + " / " + appliques.length + "種類を登録済み";
+    next.disabled = count === appliques.length;
+    output.value = "マキナツカタログ 基本サイズ設定\n" + JSON.stringify({
+      version:1,
+      sizes:appliques.filter(a => Object.prototype.hasOwnProperty.call(drafts, a.id))
+        .map(a => ({id:a.id, name:a.label, size:drafts[a.id]}))
+    }, null, 2);
+  }
+  function selectionChanged() {
+    const value = drafts[appliqueSelect.value];
+    status.textContent = "";
+    if (Number.isFinite(value)) {
+      sizeRange.value = String(value);
+      updateAppliqueScale();
+    }
+    refresh();
+  }
+  calibrationController = {refresh, selectionChanged};
+  document.getElementById("registerBasicSize").addEventListener("click", () => {
+    const a = appliques.find(a => a.id === appliqueSelect.value);
+    if (!a) return;
+    const value = Math.round(Number(sizeRange.value) * 10) / 10;
+    if (!Number.isFinite(value) || value < Number(sizeRange.min) || value > Number(sizeRange.max)) return;
+    drafts[a.id] = value;
+    try { localStorage.setItem(storageKey, JSON.stringify(drafts)); canPersist = true; }
+    catch (_) { canPersist = false; }
+    status.textContent = a.label + "の基本サイズを登録しました。" + (canPersist ? "" : " このブラウザーでは保存できないため、閉じる前に設定をコピーしてください。");
+    copyStatus.textContent = "";
+    refresh();
+  });
+  next.addEventListener("click", () => {
+    const index = appliques.findIndex(a => a.id === appliqueSelect.value);
+    const ordered = appliques.slice(index + 1).concat(appliques.slice(0, index + 1));
+    const a = ordered.find(a => !Object.prototype.hasOwnProperty.call(drafts, a.id));
+    if (!a) return;
+    currentCategory = a.category;
+    appliqueSearch.value = "";
+    categoryButtons.forEach(b => b.classList.toggle("active", b.dataset.category === currentCategory));
+    populateAppliques();
+    appliqueSelect.value = a.id;
+    resetAppliqueTransform();
+    updateApplique();
+    document.querySelector(".preview-section").scrollIntoView({behavior:"smooth", block:"start"});
+  });
+  document.getElementById("copyBasicSizes").addEventListener("click", async () => {
+    if (!Object.keys(drafts).length) {
+      copyStatus.textContent = "まず１種類の基本サイズを登録してください。"; return;
+    }
+    try {
+      await navigator.clipboard.writeText(output.value);
+      copyStatus.textContent = "コピーしました。チャッピーとのチャットに貼り付けて送ってね。";
+    } catch (_) {
+      output.focus(); output.select();
+      copyStatus.textContent = "自動コピーができませんでした。下の欄を長押しし、全文をコピーしてください。";
+    }
+  });
+  if (!canPersist) status.textContent = "保存データを読み込めませんでした。登録後は閉じる前に設定をコピーしてください。";
+  selectionChanged();
 }
