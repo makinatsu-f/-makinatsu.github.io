@@ -8,7 +8,7 @@
   <!-- フォント（BASEに近い雰囲気） -->
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20261029-compare" />
+  <link rel="stylesheet" href="style.css?v=20261029-setup" />
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="images/makinatsu_icon_192.png">
 <meta name="theme-color" content="#ffffff">
@@ -84,6 +84,24 @@
           バッグの上で、１本指で移動・２本指で大きさを調整できます。
         </p>
         </div>
+
+        <section id="calibrationPanel" class="calibration-panel hidden" aria-labelledby="calibrationTitle">
+          <h3 id="calibrationTitle">作家用：基本の大きさを設定</h3>
+          <p class="calibration-note">① 生き物を選ぶ → ② 大きさを調整 → ③ 下のボタンで登録。<br>設定はこの端末・ブラウザーに保存されます。お客様の画面への反映は、チャッピーに設定を渡した後に行います。</p>
+          <p id="calibrationCurrent"></p>
+          <button id="registerBasicSize" type="button">この大きさを基本にする</button>
+          <p id="calibrationStatus" role="status"></p>
+          <p id="calibrationProgress"></p>
+          <button id="nextUnconfigured" type="button">次の未設定の生き物へ</button>
+          <details class="calibration-export">
+            <summary>設定をコピーしてチャッピーに渡す</summary>
+            <p class="calibration-note">途中の分だけでも渡せます。下のボタンでコピーして、チャットに貼り付けて送ってください。</p>
+            <button id="copyBasicSizes" type="button">設定をまとめてコピー</button>
+            <p id="calibrationCopyStatus" role="status"></p>
+            <label for="basicSizesExport">コピーできないときは、この欄を長押しして全文をコピー</label>
+            <textarea id="basicSizesExport" readonly rows="6" spellcheck="false"></textarea>
+          </details>
+        </section>
 
         <button id="saveCombination" class="save-btn" type="button">＋ この組み合わせを保存</button>
         <p id="saveStatus" class="save-status" role="status"></p>
@@ -187,6 +205,6 @@
     </div>
     <div class="mini-details"><span id="miniLabel"></span><button id="returnToPreview" type="button">大きく見て調整 ↑</button><button id="jumpToComparison" type="button">保存したバッグを比べる</button></div>
   </aside>
-  <script src="script.js?v=20261029-compare"></script>
+  <script src="script.js?v=20261029-setup"></script>
 </body>
 </html>
