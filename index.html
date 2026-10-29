@@ -8,7 +8,7 @@
   <!-- フォント（BASEに近い雰囲気） -->
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20261029-pinch" />
+  <link rel="stylesheet" href="style.css?v=20261029-compare" />
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="images/makinatsu_icon_192.png">
 <meta name="theme-color" content="#ffffff">
@@ -85,6 +85,8 @@
         </p>
         </div>
 
+        <button id="saveCombination" class="save-btn" type="button">＋ この組み合わせを保存</button>
+        <p id="saveStatus" class="save-status" role="status"></p>
         <div class="info-panel">
           <p>
             <strong>バッグ色：</strong>
@@ -125,6 +127,12 @@
 
       </section>
     </main>
+
+    <section id="comparison" class="comparison" aria-labelledby="comparisonTitle">
+      <h2 id="comparisonTitle" class="section-title">保存したバッグを比べる <span id="savedCount">0 / 3</span></h2>
+      <p class="compare-note">３点まで保存できます。「このバッグに戻す」で続きを調整できます。</p>
+      <div id="savedCombinations" class="saved-grid"></div>
+    </section>
 
     <!-- スクショ専用モード -->
     <main class="main main-snapshot hidden" id="mode-snapshot">
@@ -172,6 +180,13 @@
     </main>
   </div>
 
-  <script src="script.js?v=20261029-pinch"></script>
+  <aside id="miniPreview" class="mini-preview hidden" aria-label="選んでいるバッグ">
+    <div class="bag-preview mini-bag" aria-hidden="true">
+      <img id="miniBagImage" class="bag-image" alt="">
+      <img id="miniAppliqueImage" class="applique-image" alt="">
+    </div>
+    <div class="mini-details"><span id="miniLabel"></span><button id="returnToPreview" type="button">大きく見て調整 ↑</button><button id="jumpToComparison" type="button">保存したバッグを比べる</button></div>
+  </aside>
+  <script src="script.js?v=20261029-compare"></script>
 </body>
 </html>
