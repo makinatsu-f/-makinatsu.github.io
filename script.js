@@ -273,59 +273,59 @@ function resetAppliqueTransform() {
 }
 
 function setupDrag() {
-  const target = appliqueImage;
-  let dragging = false;
-  let startX = 0;
-  let startY = 0;
-  let startLeft = 0;
-  let startTop = 0;
-
-  const bagPreview = document.getElementById("bagPreview");
-
-  function pointerDown(e) {
+  const surface = document.getElementById("bagPreview");
+  const pointers = new Map();
+  let baseline = null;
+  const distance = points => Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y);
+  function rebase() {
+    const points = [...pointers.values()];
+    baseline = points.length ? {
+      x: points[0].x, y: points[0].y,
+      left: parseFloat(appliqueImage.style.left || "60"),
+      top: parseFloat(appliqueImage.style.top || "55"),
+      size: Number(sizeRange.value),
+      distance: points.length >= 2 ? distance(points) : 0
+    } : null;
+  }
+  function down(e) {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
     e.preventDefault();
-    dragging = true;
-    target.setPointerCapture(e.pointerId);
-    const rect = bagPreview.getBoundingClientRect();
-    startX = e.clientX;
-    startY = e.clientY;
-
-    const leftPercent = parseFloat(target.style.left || "60%");
-    const topPercent = parseFloat(target.style.top || "55%");
-    startLeft = (leftPercent / 100) * rect.width;
-    startTop = (topPercent / 100) * rect.height;
+    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    surface.setPointerCapture(e.pointerId);
+    rebase();
   }
-
-  function pointerMove(e) {
-    if (!dragging) return;
-    const rect = bagPreview.getBoundingClientRect();
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    let newLeftPx = startLeft + dx;
-    let newTopPx = startTop + dy;
-
-    let leftPercent = (newLeftPx / rect.width) * 100;
-    let topPercent = (newTopPx / rect.height) * 100;
-
-    // はみ出し防止（ざっくり）
-    const clampedLeft = Math.min(90, Math.max(10, leftPercent));
-    const clampedTop = Math.min(80, Math.max(20, topPercent));
-
-    target.style.left = `${clampedLeft}%`;
-    target.style.top = `${clampedTop}%`;
+  function move(e) {
+    if (!pointers.has(e.pointerId)) return;
+    e.preventDefault();
+    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    const points = [...pointers.values()];
+    if (points.length >= 2) {
+      if (baseline.distance > 0) {
+        const value = baseline.size * distance(points) / baseline.distance;
+        sizeRange.value = String(Math.min(Number(sizeRange.max), Math.max(Number(sizeRange.min), value)));
+        updateAppliqueScale();
+      } else rebase();
+    } else {
+      const rect = surface.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const left = baseline.left + (points[0].x - baseline.x) / rect.width * 100;
+      const top = baseline.top + (points[0].y - baseline.y) / rect.height * 100;
+      appliqueImage.style.left = Math.min(90, Math.max(10, left)) + "%";
+      appliqueImage.style.top = Math.min(80, Math.max(20, top)) + "%";
+    }
   }
-
-  function pointerUp(e) {
-    dragging = false;
-    target.releasePointerCapture(e.pointerId);
+  function up(e) {
+    if (!pointers.delete(e.pointerId)) return;
+    if (surface.hasPointerCapture(e.pointerId)) surface.releasePointerCapture(e.pointerId);
+    rebase();
   }
-
   resetAppliqueTransform();
-
-  target.addEventListener("pointerdown", pointerDown);
-  target.addEventListener("pointermove", pointerMove);
-  target.addEventListener("pointerup", pointerUp);
-  target.addEventListener("pointercancel", pointerUp);
+  surface.addEventListener("pointerdown", down);
+  surface.addEventListener("pointermove", move);
+  surface.addEventListener("pointerup", up);
+  surface.addEventListener("pointercancel", up);
+  surface.addEventListener("lostpointercapture", up);
+  window.addEventListener("blur", () => { pointers.clear(); rebase(); });
 }
 
 // ==== モード切り替え & スクショ用コピー ===========================
