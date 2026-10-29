@@ -58,7 +58,7 @@ body {
 }
 
 .mode-tab.active {
-  background: #4da08c;
+  background: #193f35;
   color: #fff;
 }
 
@@ -146,8 +146,8 @@ select {
 }
 
 .category-btn.active {
-  background: #4da08c;
-  border-color: #4da08c;
+  background: #193f35;
+  border-color: #193f35;
   color: #fff;
 }
 
@@ -428,8 +428,8 @@ input[type="range"] {
   padding: 12px 0;
   text-align: center;
   text-decoration: none;
-  color: #009c8e;               /* BASEっぽい緑 */
-  border: 2px solid #009c8e;
+  color: #193f35;               /* BASEっぽい緑 */
+  border: 2px solid #193f35;
   border-radius: 999px;
   font-size: 16px;
   font-weight: 600;
@@ -442,7 +442,7 @@ input[type="range"] {
   text-align: center;
   background: none;
   border: none;
-  color: #00816a;
+  color: #193f35;
   font-size: 14px;
   text-decoration: underline;
   cursor: pointer;
@@ -461,11 +461,11 @@ input[type="range"] {
 .applique-card { min-width:0; padding:8px 4px; border:2px solid #e8e1d4; border-radius:12px; background:#fff; color:#333; font:inherit; cursor:pointer; }
 .applique-card img { display:block; width:100%; height:78px; object-fit:contain; margin-bottom:6px; }
 .applique-card span { display:block; font-size:11px; line-height:1.5; overflow-wrap:anywhere; }
-.applique-card[aria-pressed="true"] { border-color:#397f6e; background:#eaf4ec; box-shadow:0 0 0 1px #397f6e; }
+.applique-card[aria-pressed="true"] { border-color:#193f35; background:#eaf4ec; box-shadow:0 0 0 1px #193f35; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid #b65a33; outline-offset:3px; }
 .category-btn { min-height:44px; }
 .page-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-.howto-button { flex-shrink:0; border:1px solid #cfc6b8; border-radius:20px; padding:8px 12px; background:#fffdf8; color:#397f6e; cursor:pointer; }
+.howto-button { flex-shrink:0; border:1px solid #cfc6b8; border-radius:20px; padding:8px 12px; background:#fffdf8; color:#193f35; cursor:pointer; }
 .logo-text { font-size:clamp(15px,3.7vw,22px); }
 .control-group { margin-top:20px; }
 .main-snapshot { width:100%; max-width:540px; margin:0 auto; }
@@ -491,12 +491,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .preview-controls { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #f5f3eb; }
 .preview-controls .control-group { margin: 4px 0 8px; }
 .preview-controls .control-label { color: #555; font-size: 13px; }
-.preview-controls input[type="range"] { display: block; height: 30px; margin: 0; accent-color: #397f6e; }
-.preview-controls .pill-btn { min-height: 40px; min-width: 100px; color: #397f6e; }
+.preview-controls input[type="range"] { display: block; height: 30px; margin: 0; accent-color: #193f35; }
+.preview-controls .pill-btn { min-height: 40px; min-width: 100px; color: #193f35; }
 .preview-controls .hint { margin: 4px 0 0; color: #666; line-height: 1.6; }
 
-.save-btn { width:100%; padding:11px 8px; margin-top:10px; border:1px solid #397f6e; border-radius:20px; background:#eaf4ec; color:#285e50; font:inherit; font-size:14px; cursor:pointer; }
-.save-status { font-size:12px; color:#285e50; margin:6px 0; }
+.save-btn { width:100%; padding:11px 8px; margin-top:10px; border:1px solid #193f35; border-radius:20px; background:#eaf4ec; color:#193f35; font:inherit; font-size:14px; cursor:pointer; }
+.save-status { font-size:12px; color:#193f35; margin:6px 0; }
 .comparison { padding:16px; margin:0 16px 24px; border:1px solid #e8e1d4; border-radius:18px; background:#fffdf8; scroll-margin-top:16px; }
 .compare-note { font-size:12px; line-height:1.7; color:#666; }
 .saved-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; align-items:start; }
@@ -504,14 +504,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .saved-card { min-width:0; border:1px solid #d8d1c5; border-radius:12px; padding:8px 4px; background:#fff; }
 .saved-card h3 { font-size:13px; margin:2px 0 6px; text-align:center; }
 .saved-card p { font-size:11px; line-height:1.6; overflow-wrap:anywhere; }
-.saved-card button { width:100%; min-height:44px; border:1px solid #397f6e; border-radius:10px; background:#eaf4ec; color:#285e50; font:inherit; font-size:11px; cursor:pointer; margin-top:6px; }
+.saved-card button { width:100%; min-height:44px; border:1px solid #193f35; border-radius:10px; background:#eaf4ec; color:#193f35; font:inherit; font-size:11px; cursor:pointer; margin-top:6px; }
 .saved-card .remove-saved { background:white; border-color:#ddd; color:#666; }
 .saved-bag { max-width:100%; pointer-events:none; }
 .mini-preview { display:flex; position:fixed; top:0; left:0; right:0; z-index:100; align-items:center; gap:12px; padding:8px 16px; background:rgba(253,251,248,.98); border-bottom:1px solid #d8d1c5; box-shadow:0 3px 12px #0001; }
 .mini-bag { flex:0 0 112px; width:112px; margin:0; pointer-events:none; }
 .mini-details { flex:1; min-width:0; }
 .mini-details span { display:block; font-size:11px; line-height:1.5; }
-.mini-details button { display:block; margin-top:5px; padding:5px 8px; border:1px solid #397f6e; border-radius:10px; background:#eaf4ec; color:#285e50; font:inherit; font-size:11px; min-height:32px; }
+.mini-details button { display:block; margin-top:5px; padding:5px 8px; border:1px solid #193f35; border-radius:10px; background:#eaf4ec; color:#193f35; font:inherit; font-size:11px; min-height:32px; }
 .preview-section { scroll-margin-top:12px; }
 @media(min-width:720px) {
  .comparison { margin:0 28px 28px; padding:20px; }
@@ -522,26 +522,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 #bagPreview .applique-image { will-change: transform; }
 
-/* 作家用サイズ登録。専用URLでのみ表示する。 */
-.calibration-panel { margin:14px 0; padding:14px; background:#f3f0df; border:2px solid #397f6e; border-radius:14px; }
-.calibration-panel h3 { margin:0 0 8px; font-size:15px; color:#285e50; }
-.calibration-note { font-size:12px; line-height:1.7; color:#555; }
-.calibration-panel button { display:block; width:100%; padding:11px 8px; min-height:44px; margin:8px 0; border:1px solid #397f6e; border-radius:10px; color:#285e50; background:white; font:inherit; font-size:13px; cursor:pointer; }
-#registerBasicSize { background:#285e50; color:white; }
-#calibrationCurrent { font-size:13px; line-height:1.7; font-weight:bold; }
-#calibrationStatus, #calibrationProgress, #calibrationCopyStatus { font-size:12px; line-height:1.7; }
-.calibration-export { margin-top:14px; border-top:1px solid #cfc6b8; padding-top:12px; }
-.calibration-export summary { cursor:pointer; font-size:13px; line-height:1.7; }
-.calibration-export label { font-size:12px; line-height:1.7; display:block; }
-#basicSizesExport { width:100%; box-sizing:border-box; padding:8px; font-size:16px; margin-top:8px; border:1px solid #cfc6b8; border-radius:8px; }
 
-/* 生き物ごとの基本サイズ。つまみと独立した目盛りを表示する。 */
-.size-marker-row { position:relative; margin:0 10px; height:25px; }
-.basic-size-marker { position:absolute; top:0; transform:translateX(-50%); font-size:11px; color:#555; white-space:nowrap; }
-.basic-size-marker::before { content:""; position:absolute; height:8px; width:2px; background:#397f6e; left:50%; top:-9px; }
-.basic-size-marker.marker-at-start { transform:none; }
-.basic-size-marker.marker-at-start::before { left:0; }
-.basic-size-actions { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-#basicSizeFeedback { font-size:12px; color:#666; }
-.basic-size-marker.at-basic, #basicSizeFeedback.at-basic { color:#285e50; font-weight:bold; background:#e1edde; border-radius:6px; }
-.basic-size-note { margin:6px 0 10px; color:#666; font-size:11px; line-height:1.6; }
+/* マキナツの深い緑。背景と選択カードの淡い緑はそのまま残す。 */
+.section-title, .snapshot-title, .logo-text { color:#193f35; }
+.primary-btn, .line-button { background:#193f35; color:#fff; }
+.category-btn, .mode-tab, .back-btn { color:#193f35; }
+.category-btn.active, .mode-tab.active { background:#193f35; border-color:#193f35; color:white; }
+.applique-card[aria-pressed="true"] { border-color:#193f35; box-shadow:0 0 0 1px #193f35; }
+.minne-button { display:block; margin-top:10px; padding:12px 10px; border:1px solid #193f35; border-radius:999px; color:#193f35; background:#fffdf8; text-decoration:none; text-align:center; font-size:14px; }
+.howto-steps { padding-left:24px; font-size:14px; line-height:1.8; }
+.howto-steps li { margin:10px 0; }
