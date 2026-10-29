@@ -494,3 +494,30 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .preview-controls input[type="range"] { display: block; height: 30px; margin: 0; accent-color: #397f6e; }
 .preview-controls .pill-btn { min-height: 40px; min-width: 100px; color: #397f6e; }
 .preview-controls .hint { margin: 4px 0 0; color: #666; line-height: 1.6; }
+
+.save-btn { width:100%; padding:11px 8px; margin-top:10px; border:1px solid #397f6e; border-radius:20px; background:#eaf4ec; color:#285e50; font:inherit; font-size:14px; cursor:pointer; }
+.save-status { font-size:12px; color:#285e50; margin:6px 0; }
+.comparison { padding:16px; margin:0 16px 24px; border:1px solid #e8e1d4; border-radius:18px; background:#fffdf8; scroll-margin-top:16px; }
+.compare-note { font-size:12px; line-height:1.7; color:#666; }
+.saved-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; align-items:start; }
+.saved-grid > .compare-note { grid-column:1 / -1; }
+.saved-card { min-width:0; border:1px solid #d8d1c5; border-radius:12px; padding:8px 4px; background:#fff; }
+.saved-card h3 { font-size:13px; margin:2px 0 6px; text-align:center; }
+.saved-card p { font-size:11px; line-height:1.6; overflow-wrap:anywhere; }
+.saved-card button { width:100%; min-height:44px; border:1px solid #397f6e; border-radius:10px; background:#eaf4ec; color:#285e50; font:inherit; font-size:11px; cursor:pointer; margin-top:6px; }
+.saved-card .remove-saved { background:white; border-color:#ddd; color:#666; }
+.saved-bag { max-width:100%; pointer-events:none; }
+.mini-preview { display:flex; position:fixed; top:0; left:0; right:0; z-index:100; align-items:center; gap:12px; padding:8px 16px; background:rgba(253,251,248,.98); border-bottom:1px solid #d8d1c5; box-shadow:0 3px 12px #0001; }
+.mini-bag { flex:0 0 112px; width:112px; margin:0; pointer-events:none; }
+.mini-details { flex:1; min-width:0; }
+.mini-details span { display:block; font-size:11px; line-height:1.5; }
+.mini-details button { display:block; margin-top:5px; padding:5px 8px; border:1px solid #397f6e; border-radius:10px; background:#eaf4ec; color:#285e50; font:inherit; font-size:11px; min-height:32px; }
+.preview-section { scroll-margin-top:12px; }
+@media(min-width:720px) {
+ .comparison { margin:0 28px 28px; padding:20px; }
+ .saved-card { padding:12px; }
+ .saved-card p,.saved-card button { font-size:14px; }
+ .mini-preview { display:none; }
+}
+
+#bagPreview .applique-image { will-change: transform; }
