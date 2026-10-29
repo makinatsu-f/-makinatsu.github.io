@@ -484,3 +484,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .applique-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .page-header { padding-left:12px; padding-right:12px; }
 }
+
+/* バッグを見ながら位置・大きさを調整 */
+#bagPreview { touch-action: none; user-select: none; -webkit-user-select: none; }
+#bagPreview img { -webkit-user-drag: none; user-select: none; }
+.preview-controls { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #f5f3eb; }
+.preview-controls .control-group { margin: 4px 0 8px; }
+.preview-controls .control-label { color: #555; font-size: 13px; }
+.preview-controls input[type="range"] { display: block; height: 30px; margin: 0; accent-color: #397f6e; }
+.preview-controls .pill-btn { min-height: 40px; min-width: 100px; color: #397f6e; }
+.preview-controls .hint { margin: 4px 0 0; color: #666; line-height: 1.6; }
