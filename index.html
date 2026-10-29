@@ -8,7 +8,7 @@
   <!-- フォント（BASEに近い雰囲気） -->
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20261029-pinch" />
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="images/makinatsu_icon_192.png">
 <meta name="theme-color" content="#ffffff">
@@ -69,6 +69,22 @@
           </div>
         </div>
 
+        <div class="preview-controls">
+        <div class="control-group">
+          <label class="control-label" for="appliqueSize">アップリケの大きさ</label>
+          <input type="range" id="appliqueSize" min="60" max="230" value="130" step="0.1" />
+        </div>
+
+        <div class="control-group flip-row">
+          <span class="control-label">向き</span>
+          <button id="flipButton" class="pill-btn">左右反転</button>
+        </div>
+
+        <p class="hint">
+          バッグの上で、１本指で移動・２本指で大きさを調整できます。
+        </p>
+        </div>
+
         <div class="info-panel">
           <p>
             <strong>バッグ色：</strong>
@@ -107,20 +123,6 @@
         <p id="appliqueCount" class="result-count" aria-live="polite"></p>
         <div id="appliqueGallery" class="applique-gallery" aria-label="アップリケを写真で選ぶ"></div>
 
-        <div class="control-group">
-          <label class="control-label" for="appliqueSize">アップリケの大きさ</label>
-          <input type="range" id="appliqueSize" min="60" max="230" value="100" />
-        </div>
-
-        <div class="control-group flip-row">
-          <span class="control-label">向き</span>
-          <button id="flipButton" class="pill-btn">左右反転</button>
-        </div>
-
-        <p class="hint">
-          アップリケは指でドラッグして位置を動かせます。
-          スマホならそのまま指でぐいっと動かしてね。
-        </p>
       </section>
     </main>
 
@@ -170,6 +172,6 @@
     </main>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=20261029-pinch"></script>
 </body>
 </html>
