@@ -196,6 +196,7 @@ const appliqueGallery = document.getElementById("appliqueGallery");
 
 const categoryButtons = document.querySelectorAll(".category-btn");
 let currentCategory = "恐竜";
+let priceSetupController = null;
 
 // ==== 初期化 =======================================================
 
@@ -261,6 +262,7 @@ function init() {
   // ドラッグ
   setupDrag();
   setupComparison();
+  setupPriceRegistration();
 }
 
 function populateAppliques() {
@@ -304,6 +306,7 @@ function updateApplique() {
   renderGallery();
   appliqueNameIcon.src = src;
   snapshotAppliqueIcon.src = src;
+  if (priceSetupController) priceSetupController.selectionChanged();
 }
 
 function updateAppliqueScale() {
@@ -604,4 +607,118 @@ function setupComparison() {
 // 制作に使用する、生き物ごとの指定サイズ。
 function getBasicSize() {
   return basicSizes[appliqueSelect.value] ?? 130;
+}
+
+
+// 専用URLでのみ開く、作家用の価格登録。公開価格の計算とは分離する。
+function setupPriceRegistration() {
+  if (new URLSearchParams(window.location.search).get("prices") !== "1") return;
+  const panel = document.getElementById("priceSetupPanel");
+  panel.classList.remove("hidden");
+  const key = "makinatsu-catalog-base-price-drafts-v1";
+  const input = document.getElementById("basePriceInput");
+  const status = document.getElementById("priceSetupStatus");
+  const progress = document.getElementById("priceSetupProgress");
+  const output = document.getElementById("basePricesExport");
+  const copyStatus = document.getElementById("priceCopyStatus");
+  const review = document.getElementById("priceReviewList");
+  const next = document.getElementById("nextUnpriced");
+  let prices = {};
+  let readFailed = false;
+  const validPrice = value => Number.isSafeInteger(value) && value > 0 && value <= 1000000;
+  try {
+    const data = JSON.parse(localStorage.getItem(key) || "{}");
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      appliques.forEach(a => { if (validPrice(data[a.id])) prices[a.id] = data[a.id]; });
+    }
+  } catch (_) { readFailed = true; }
+  function parsePrice() {
+    const text = input.value.normalize("NFKC").replace(/[,，\s]/g, "");
+    return /^\d+$/.test(text) ? Number(text) : NaN;
+  }
+  function choose(a) {
+    currentCategory = a.category;
+    appliqueSearch.value = "";
+    categoryButtons.forEach(b => b.classList.toggle("active", b.dataset.category === currentCategory));
+    populateAppliques();
+    appliqueSelect.value = a.id;
+    resetAppliqueTransform(); updateApplique();
+    panel.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+  function render() {
+    const entries = appliques.filter(a => Object.prototype.hasOwnProperty.call(prices, a.id));
+    progress.textContent = entries.length + " / " + appliques.length + "種類を登録済み";
+    next.disabled = entries.length === appliques.length;
+    output.value = "マキナツカタログ バッグ本体価格設定\n" + JSON.stringify({
+      version:1, currency:"JPY", priceBasis:"オプションなしのバッグ本体価格",
+      prices:entries.map(a => ({id:a.id, name:a.label, price:prices[a.id]}))
+    }, null, 2);
+    review.replaceChildren();
+    appliques.forEach(a => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.textContent = a.label + "：" + (Object.prototype.hasOwnProperty.call(prices, a.id) ? prices[a.id].toLocaleString("ja-JP") + "円" : "未登録");
+      row.addEventListener("click", () => {
+        if (input.value.trim() && parsePrice() !== prices[appliqueSelect.value]) {
+          status.textContent = "入力中の価格を登録してから、別の生き物へ進んでください。"; return;
+        }
+        choose(a);
+      });
+      review.append(row);
+    });
+  }
+  function selectionChanged() {
+    const a = appliques.find(a => a.id === appliqueSelect.value);
+    if (!a) return;
+    document.getElementById("priceSetupName").textContent = a.label;
+    const value = prices[a.id];
+    input.value = Number.isFinite(value) ? String(value) : "";
+    document.getElementById("priceRegisteredValue").textContent = Number.isFinite(value)
+      ? "登録済み：" + value.toLocaleString("ja-JP") + "円（変更して再登録できます）"
+      : "まだ登録されていません";
+    status.textContent = "";
+  }
+  priceSetupController = {selectionChanged};
+  document.querySelectorAll("[data-price]").forEach(button => {
+    button.addEventListener("click", () => {
+      input.value = button.dataset.price;
+      status.textContent = "金額を確認して「この価格を登録」を押してください。";
+    });
+  });
+  document.getElementById("priceSetupForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const a = appliques.find(a => a.id === appliqueSelect.value);
+    const value = parsePrice();
+    if (!a || !validPrice(value)) {
+      status.textContent = "価格を１円以上の整数で入力してください（例：6350）。"; input.focus(); return;
+    }
+    prices[a.id] = value;
+    let persisted = true;
+    try { localStorage.setItem(key, JSON.stringify(prices)); } catch (_) { persisted = false; }
+    render(); selectionChanged();
+    copyStatus.textContent = "";
+    status.textContent = a.label + "：" + value.toLocaleString("ja-JP") + "円を登録しました。"
+      + (persisted ? "" : " このブラウザーでは保存できないため、閉じる前に設定をコピーしてください。");
+  });
+  next.addEventListener("click", () => {
+    if (input.value.trim() && parsePrice() !== prices[appliqueSelect.value]) {
+      status.textContent = "入力した価格を登録してから、次へ進んでください。"; return;
+    }
+    const i = appliques.findIndex(a => a.id === appliqueSelect.value);
+    const ordered = appliques.slice(i + 1).concat(appliques.slice(0, i + 1));
+    const a = ordered.find(a => !Object.prototype.hasOwnProperty.call(prices, a.id));
+    if (a) choose(a);
+  });
+  document.getElementById("copyBasePrices").addEventListener("click", async () => {
+    if (!Object.keys(prices).length) { copyStatus.textContent = "まず１種類の価格を登録してください。"; return; }
+    try {
+      await navigator.clipboard.writeText(output.value);
+      copyStatus.textContent = "コピーしました。チャッピーとのチャットに貼り付けて送ってください。";
+    } catch (_) {
+      output.focus(); output.select();
+      copyStatus.textContent = "自動コピーができませんでした。下の欄を長押しして全文をコピーしてください。";
+    }
+  });
+  render(); selectionChanged();
+  if (readFailed) status.textContent = "保存データを読み込めませんでした。登録後は閉じる前に設定をコピーしてください。";
 }
