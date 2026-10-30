@@ -546,7 +546,7 @@ function setupComparison() {
   }
   try {
     const data = JSON.parse(localStorage.getItem(key) || "[]");
-    if (Array.isArray(data)) saved = data.filter(valid).slice(0, 3).map(s => ({...s, size:basicSizes[s.applique] ?? 130, options:normalizeOptions(s.options)}));
+    if (Array.isArray(data)) saved = data.filter(valid).slice(0, 3).map(s => ({...s, size:basicSizes[s.applique] ?? 130, options:normalizeOptions(s.options, s.applique)}));
   } catch (_) {}
   function state() {
     return {bag:bagSelect.value, applique:appliqueSelect.value,
@@ -622,7 +622,7 @@ function setupComparison() {
       });
       const optionText = document.createElement("p");
       optionText.className = "saved-options";
-      optionText.textContent = optionDescriptions(s.options).join("／");
+      optionText.textContent = optionDescriptions(s.options, s.applique).join("／");
       const price = document.createElement("p");
       price.className = "saved-price";
       price.textContent = "合計の目安 " + yen(calculatePrice(s.applique, s.options).total) + "〈送料無料〉";
@@ -634,7 +634,7 @@ function setupComparison() {
     const s = state();
     if (saved.some(x => x.bag === s.bag && x.applique === s.applique && x.flipped === s.flipped
       && x.left === s.left && x.top === s.top
-      && JSON.stringify(normalizeOptions(x.options)) === JSON.stringify(s.options))) {
+      && JSON.stringify(normalizeOptions(x.options, x.applique)) === JSON.stringify(s.options))) {
       status.textContent = "この組み合わせは保存済みです。"; return;
     }
     if (saved.length >= 3) {
@@ -800,7 +800,7 @@ const optionRates = {
     none:{label:"開閉の追加なし", price:0},
     zipper:{label:"ファスナー", price:1000},
     magnet:{label:"マグネットボタン", price:600},
-    flap:{label:"フラップ（約10×10cm）", price:1300}
+    flap:{label:"フラップ（ふた・約10×10cm）", price:1300}
   },
   size: {
     basic:{label:"基本：縦30×横40×マチ4cm", price:0},
@@ -809,12 +809,13 @@ const optionRates = {
   }
 };
 const yen = value => value.toLocaleString("ja-JP") + "円";
-function normalizeOptions(input) {
+function normalizeOptions(input, id) {
   const o = input && typeof input === "object" ? input : {};
   return {
     closure:Object.prototype.hasOwnProperty.call(optionRates.closure, o.closure) ? o.closure : "none",
     size:Object.prototype.hasOwnProperty.call(optionRates.size, o.size) ? o.size : "basic",
-    loop:o.loop === true, name:o.name === true, shoes:o.shoes === true
+    loop:o.loop === true, name:o.name === true, shoes:o.shoes === true,
+    bubbles:o.bubbles === true && (!id || basePrices[id] === 6350)
   };
 }
 function readOptions() {
@@ -823,33 +824,38 @@ function readOptions() {
     size:document.getElementById("optionSize")?.value,
     loop:document.getElementById("optionLoop")?.checked,
     name:document.getElementById("optionName")?.checked,
-    shoes:document.getElementById("optionShoes")?.checked
-  });
+    shoes:document.getElementById("optionShoes")?.checked,
+    bubbles:document.getElementById("optionBubbles")?.checked
+  }, appliqueSelect.value);
 }
 function applyOptions(options) {
-  const o = normalizeOptions(options);
+  const o = normalizeOptions(options, appliqueSelect.value);
   document.getElementById("optionClosure").value = o.closure;
   document.getElementById("optionSize").value = o.size;
   document.getElementById("optionLoop").checked = o.loop;
   document.getElementById("optionName").checked = o.name;
   document.getElementById("optionShoes").checked = o.shoes;
+  const bubbles = document.getElementById("optionBubbles");
+  if (bubbles) bubbles.checked = o.bubbles;
 }
 function calculatePrice(id, options) {
   const base = basePrices[id];
   if (!Number.isSafeInteger(base)) throw new Error("本体価格が未登録です：" + id);
-  const o = normalizeOptions(options);
+  const o = normalizeOptions(options, id);
   const lines = [{label:"バッグ本体", amount:base}];
   if (o.closure !== "none") lines.push({label:optionRates.closure[o.closure].label, amount:optionRates.closure[o.closure].price});
   if (o.size !== "basic") lines.push({label:optionRates.size[o.size].label, amount:optionRates.size[o.size].price});
+  if (o.bubbles) lines.push({label:"泡の飾りオプション", amount:2000});
   if (o.loop) lines.push({label:"短い取手（机かけループ）", amount:500});
   if (o.name) lines.push({label:"レッスンバッグのお名前刺しゅう", amount:800});
   if (o.shoes) lines.push({label:"おそろいシューズバッグ", amount:6550});
   if (o.name && o.shoes) lines.push({label:"おそろいシューズバッグのお名前刺しゅう〈特典〉", amount:0});
   return {lines, total:lines.reduce((sum, line) => sum + line.amount, 0)};
 }
-function optionDescriptions(options) {
-  const o = normalizeOptions(options);
+function optionDescriptions(options, id = appliqueSelect.value) {
+  const o = normalizeOptions(options, id);
   const labels = [optionRates.size[o.size].label, optionRates.closure[o.closure].label];
+  if (o.bubbles) labels.push("泡の飾り");
   if (o.loop) labels.push("短い取手");
   if (o.name) labels.push("名前刺しゅう");
   if (o.shoes) labels.push("おそろいシューズバッグ");
@@ -858,6 +864,11 @@ function optionDescriptions(options) {
 }
 function updatePriceUI() {
   if (!document.getElementById("priceTotal") || !basePrices[appliqueSelect.value]) return;
+  const bubbles = document.getElementById("optionBubbles");
+  if (bubbles) {
+    bubbles.disabled = basePrices[appliqueSelect.value] !== 6350;
+    if (bubbles.disabled) bubbles.checked = false;
+  }
   const o = readOptions();
   const quote = calculatePrice(appliqueSelect.value, o);
   document.getElementById("priceBase").textContent = yen(basePrices[appliqueSelect.value]);
@@ -889,8 +900,8 @@ function updatePriceUI() {
 }
 function setupPriceSimulator() {
   if (!document.getElementById("priceOptions")) return;
-  ["optionClosure","optionSize","optionLoop","optionName","optionShoes"].forEach(id => {
-    document.getElementById(id).addEventListener("change", updatePriceUI);
+  ["optionClosure","optionSize","optionLoop","optionName","optionShoes","optionBubbles"].forEach(id => {
+    document.getElementById(id)?.addEventListener("change", updatePriceUI);
   });
   function showOptions() {
     const panel = document.getElementById("priceOptions");
