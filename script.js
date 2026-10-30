@@ -104,6 +104,64 @@ const appliques = [
   { id: "jellyfish-vinyl", label: "クラゲ（ビニール）", file: "jellyfish-vinyl.png", category: "その他" },
 ];
 
+const basePrices = {
+  "trex-red": 8350,
+  "trex-ochre": 8350,
+  "spinosaurus": 8350,
+  "stegosaurus": 8350,
+  "diplodocus": 8350,
+  "triceratops": 8350,
+  "velociraptor": 6350,
+  "mosasaurus": 6350,
+  "dunkleosteus": 6350,
+  "trex-green": 8350,
+  "anomalocaris": 6350,
+  "dunkleosteus-02": 6350,
+  "greatwhite-shark": 6350,
+  "catshark": 6350,
+  "whale-shark": 6350,
+  "sand-tiger-shark": 6350,
+  "zebra-shark": 6350,
+  "hammerhead-shark": 6350,
+  "goblin-shark": 6350,
+  "tai": 6350,
+  "saba": 6350,
+  "maguro": 6350,
+  "manta": 6350,
+  "anglerfish": 6350,
+  "aori-ika": 6350,
+  "mendako-orange": 6350,
+  "blue-whale": 6350,
+  "orca": 6350,
+  "orca-pink": 6350,
+  "bottlenose-blue": 6350,
+  "manatee": 6350,
+  "humpback-whale": 6350,
+  "sunfish": 6350,
+  "houlai-eso": 6350,
+  "megalodon": 6350,
+  "sailfish": 6350,
+  "sea-turtle": 6350,
+  "ranchu": 6350,
+  "ranchu-02": 6350,
+  "crocodile-gray": 8350,
+  "crocodile-green": 8350,
+  "hercules-beetle": 6350,
+  "beetle": 6350,
+  "giraffa-stagbeetle": 8350,
+  "ookuwagata": 6350,
+  "chameleon": 6350,
+  "axolotl": 6350,
+  "lobster": 6350,
+  "emperor-penguin-family": 6350,
+  "chick-penguin": 6350,
+  "parent-penguin": 6350,
+  "african-spurred-tortoise": 8350,
+  "horse": 6350,
+  "panda": 6350,
+  "jellyfish-vinyl": 6350
+};
+
 const basicSizes = {
   "trex-red": 103.4,
   "trex-ochre": 103.4,
@@ -261,6 +319,7 @@ function init() {
 
   // ドラッグ
   setupDrag();
+  setupPriceSimulator();
   setupComparison();
   setupPriceRegistration();
 }
@@ -307,6 +366,7 @@ function updateApplique() {
   appliqueNameIcon.src = src;
   snapshotAppliqueIcon.src = src;
   if (priceSetupController) priceSetupController.selectionChanged();
+  updatePriceUI();
 }
 
 function updateAppliqueScale() {
@@ -385,6 +445,7 @@ function switchMode(mode) {
 }
 
 function copyToSnapshot() {
+  updatePriceUI();
   // ラベルとアイコンは updateBag / updateApplique の中で
   // すでに snapshot 用にも反映しているので、ここでは位置だけコピー
   snapshotAppliqueImage.style.transform = appliqueImage.style.transform;
@@ -485,11 +546,11 @@ function setupComparison() {
   }
   try {
     const data = JSON.parse(localStorage.getItem(key) || "[]");
-    if (Array.isArray(data)) saved = data.filter(valid).slice(0, 3).map(s => ({...s, size:basicSizes[s.applique] ?? 130}));
+    if (Array.isArray(data)) saved = data.filter(valid).slice(0, 3).map(s => ({...s, size:basicSizes[s.applique] ?? 130, options:normalizeOptions(s.options)}));
   } catch (_) {}
   function state() {
     return {bag:bagSelect.value, applique:appliqueSelect.value,
-      size:getBasicSize(), flipped:isFlipped,
+      size:getBasicSize(), flipped:isFlipped, options:readOptions(),
       left:parseFloat(appliqueImage.style.left || "60"),
       top:parseFloat(appliqueImage.style.top || "55")};
   }
@@ -541,6 +602,7 @@ function setupComparison() {
         categoryButtons.forEach(b => b.classList.toggle("active", b.dataset.category === currentCategory));
         populateAppliques();
         appliqueSelect.value = s.applique;
+        applyOptions(s.options);
         isFlipped = s.flipped;
         appliqueImage.style.left = s.left + "%";
         appliqueImage.style.top = s.top + "%";
@@ -558,13 +620,21 @@ function setupComparison() {
         const persisted = persist(); render();
         status.textContent = persisted ? "候補を削除しました。" : "候補を削除しました。この画面を閉じると変更が残らない場合があります。";
       });
-      card.append(title, picture(s), label, restore, remove);
+      const optionText = document.createElement("p");
+      optionText.className = "saved-options";
+      optionText.textContent = optionDescriptions(s.options).join("／");
+      const price = document.createElement("p");
+      price.className = "saved-price";
+      price.textContent = "合計の目安 " + yen(calculatePrice(s.applique, s.options).total) + "〈送料別〉";
+      card.append(title, picture(s), label, optionText, price, restore, remove);
       list.append(card);
     });
   }
   document.getElementById("saveCombination").addEventListener("click", () => {
     const s = state();
-    if (saved.some(x => JSON.stringify(x) === JSON.stringify(s))) {
+    if (saved.some(x => x.bag === s.bag && x.applique === s.applique && x.flipped === s.flipped
+      && x.left === s.left && x.top === s.top
+      && JSON.stringify(normalizeOptions(x.options)) === JSON.stringify(s.options))) {
       status.textContent = "この組み合わせは保存済みです。"; return;
     }
     if (saved.length >= 3) {
@@ -721,4 +791,113 @@ function setupPriceRegistration() {
   });
   render(); selectionChanged();
   if (readFailed) status.textContent = "保存データを読み込めませんでした。登録後は閉じる前に設定をコピーしてください。";
+}
+
+
+// 選択肢・計算は同じ定義を使い、価格内訳と保存候補の差異を防ぐ。
+const optionRates = {
+  closure: {
+    none:{label:"開閉の追加なし", price:0},
+    zipper:{label:"ファスナー", price:1000},
+    magnet:{label:"マグネットボタン", price:600},
+    flap:{label:"フラップ（約10×10cm）", price:1300}
+  },
+  size: {
+    basic:{label:"基本：縦30×横40×マチ4cm", price:0},
+    large:{label:"大きめ：縦35×横45×マチ4cm", price:800},
+    custom:{label:"サイズオーダー：縦35×横45×マチ10cmまで", price:2000}
+  }
+};
+const yen = value => value.toLocaleString("ja-JP") + "円";
+function normalizeOptions(input) {
+  const o = input && typeof input === "object" ? input : {};
+  return {
+    closure:Object.prototype.hasOwnProperty.call(optionRates.closure, o.closure) ? o.closure : "none",
+    size:Object.prototype.hasOwnProperty.call(optionRates.size, o.size) ? o.size : "basic",
+    loop:o.loop === true, name:o.name === true, shoes:o.shoes === true
+  };
+}
+function readOptions() {
+  return normalizeOptions({
+    closure:document.getElementById("optionClosure")?.value,
+    size:document.getElementById("optionSize")?.value,
+    loop:document.getElementById("optionLoop")?.checked,
+    name:document.getElementById("optionName")?.checked,
+    shoes:document.getElementById("optionShoes")?.checked
+  });
+}
+function applyOptions(options) {
+  const o = normalizeOptions(options);
+  document.getElementById("optionClosure").value = o.closure;
+  document.getElementById("optionSize").value = o.size;
+  document.getElementById("optionLoop").checked = o.loop;
+  document.getElementById("optionName").checked = o.name;
+  document.getElementById("optionShoes").checked = o.shoes;
+}
+function calculatePrice(id, options) {
+  const base = basePrices[id];
+  if (!Number.isSafeInteger(base)) throw new Error("本体価格が未登録です：" + id);
+  const o = normalizeOptions(options);
+  const lines = [{label:"バッグ本体", amount:base}];
+  if (o.closure !== "none") lines.push({label:optionRates.closure[o.closure].label, amount:optionRates.closure[o.closure].price});
+  if (o.size !== "basic") lines.push({label:optionRates.size[o.size].label, amount:optionRates.size[o.size].price});
+  if (o.loop) lines.push({label:"短い取手（机かけループ）", amount:500});
+  if (o.name) lines.push({label:"レッスンバッグのお名前刺しゅう", amount:800});
+  if (o.shoes) lines.push({label:"おそろいシューズバッグ", amount:6550});
+  if (o.name && o.shoes) lines.push({label:"おそろいシューズバッグのお名前刺しゅう〈特典〉", amount:0});
+  return {lines, total:lines.reduce((sum, line) => sum + line.amount, 0)};
+}
+function optionDescriptions(options) {
+  const o = normalizeOptions(options);
+  const labels = [optionRates.size[o.size].label, optionRates.closure[o.closure].label];
+  if (o.loop) labels.push("短い取手");
+  if (o.name) labels.push("名前刺しゅう");
+  if (o.shoes) labels.push("おそろいシューズバッグ");
+  if (o.shoes && o.name) labels.push("シューズ側の名入れ無料");
+  return labels;
+}
+function updatePriceUI() {
+  if (!document.getElementById("priceTotal") || !basePrices[appliqueSelect.value]) return;
+  const o = readOptions();
+  const quote = calculatePrice(appliqueSelect.value, o);
+  document.getElementById("priceBase").textContent = yen(basePrices[appliqueSelect.value]);
+  document.getElementById("priceTotal").textContent = yen(quote.total);
+  document.getElementById("optionsTotal").textContent = yen(quote.total);
+  document.getElementById("miniPrice").textContent = "合計の目安 " + yen(quote.total) + "〈送料別〉";
+  document.getElementById("priceOptionSummary").textContent = optionDescriptions(o).join("／");
+  document.getElementById("flapNotice").classList.toggle("hidden", o.closure !== "flap");
+  document.getElementById("customSizeNotice").classList.toggle("hidden", o.size !== "custom");
+  document.getElementById("shoeNameNotice").classList.toggle("hidden", !(o.name && o.shoes));
+  document.getElementById("snapshotSize").textContent = optionRates.size[o.size].label;
+  document.getElementById("snapshotOptions").textContent = optionDescriptions(o).slice(1).join("／");
+  document.getElementById("snapshotTotal").textContent = yen(quote.total);
+  document.getElementById("snapshotConditionalNote").textContent = [
+    o.closure === "flap" ? "フラップと重なる部分は、デザインを調整する場合があります。" : "",
+    o.size === "custom" ? "サイズオーダーは事前相談が必要です。寸法はご相談時に確認します。" : ""
+  ].filter(Boolean).join(" ");
+  const breakdown = document.getElementById("snapshotPriceBreakdown");
+  breakdown.replaceChildren();
+  quote.lines.forEach(line => {
+    const row = document.createElement("div");
+    const label = document.createElement("dt");
+    const amount = document.createElement("dd");
+    label.textContent = line.label;
+    amount.textContent = yen(line.amount);
+    row.append(label, amount);
+    breakdown.append(row);
+  });
+}
+function setupPriceSimulator() {
+  if (!document.getElementById("priceOptions")) return;
+  ["optionClosure","optionSize","optionLoop","optionName","optionShoes"].forEach(id => {
+    document.getElementById(id).addEventListener("change", updatePriceUI);
+  });
+  function showOptions() {
+    const panel = document.getElementById("priceOptions");
+    panel.open = true;
+    panel.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  document.getElementById("openPriceOptions").addEventListener("click", showOptions);
+  document.getElementById("miniPriceOptions").addEventListener("click", showOptions);
+  updatePriceUI();
 }
