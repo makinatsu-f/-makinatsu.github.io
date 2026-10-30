@@ -8,7 +8,7 @@
   <!-- フォント（BASEに近い雰囲気） -->
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20261030-price-setup" />
+  <link rel="stylesheet" href="style.css?v=20261030-simulator" />
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="images/makinatsu_icon_192.png">
 <meta name="theme-color" content="#ffffff">
@@ -22,7 +22,7 @@
     <ol class="howto-steps">
       <li>バッグの色と、好きな生き物を選びます。</li>
       <li>アップリケを指やマウスで動かし、ボタンで左右の向きを選べます。大きさは生き物ごとに決まっています。</li>
-      <li>迷ったら３点まで保存して比べられます。同じ端末・ブラウザーなら、開き直しても候補が残ります。</li>
+      <li>オプションと合計の目安を確認できます。迷ったら３点まで保存して比べられます。同じ端末・ブラウザーなら、開き直しても候補が残ります。</li>
       <li>「選んだバッグを確認」からスクショを撮り、LINEまたはminneのメッセージで送ってください。</li>
       <li>デザイン・価格・納期を確認後、ご案内する購入ページでご注文ください。</li>
     </ol>
@@ -119,6 +119,13 @@
           </p>
         </div>
 
+        <section class="quote-preview" aria-label="選んだバッグの価格">
+          <p>バッグ本体 <span id="priceBase"></span></p>
+          <p class="quote-total">合計の目安 <strong id="priceTotal"></strong><span>〈送料別〉</span></p>
+          <p id="priceOptionSummary" class="quote-options"></p>
+          <button id="openPriceOptions" type="button">オプションと価格を確認</button>
+        </section>
+
         <button id="toSnapshot" class="primary-btn">
           選んだ組み合わせをスクショ表示する
         </button>
@@ -144,12 +151,40 @@
         <p id="appliqueCount" class="result-count" aria-live="polite"></p>
         <div id="appliqueGallery" class="applique-gallery" aria-label="アップリケを写真で選ぶ"></div>
 
+        <details id="priceOptions" class="price-options">
+          <summary>オプションと価格を確認</summary>
+          <p class="option-intro">必要なものだけ選んでください。追加しなければ、本体価格のままです。</p>
+          <label for="optionClosure">開閉オプション</label>
+          <select id="optionClosure">
+            <option value="none">追加しない ＋0円</option>
+            <option value="zipper">ファスナー ＋1,000円</option>
+            <option value="magnet">マグネットボタン ＋600円</option>
+            <option value="flap">フラップ（約10×10cm）＋1,300円</option>
+          </select>
+          <p id="flapNotice" class="option-note hidden">フラップと重なる部分は、デザインを調整する場合があります。</p>
+          <label for="optionSize">バッグのサイズ</label>
+          <select id="optionSize">
+            <option value="basic">基本：縦30×横40×マチ4cm ＋0円</option>
+            <option value="large">大きめ：縦35×横45×マチ4cm ＋800円</option>
+            <option value="custom">サイズオーダー：縦35×横45×マチ10cmまで ＋2,000円</option>
+          </select>
+          <p id="customSizeNotice" class="option-note hidden">サイズオーダーは上限内で一律＋2,000円です。事前相談が必要です。ご希望の寸法はご相談時にお知らせください。</p>
+          <p class="option-note">バッグ画像は標準サイズのイメージです。開閉・名入れ・取手・シューズバッグなどは画像には反映されません。</p>
+          <label class="option-check"><input type="checkbox" id="optionLoop"><span>短い取手（机かけループ）＋500円</span></label>
+          <label class="option-check"><input type="checkbox" id="optionName"><span>レッスンバッグのお名前刺しゅう ＋800円</span></label>
+          <label class="option-check"><input type="checkbox" id="optionShoes"><span>おそろいシューズバッグ ＋6,550円</span></label>
+          <p class="option-note">シューズバッグは、同じモチーフ・雰囲気でお作りします。</p>
+          <p id="shoeNameNotice" class="option-benefit hidden">おそろいシューズバッグにも、お名前刺しゅうが無料で入ります（通常800円）。</p>
+          <p class="quote-total">合計の目安 <strong id="optionsTotal"></strong>〈送料別〉</p>
+          <p class="option-note">お名前・糸の色・詳しい仕様は、ご相談時に確認します。</p>
+        </details>
+
       </section>
     </main>
 
     <section id="comparison" class="comparison" aria-labelledby="comparisonTitle">
       <h2 id="comparisonTitle" class="section-title">保存したバッグを比べる <span id="savedCount">0 / 3</span></h2>
-      <p class="compare-note">３点まで保存できます。「このバッグに戻す」で続きを調整できます。</p>
+      <p class="compare-note">３点まで、オプションと金額も一緒に保存できます。「このバッグに戻す」で続きを調整できます。</p>
       <div id="savedCombinations" class="saved-grid"></div>
     </section>
 
@@ -187,17 +222,19 @@
         </div>
 
         <div class="snapshot-price">
-          <p class="snapshot-price-title">カタログオーダー：<strong>6,350円〜</strong></p>
-          <p class="snapshot-price-title">恐竜のアップリケ：<strong>8,350円〜</strong></p>
-          <p>標準サイズ：縦30×横40×マチ4cm</p>
-          <p class="snapshot-price-note">※オプション・送料は別途。最終価格はご相談時にご案内します。</p>
+          <p id="snapshotSize"></p>
+          <p id="snapshotOptions"></p>
+          <dl id="snapshotPriceBreakdown" class="price-breakdown"></dl>
+          <p class="snapshot-price-title">合計の目安：<strong id="snapshotTotal"></strong>〈送料別〉</p>
+          <p id="snapshotConditionalNote" class="snapshot-price-note"></p>
+          <p class="snapshot-price-note">画像は標準サイズのイメージです。オプションは画像に反映されません。最終価格・仕様・納期はご相談時に確認します。</p>
         </div>
         </div>
 
         <section class="snapshot-howto">
           <h3 class="snapshot-howto-title">📷 この画面をスクショしてください</h3>
           <p class="snapshot-howto-text">
-            バッグ画像・選んだ色と生き物・サイズと価格の目安が写るように撮って、下の相談先からお送りください。
+            バッグ画像・選んだ色と生き物・オプションと金額が写るように撮って、下の相談先からお送りください。
           </p>
         </section>
 
@@ -221,8 +258,8 @@
       <img id="miniBagImage" class="bag-image" alt="">
       <img id="miniAppliqueImage" class="applique-image" alt="">
     </div>
-    <div class="mini-details"><span id="miniLabel"></span><button id="returnToPreview" type="button">大きく見て調整 ↑</button><button id="jumpToComparison" type="button">保存したバッグを比べる</button></div>
+    <div class="mini-details"><span id="miniLabel"></span><strong id="miniPrice" class="mini-price"></strong><button id="returnToPreview" type="button">大きく見て調整 ↑</button><div class="mini-actions"><button id="miniPriceOptions" type="button">オプション</button><button id="jumpToComparison" type="button">保存した３点を比較</button></div></div>
   </aside>
-  <script src="script.js?v=20261030-price-setup"></script>
+  <script src="script.js?v=20261030-simulator"></script>
 </body>
 </html>
