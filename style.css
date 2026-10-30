@@ -594,3 +594,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .mini-actions { display:flex; flex-wrap:wrap; gap:5px; }
 .mini-actions button { font-size:10px; padding:4px 6px; }
+
+/* 撮影する範囲を、画像から料金まで赤枠で明示する。 */
+.snapshot-summary { border:2px solid #c45443; border-radius:14px; padding:10px; }
+.screenshot-guide { margin:0 0 10px; color:#a33e31; font-size:13px; font-weight:bold; line-height:1.6; }
+.snapshot-howto-title { color:#a33e31; }
+@media(max-width:480px) { .snapshot-summary { padding:8px; } }
