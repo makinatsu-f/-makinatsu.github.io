@@ -584,8 +584,8 @@ function setupComparison() {
     app.style.cssText = appliqueImage.style.cssText;
     document.getElementById("miniLabel").textContent = bagNameLabel.textContent + "／" + appliqueNameLabel.textContent;
     const pastPreview = preview.getBoundingClientRect().bottom <= 0;
-    const atComparison = document.getElementById("comparison").getBoundingClientRect().top < window.innerHeight;
-    mini.classList.toggle("hidden", window.innerWidth >= 720 || !pastPreview || atComparison || mainCustom.classList.contains("hidden"));
+    // 比較欄が近づいても、選択中のバッグを表示し続ける。
+    mini.classList.toggle("hidden", window.innerWidth >= 720 || !pastPreview || mainCustom.classList.contains("hidden"));
   }
   function scheduleMini() {
     if (queued) return;
