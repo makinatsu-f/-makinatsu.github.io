@@ -8,7 +8,7 @@
   <!-- フォント（BASEに近い雰囲気） -->
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20261029-consult" />
+  <link rel="stylesheet" href="style.css?v=20261030-price-setup" />
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="images/makinatsu_icon_192.png">
 <meta name="theme-color" content="#ffffff">
@@ -72,6 +72,37 @@
           アップリケの大きさは決まっています。位置と向きは変更できます。<br>バッグの上で、指やマウスでアップリケを動かせます。
         </p>
         </div>
+
+        <section id="priceSetupPanel" class="price-setup-panel hidden" aria-labelledby="priceSetupTitle">
+          <h3 id="priceSetupTitle">作家用：バッグ本体価格の登録</h3>
+          <p class="price-setup-note">生き物ごとの、開閉・名入れなどのオプションを付ける前の価格を登録します。登録した価格はこの端末・ブラウザーに保存されます。お客様の画面にはまだ反映されません。</p>
+          <p id="priceSetupName" class="price-setup-name"></p>
+          <form id="priceSetupForm" novalidate>
+            <label for="basePriceInput">バッグ本体価格〈円〉</label>
+            <input id="basePriceInput" type="text" inputmode="numeric" autocomplete="off" placeholder="例：6350">
+            <div class="price-quick-buttons">
+              <button type="button" data-price="6350">6,350円を入力</button>
+              <button type="button" data-price="8350">8,350円を入力</button>
+            </div>
+            <p id="priceRegisteredValue"></p>
+            <button id="registerBasePrice" type="submit">この価格を登録</button>
+          </form>
+          <p id="priceSetupStatus" role="status"></p>
+          <p id="priceSetupProgress"></p>
+          <button id="nextUnpriced" type="button">次の未登録の生き物へ</button>
+          <details class="price-export">
+            <summary>設定をコピーしてチャッピーに渡す</summary>
+            <p class="price-setup-note">途中の分だけでも送れます。コピーして、このチャットに貼り付けてください。</p>
+            <button id="copyBasePrices" type="button">登録した価格をまとめてコピー</button>
+            <p id="priceCopyStatus" role="status"></p>
+            <label for="basePricesExport">コピーできない場合は、下の欄を長押しして全文をコピー</label>
+            <textarea id="basePricesExport" rows="6" readonly spellcheck="false"></textarea>
+          </details>
+          <details class="price-review">
+            <summary>登録状況を一覧で確認・修正</summary>
+            <div id="priceReviewList"></div>
+          </details>
+        </section>
 
         <button id="saveCombination" class="save-btn" type="button">＋ この組み合わせを保存</button>
         <p id="saveStatus" class="save-status" role="status"></p>
@@ -192,6 +223,6 @@
     </div>
     <div class="mini-details"><span id="miniLabel"></span><button id="returnToPreview" type="button">大きく見て調整 ↑</button><button id="jumpToComparison" type="button">保存したバッグを比べる</button></div>
   </aside>
-  <script src="script.js?v=20261030-persistent-mini"></script>
+  <script src="script.js?v=20261030-price-setup"></script>
 </body>
 </html>
