@@ -566,3 +566,31 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 #priceSetupStatus, #priceSetupProgress, #priceCopyStatus, #priceRegisteredValue { font-size:12px; line-height:1.7; }
 .price-export, .price-review { margin-top:12px; padding-top:12px; border-top:1px solid #d3d7c9; }
 .price-setup-panel summary { font-size:13px; line-height:1.8; cursor:pointer; }
+
+/* オプションを選びながら、合計の目安を確認 */
+.quote-preview { margin-top:12px; padding:10px 12px; border:1px solid #dce2d5; border-radius:12px; background:#eef2e9; }
+.quote-preview p { margin:4px 0; font-size:12px; color:#193f35; line-height:1.6; }
+.quote-total { color:#193f35; font-size:14px; line-height:1.7; }
+.quote-total strong { font-size:22px; white-space:nowrap; }
+.quote-total span { font-size:11px; }
+.quote-preview .quote-options { font-size:11px; color:#5b645e; }
+#openPriceOptions { margin:6px 0 0; min-height:40px; width:100%; padding:8px; border:1px solid #193f35; border-radius:10px; background:white; color:#193f35; font:inherit; font-size:13px; cursor:pointer; }
+.price-options { margin-top:20px; padding:12px; border:1px solid #d8d1c5; background:#faf8f1; border-radius:14px; scroll-margin-top:180px; }
+.price-options summary { cursor:pointer; font-size:15px; color:#193f35; font-weight:bold; min-height:30px; }
+.price-options > label { display:block; margin:14px 0 6px; font-size:14px; color:#193f35; }
+.price-options select { border-radius:12px; font-size:14px; }
+.option-note, .option-intro { font-size:12px; line-height:1.7; color:#5b645e; }
+.price-options > .option-check { display:flex; align-items:flex-start; gap:10px; margin:10px 0; padding:10px 8px; border:1px solid #dce2d5; border-radius:10px; background:white; cursor:pointer; line-height:1.6; }
+.option-check input { flex-shrink:0; width:20px; height:20px; margin:1px 0 0; accent-color:#193f35; }
+.option-benefit { font-size:12px; line-height:1.7; padding:10px; color:#193f35; background:#e1edde; border-radius:10px; }
+.price-breakdown { margin:10px 0; border-top:1px solid #dce2d5; padding-top:6px; }
+.price-breakdown > div { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:4px 0; font-size:12px; line-height:1.5; }
+.price-breakdown dt { flex:1; }
+.price-breakdown dd { margin:0; white-space:nowrap; }
+.saved-card .saved-price { font-weight:bold; color:#193f35; }
+.saved-card .saved-options { color:#5b645e; font-size:10px; }
+.mini-price { display:block; font-size:12px; color:#193f35; margin:4px 0; line-height:1.5; }
+@media(min-width:720px) { .saved-card .saved-options { font-size:12px; } }
+
+.mini-actions { display:flex; flex-wrap:wrap; gap:5px; }
+.mini-actions button { font-size:10px; padding:4px 6px; }
