@@ -899,5 +899,6 @@ function setupPriceSimulator() {
   }
   document.getElementById("openPriceOptions").addEventListener("click", showOptions);
   document.getElementById("miniPriceOptions").addEventListener("click", showOptions);
+  document.getElementById("optionsToSnapshot")?.addEventListener("click", () => toSnapshotButton.click());
   updatePriceUI();
 }
