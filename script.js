@@ -625,7 +625,7 @@ function setupComparison() {
       optionText.textContent = optionDescriptions(s.options).join("／");
       const price = document.createElement("p");
       price.className = "saved-price";
-      price.textContent = "合計の目安 " + yen(calculatePrice(s.applique, s.options).total) + "〈送料別〉";
+      price.textContent = "合計の目安 " + yen(calculatePrice(s.applique, s.options).total) + "〈送料無料〉";
       card.append(title, picture(s), label, optionText, price, restore, remove);
       list.append(card);
     });
@@ -863,7 +863,7 @@ function updatePriceUI() {
   document.getElementById("priceBase").textContent = yen(basePrices[appliqueSelect.value]);
   document.getElementById("priceTotal").textContent = yen(quote.total);
   document.getElementById("optionsTotal").textContent = yen(quote.total);
-  document.getElementById("miniPrice").textContent = "合計の目安 " + yen(quote.total) + "〈送料別〉";
+  document.getElementById("miniPrice").textContent = "合計の目安 " + yen(quote.total) + "〈送料無料〉";
   document.getElementById("priceOptionSummary").textContent = optionDescriptions(o).join("／");
   document.getElementById("flapNotice").classList.toggle("hidden", o.closure !== "flap");
   document.getElementById("customSizeNotice").classList.toggle("hidden", o.size !== "custom");
