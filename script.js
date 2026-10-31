@@ -536,6 +536,11 @@ function setupComparison() {
   const list = document.getElementById("savedCombinations");
   const status = document.getElementById("saveStatus");
   const mini = document.getElementById("miniPreview");
+  function showSaveStatus(message) {
+    status.textContent = message;
+    const miniStatus = document.getElementById("miniSaveStatus");
+    if (miniStatus) miniStatus.textContent = message;
+  }
   const preview = document.querySelector(".preview-section");
   let saved = [];
   function valid(s) {
@@ -630,22 +635,24 @@ function setupComparison() {
       list.append(card);
     });
   }
-  document.getElementById("saveCombination").addEventListener("click", () => {
+  function saveCurrentCombination() {
     const s = state();
     if (saved.some(x => x.bag === s.bag && x.applique === s.applique && x.flipped === s.flipped
       && x.left === s.left && x.top === s.top
       && JSON.stringify(normalizeOptions(x.options, x.applique)) === JSON.stringify(s.options))) {
-      status.textContent = "この組み合わせは保存済みです。"; return;
+      showSaveStatus("この組み合わせは保存済みです。"); return;
     }
     if (saved.length >= 3) {
-      status.textContent = "３点保存済みです。比較欄で不要な候補を削除すると追加できます。";
+      showSaveStatus("３点保存済みです。比較欄で不要な候補を削除すると追加できます。");
       document.getElementById("comparison").scrollIntoView({behavior:"smooth", block:"start"});
       return;
     }
     saved.push(s);
     const persisted = persist(); render();
-    status.textContent = persisted ? "候補" + saved.length + "に保存しました。下の比較欄で見られます。" : "この画面では保存できました。ブラウザーの設定により、閉じると消える場合があります。";
-  });
+    showSaveStatus(persisted ? "候補" + saved.length + "に保存しました。下の比較欄で見られます。" : "この画面では保存できました。ブラウザーの設定により、閉じると消える場合があります。");
+  }
+  document.getElementById("saveCombination").addEventListener("click", saveCurrentCombination);
+  document.getElementById("miniSaveCombination")?.addEventListener("click", saveCurrentCombination);
   document.getElementById("returnToPreview").addEventListener("click", () => preview.scrollIntoView({behavior:"smooth", block:"start"}));
   document.getElementById("jumpToComparison").addEventListener("click", () => document.getElementById("comparison").scrollIntoView({behavior:"smooth", block:"start"}));
   let queued = false;
