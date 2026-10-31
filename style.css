@@ -620,3 +620,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     scroll-margin-top:calc(var(--mini-preview-height, 0px) + 12px);
   }
 }
+
+/* カテゴリーだけに、レトロなお道具箱の淡い色を添える。 */
+.category-btn[data-category] {
+  background:var(--category-color);
+  color:#193f35;
+  border:2px solid #cfc6b8;
+}
+.category-btn[data-category="恐竜"] { --category-color:#f4dcc5; }
+.category-btn[data-category="海"] { --category-color:#d8e9eb; }
+.category-btn[data-category="その他"] { --category-color:#f5eab9; }
+.category-btn[data-category].active {
+  border-color:#193f35;
+  font-weight:700;
+}
+.category-btn[data-category].active::before {
+  content:"";
+  display:inline-block;
+  width:5px;
+  height:9px;
+  margin-right:6px;
+  border:solid currentColor;
+  border-width:0 2px 2px 0;
+  transform:translateY(-1px) rotate(45deg);
+}
