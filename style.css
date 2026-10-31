@@ -605,3 +605,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 #miniSaveCombination { width:100%; background:#193f35; color:#fff; }
 .mini-save-status { margin:5px 0 0; font-size:11px; line-height:1.5; color:#193f35; }
 .mini-save-status:empty { display:none; }
+
+/* スマホは、バッグのすぐ下から色を選べる流れにする。 */
+@media(max-width:719px) {
+  .preview-section > #saveCombination,
+  .preview-section > #saveStatus,
+  .preview-section > .info-panel,
+  .preview-section > .quote-preview,
+  .preview-section > #toSnapshot,
+  .preview-section > .note { display:none; }
+  #bagColorControl { margin-top:12px; }
+  #bagColorControl select { font-size:16px; min-height:44px; }
+  .price-options, .comparison {
+    scroll-margin-top:calc(var(--mini-preview-height, 0px) + 12px);
+  }
+}
