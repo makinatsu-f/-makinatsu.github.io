@@ -320,6 +320,7 @@ function init() {
   // ドラッグ
   setupDrag();
   setupPriceSimulator();
+  setupResponsiveColorControl();
   setupComparison();
   setupPriceRegistration();
 }
@@ -531,6 +532,20 @@ function renderGallery() {
 }
 
 // 保存・比較。保存データはこのブラウザーだけに保持する。
+
+function setupResponsiveColorControl() {
+  const control = document.getElementById("bagColorControl");
+  const desktopHome = document.querySelector(".form-section");
+  const mobileHome = document.querySelector(".preview-controls");
+  const media = window.matchMedia("(max-width: 719px)");
+  function placeColorControl() {
+    if (media.matches) mobileHome.after(control);
+    else desktopHome.prepend(control);
+  }
+  media.addEventListener("change", placeColorControl);
+  placeColorControl();
+}
+
 function setupComparison() {
   const key = "makinatsu-catalog-saved-v1";
   const list = document.getElementById("savedCombinations");
@@ -663,9 +678,12 @@ function setupComparison() {
     app.src = appliqueImage.src;
     app.style.cssText = appliqueImage.style.cssText;
     document.getElementById("miniLabel").textContent = bagNameLabel.textContent + "／" + appliqueNameLabel.textContent;
-    const pastPreview = preview.getBoundingClientRect().bottom <= 0;
+    // 大きなバッグが上で見切れたら、カラー選択中も小さなプレビューを表示する。
+    const pastPreview = document.getElementById("bagPreview").getBoundingClientRect().top < 0;
     // 比較欄が近づいても、選択中のバッグを表示し続ける。
     mini.classList.toggle("hidden", window.innerWidth >= 720 || !pastPreview || mainCustom.classList.contains("hidden"));
+    const miniHeight = mini.classList.contains("hidden") ? 0 : mini.getBoundingClientRect().height;
+    document.documentElement.style.setProperty("--mini-preview-height", miniHeight + "px");
   }
   function scheduleMini() {
     if (queued) return;
@@ -678,6 +696,7 @@ function setupComparison() {
   observer.observe(mainCustom, {attributes:true, attributeFilter:["class"]});
   window.addEventListener("scroll", scheduleMini, {passive:true});
   window.addEventListener("resize", scheduleMini);
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(scheduleMini).observe(mini);
   render(); syncMini();
 }
 
