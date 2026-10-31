@@ -600,3 +600,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .screenshot-guide { margin:0 0 10px; color:#a33e31; font-size:13px; font-weight:bold; line-height:1.6; }
 .snapshot-howto-title { color:#a33e31; }
 @media(max-width:480px) { .snapshot-summary { padding:8px; } }
+
+/* 選択中の小さなプレビューから、その場で候補を保存する。 */
+#miniSaveCombination { width:100%; background:#193f35; color:#fff; }
+.mini-save-status { margin:5px 0 0; font-size:11px; line-height:1.5; color:#193f35; }
+.mini-save-status:empty { display:none; }
