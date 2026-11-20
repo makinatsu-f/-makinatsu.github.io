@@ -1,4 +1,4 @@
-import { songs, categories, filterSongs, formatTime } from './songs.js?v=13';
+import { songs, categories, filterSongs, formatTime } from './songs.js?v=14';
 
 const $ = id => document.getElementById(id);
 const audio = $('audio');
