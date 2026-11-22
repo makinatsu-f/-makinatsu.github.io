@@ -8,7 +8,7 @@
   <title>マキナツ いきもの音楽室</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%23173f35'/%3E%3Ctext x='16' y='47' font-size='48' fill='%23f2d477'%3E♪%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="music-room/styles.css">
-  <script type="module" src="music-room/app.js?v=16"></script>
+  <script type="module" src="music-room/app.js?v=17"></script>
 </head>
 <body>
   <a class="skip-link" href="#library">うたの一覧へ</a>
@@ -41,7 +41,7 @@
 
   <section id="player" class="player" aria-label="音楽プレーヤー">
     <div class="player-inner wrap">
-      <div class="now-playing"><img id="player-image" src="thumb_15.png" width="52" height="52" alt=""><div class="now-copy"><span id="playback-status" class="playing-label">えらんで、聴いてみよう</span><h2 id="player-title">白と黒のしましま模様（イヌザメ）</h2><p id="queue-note">全15曲を順に再生</p></div></div>
+      <div class="now-playing"><img id="player-image" src="thumb_15.jpg" width="52" height="52" alt=""><div class="now-copy"><span id="playback-status" class="playing-label">えらんで、聴いてみよう</span><h2 id="player-title">白と黒のしましま模様（イヌザメ）</h2><p id="queue-note">全15曲を順に再生</p></div></div>
       <div class="player-controls"><button id="previous" class="icon-button step-button" aria-label="前の曲" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M19 5 8 12l11 7z"></path></svg></button><button id="toggle-play" class="main-play" aria-label="再生" type="button"></button><button id="next" class="icon-button step-button" aria-label="次の曲" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M5 5l11 7-11 7z"></path></svg></button><button id="toggle-loop" class="loop-button" aria-pressed="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 2 4 4-4 4M20 6H7a4 4 0 0 0-4 4m5 12-4-4 4-4M4 18h13a4 4 0 0 0 4-4"></path><path d="M11 10h1v5"></path></svg><span>1曲リピート</span><b id="loop-state">オフ</b></button></div>
       <div class="progress"><span id="current-time">0:00</span><input id="seek" type="range" min="0" max="66" step="0.1" value="0" aria-label="再生位置" aria-valuetext="0分0秒"><span id="duration">1:06</span></div>
       <p id="player-message" class="player-message" role="status" aria-live="polite" hidden></p>
