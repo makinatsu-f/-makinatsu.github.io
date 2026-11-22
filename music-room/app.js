@@ -1,4 +1,4 @@
-import { songs, categories, filterSongs, formatTime } from './songs.js?v=15';
+import { songs, categories, filterSongs, formatTime } from './songs.js?v=16';
 
 const $ = id => document.getElementById(id);
 const coverUrl = song => song.order >= 14 ? song.image : `music-room/images/${song.image}`;
