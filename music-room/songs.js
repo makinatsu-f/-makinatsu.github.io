@@ -9,6 +9,7 @@ export const categories = [
 // 曲を増やすときは、この一覧に1件追加します。音声はリポジトリ直下、画像は music-room/images/ へ。
 // order は追加順。既存 music.html の曲名・対応ファイルをそのまま保持。
 export const songs = [
+  { id: 'song-15', order: 15, title: '白と黒のしましま模様（イヌザメ）', category: 'sea', keywords: 'しろとくろのしましまもよう イヌザメ いぬざめ サメ 幼魚', audio: 'song_15.mp3', image: '../../thumb_15.png', duration: 66 },
   { id: 'song-14', order: 14, title: '世界にひとつの宝物', category: 'makinatsu', keywords: 'せかいにひとつのたからもの オーダー わくわく ものづくり', audio: 'song_14.mp3', image: '../../thumb_14.jpeg', duration: 82 },
   { id: 'song-13', order: 13, title: 'ママが決めて！', category: 'makinatsu', keywords: 'ままがきめて ママ まま お母さん おかあさん 親子', audio: 'song_13.mp3', image: 'thumb_13.jpeg', duration: 42 },
   { id: 'song-12', order: 12, title: 'これ、ぼくのだいすき！', category: 'makinatsu', keywords: 'これ ぼくの だいすき 大好き', audio: 'song_12.mp3', image: 'thumb_12.jpeg', duration: 53 },
