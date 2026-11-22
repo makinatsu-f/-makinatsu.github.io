@@ -8,7 +8,7 @@
   <title>マキナツ いきもの音楽室</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%23173f35'/%3E%3Ctext x='16' y='47' font-size='48' fill='%23f2d477'%3E♪%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="music-room/styles.css">
-  <script type="module" src="music-room/app.js?v=14"></script>
+  <script type="module" src="music-room/app.js?v=15"></script>
 </head>
 <body>
   <a class="skip-link" href="#library">うたの一覧へ</a>
@@ -32,7 +32,7 @@
       <div class="list-toolbar"><p id="result-count" role="status" aria-live="polite"></p><label class="sort-label" for="sort">並び順 <select id="sort"><option value="new">新しい順</option><option value="name">名前順</option></select></label></div>
       <div id="song-list" class="song-grid" role="list" aria-label="うたの一覧"></div>
       <div id="empty-state" class="empty-state" hidden><span aria-hidden="true">⌕</span><h3>うたが見つかりませんでした</h3><p>短い名前や、ほかの仲間でもさがしてみてね。</p><button id="reset-search" class="text-button" type="button">すべてのうたを見る</button></div>
-      <noscript><p>うたの検索と再生にはJavaScriptを有効にしてください。</p><audio controls src="song_14.mp3"></audio></noscript>
+      <noscript><p>うたの検索と再生にはJavaScriptを有効にしてください。</p><audio controls src="song_15.mp3"></audio></noscript>
     </section>
 
     <section class="about-section" id="about" aria-labelledby="about-title"><div class="about-symbol" aria-hidden="true">♪</div><div><h2 id="about-title">いきものソング、できました。</h2><p>「この子の歌があったら面白そう！」<br>そんな思いつきから生まれた、マキナツの制作秘話のような音楽です。</p><details><summary>保護者の方へ・音楽室のこと</summary><div class="about-details"><p>生き物の特徴を正確に紹介する歌ではありません。作品づくりから生まれた、自由な歌としてお楽しみください。</p><p>音楽制作にはAI（SUNO）を使用しています。</p><p>再生ボタンを押すまで音は鳴りません。曲が終わると、選んだときの一覧の順に次の曲へ進みます。「1曲リピート」をオンにすると、その曲をくり返します。検索や絞り込みをしても、再生中の曲は止まりません。</p></div></details></div></section>
@@ -41,7 +41,7 @@
 
   <section id="player" class="player" aria-label="音楽プレーヤー">
     <div class="player-inner wrap">
-      <div class="now-playing"><img id="player-image" src="thumb_14.jpeg" width="52" height="52" alt=""><div class="now-copy"><span id="playback-status" class="playing-label">えらんで、聴いてみよう</span><h2 id="player-title">ママが決めて！</h2><p id="queue-note">全14曲を順に再生</p></div></div>
+      <div class="now-playing"><img id="player-image" src="thumb_15.png" width="52" height="52" alt=""><div class="now-copy"><span id="playback-status" class="playing-label">えらんで、聴いてみよう</span><h2 id="player-title">白と黒のしましま模様（イヌザメ）</h2><p id="queue-note">全15曲を順に再生</p></div></div>
       <div class="player-controls"><button id="previous" class="icon-button step-button" aria-label="前の曲" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M19 5 8 12l11 7z"></path></svg></button><button id="toggle-play" class="main-play" aria-label="再生" type="button"></button><button id="next" class="icon-button step-button" aria-label="次の曲" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M5 5l11 7-11 7z"></path></svg></button><button id="toggle-loop" class="loop-button" aria-pressed="false" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 2 4 4-4 4M20 6H7a4 4 0 0 0-4 4m5 12-4-4 4-4M4 18h13a4 4 0 0 0 4-4"></path><path d="M11 10h1v5"></path></svg><span>1曲リピート</span><b id="loop-state">オフ</b></button></div>
       <div class="progress"><span id="current-time">0:00</span><input id="seek" type="range" min="0" max="42" step="0.1" value="0" aria-label="再生位置" aria-valuetext="0分0秒"><span id="duration">0:42</span></div>
       <p id="player-message" class="player-message" role="status" aria-live="polite" hidden></p>
