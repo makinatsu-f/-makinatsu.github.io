@@ -1,6 +1,7 @@
 import { songs, categories, filterSongs, formatTime } from './songs.js?v=15';
 
 const $ = id => document.getElementById(id);
+const coverUrl = song => song.order >= 14 ? song.image : `music-room/images/${song.image}`;
 const audio = $('audio');
 const playIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 4 13 8-13 8z"/></svg>';
 const pauseIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>';
@@ -39,7 +40,7 @@ function renderList() {
   const fragment = document.createDocumentFragment();
   for (const song of filtered) {
     const card = document.createElement('article'); card.className = 'song-card'; card.dataset.id = song.id; card.setAttribute('role', 'listitem');
-    const image = document.createElement('img'); image.src = `music-room/images/${song.image}`; image.alt = ''; image.className = 'song-cover'; image.width = 96; image.height = 96; image.loading = 'lazy';
+    const image = document.createElement('img'); image.src = coverUrl(song); image.alt = ''; image.className = 'song-cover'; image.width = 96; image.height = 96; image.loading = 'lazy';
     const copy = document.createElement('div'); copy.className = 'song-copy';
     const meta = document.createElement('div'); meta.className = 'song-meta';
     const cat = document.createElement('span'); cat.className = 'song-category'; cat.textContent = categories.find(item => item.id === song.category).label;
@@ -119,10 +120,10 @@ function selectSong(song) {
   ++playRequest; audio.pause(); current = song; seeking = false;
   audio.src = `${song.audio}`;
   audio.loop = repeated.has(song.id);
-  $('player-image').src = `music-room/images/${song.image}`;
+  $('player-image').src = coverUrl(song);
   $('player-title').textContent = song.title;
   if ('mediaSession' in navigator && 'MediaMetadata' in window) {
-    navigator.mediaSession.metadata = new MediaMetadata({ title: song.title, artist: 'マキナツ いきもの音楽室', artwork: [{ src: new URL(`music-room/images/${song.image}`, location.href).href }] });
+    navigator.mediaSession.metadata = new MediaMetadata({ title: song.title, artist: 'マキナツ いきもの音楽室', artwork: [{ src: new URL(coverUrl(song), location.href).href }] });
   }
   syncProgress(); syncPlayer(); startPlayback();
 }
